@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1549113027783.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "BAF0DE7F",
+    "lastKnownWriteTime" : 1549124260,
+    "last_content_update" : 1549124260061,
+    "path" : "~/Documents/HSG/Rpackage/orf/orf/R/orf.R",
+    "project_path" : "R/orf.R",
+    "properties" : {
+        "cursorPosition" : "11,14",
+        "scrollLine" : "0",
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

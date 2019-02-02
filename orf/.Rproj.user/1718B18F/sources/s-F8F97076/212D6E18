@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1549122396757.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1681880659",
+    "id" : "212D6E18",
+    "lastKnownWriteTime" : 1549124498,
+    "last_content_update" : 1549124498484,
+    "path" : "~/Documents/HSG/Rpackage/orf/orf/R/coefstars.R",
+    "project_path" : "R/coefstars.R",
+    "properties" : {
+        "cursorPosition" : "6,24",
+        "scrollLine" : "0"
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

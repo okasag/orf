@@ -4,7 +4,7 @@
 \name{orf}
 \alias{orf}
 \alias{orf-package}
-\title{orf}
+\title{orf: An Implementation of the Ordered Random Forest Algorithm}
 \description{
 An Implementation of the Ordered Random Forest Algorithm
 as in Lechner & Okasa (2019) and other related estimators for

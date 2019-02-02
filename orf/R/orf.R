@@ -1,4 +1,4 @@
-#' orf
+#' orf: An Implementation of the Ordered Random Forest Algorithm
 #'
 #' An Implementation of the Ordered Random Forest Algorithm
 #' as in Lechner & Okasa (2019) and other related estimators for
@@ -17,5 +17,4 @@
 #' @author Gabriel Okasa \email{gabriel.okasa@@unisg.ch}
 #'
 #' @name orf
-#'
 NULL

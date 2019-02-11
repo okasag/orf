@@ -17,4 +17,7 @@
 #' @author Gabriel Okasa \email{gabriel.okasa@@unisg.ch}
 #'
 #' @name orf
+#'
+#' @useDynLib orf, .registration = TRUE
+#' @importFrom Rcpp sourceCpp
 NULL

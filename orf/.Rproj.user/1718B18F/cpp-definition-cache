@@ -13,5 +13,65 @@
         ],
         "file" : "/home/okasag/Documents/HSG/Rpackage/orf/orf/src/example_rcpp.cpp",
         "file_last_write" : 1549912860
+    },
+    {
+        "definitions" : [
+            {
+                "column" : 15,
+                "file" : "/home/okasag/Documents/HSG/Rpackage/orf/orf/src/get_honest_rcpp.cpp",
+                "kind" : 6,
+                "line" : 14,
+                "name" : "get_honest_C(List, NumericVector, NumericMatrix, NumericMatrix)",
+                "parent_name" : "",
+                "usr" : "c:@F@get_honest_C#$@N@Rcpp@C@Vector>#VI19#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Vector>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Matrix>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#S2_#"
+            }
+        ],
+        "file" : "/home/okasag/Documents/HSG/Rpackage/orf/orf/src/get_honest_rcpp.cpp",
+        "file_last_write" : 1549986009
+    },
+    {
+        "definitions" : [
+            {
+                "column" : 15,
+                "file" : "/home/okasag/Documents/HSG/Rpackage/orf/orf/src/get_weights_rcpp.cpp",
+                "kind" : 6,
+                "line" : 13,
+                "name" : "get_weights_C(List, List, List)",
+                "parent_name" : "",
+                "usr" : "c:@F@get_weights_C#$@N@Rcpp@C@Vector>#VI19#@N@Rcpp@CT>1#T@PreserveStorage#S0_#S0_#"
+            }
+        ],
+        "file" : "/home/okasag/Documents/HSG/Rpackage/orf/orf/src/get_weights_rcpp.cpp",
+        "file_last_write" : 1549986244
+    },
+    {
+        "definitions" : [
+            {
+                "column" : 15,
+                "file" : "/home/okasag/Documents/HSG/Rpackage/orf/orf/src/pred_honest_rcpp.cpp",
+                "kind" : 6,
+                "line" : 14,
+                "name" : "pred_honest_C(List, NumericVector, NumericMatrix, NumericMatrix)",
+                "parent_name" : "",
+                "usr" : "c:@F@pred_honest_C#$@N@Rcpp@C@Vector>#VI19#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Vector>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Matrix>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#S2_#"
+            }
+        ],
+        "file" : "/home/okasag/Documents/HSG/Rpackage/orf/orf/src/pred_honest_rcpp.cpp",
+        "file_last_write" : 1549986572
+    },
+    {
+        "definitions" : [
+            {
+                "column" : 15,
+                "file" : "/home/okasag/Documents/HSG/Rpackage/orf/orf/src/pred_weights_rcpp.cpp",
+                "kind" : 6,
+                "line" : 13,
+                "name" : "pred_weights_C(List, List, List)",
+                "parent_name" : "",
+                "usr" : "c:@F@pred_weights_C#$@N@Rcpp@C@Vector>#VI19#@N@Rcpp@CT>1#T@PreserveStorage#S0_#S0_#"
+            }
+        ],
+        "file" : "/home/okasag/Documents/HSG/Rpackage/orf/orf/src/pred_weights_rcpp.cpp",
+        "file_last_write" : 1549986371
     }
 ]

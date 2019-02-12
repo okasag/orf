@@ -29,4 +29,8 @@
 /home/okasag/Documents/HSG/Rpackage/orf/orf/src/.gitignore="68E8ABFF"
 /home/okasag/Documents/HSG/Rpackage/orf/orf/src/RcppExports.cpp="3F17D518"
 /home/okasag/Documents/HSG/Rpackage/orf/orf/src/example_rcpp.cpp="8110C440"
+/home/okasag/Documents/HSG/Rpackage/orf/orf/src/get_honest_rcpp.cpp="10E4D01F"
+/home/okasag/Documents/HSG/Rpackage/orf/orf/src/get_weights_rcpp.cpp="EC6C35BE"
+/home/okasag/Documents/HSG/Rpackage/orf/orf/src/pred_honest_rcpp.cpp="2953FFFC"
+/home/okasag/Documents/HSG/Rpackage/orf/orf/src/pred_weights_rcpp.cpp="B77439DD"
 /home/okasag/Documents/HSG/Rpackage/orf/orf/vignettes/orf_vignette.Rmd="4F1488B0"

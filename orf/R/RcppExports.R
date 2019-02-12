@@ -9,7 +9,7 @@ timesTwo <- function(x) {
     .Call(`_orf_timesTwo`, x)
 }
 
-#' Get honest predictions
+#' Get honest predictions (C++)
 #'
 #' Computes honest predictions (fitted values) from the random forest
 #' for the train and honest sample based on the honest training sample
@@ -22,7 +22,7 @@ get_honest_C <- function(x, y, z, w) {
     .Call(`_orf_get_honest_C`, x, y, z, w)
 }
 
-#' Get honest weights
+#' Get honest weights (C++)
 #'
 #' Computes honest weights from the random forest as in Wager & Athey (2019)
 #' for the train and honest sample based on the honest training sample
@@ -34,7 +34,7 @@ get_weights_C <- function(x, y, z) {
     .Call(`_orf_get_weights_C`, x, y, z)
 }
 
-#' Predict honest predictions
+#' Predict honest predictions (C++)
 #'
 #' Computes honest predictions from the random forest for a test sample based
 #' on the honest training sample
@@ -47,7 +47,7 @@ pred_honest_C <- function(x, y, z, w) {
     .Call(`_orf_pred_honest_C`, x, y, z, w)
 }
 
-#' Predict honest weights
+#' Predict honest weights (C++)
 #'
 #' Computes honest weights from the random forest as in Wager & Athey (2019)
 #' for the test sample based on the honest training sample

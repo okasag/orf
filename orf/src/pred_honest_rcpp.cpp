@@ -1,7 +1,7 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 
-//' Predict honest predictions
+//' Predict honest predictions (C++)
 //'
 //' Computes honest predictions from the random forest for a test sample based
 //' on the honest training sample

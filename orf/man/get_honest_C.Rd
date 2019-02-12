@@ -2,7 +2,7 @@
 % Please edit documentation in R/RcppExports.R
 \name{get_honest_C}
 \alias{get_honest_C}
-\title{Get honest predictions}
+\title{Get honest predictions (C++)}
 \usage{
 get_honest_C(x, y, z, w)
 }

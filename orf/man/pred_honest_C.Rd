@@ -2,7 +2,7 @@
 % Please edit documentation in R/RcppExports.R
 \name{pred_honest_C}
 \alias{pred_honest_C}
-\title{Predict honest predictions}
+\title{Predict honest predictions (C++)}
 \usage{
 pred_honest_C(x, y, z, w)
 }

@@ -1,7 +1,7 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 
-//' Get honest predictions
+//' Get honest predictions (C++)
 //'
 //' Computes honest predictions (fitted values) from the random forest
 //' for the train and honest sample based on the honest training sample

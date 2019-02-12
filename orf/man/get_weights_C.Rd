@@ -2,7 +2,7 @@
 % Please edit documentation in R/RcppExports.R
 \name{get_weights_C}
 \alias{get_weights_C}
-\title{Get honest weights}
+\title{Get honest weights (C++)}
 \usage{
 get_weights_C(x, y, z)
 }

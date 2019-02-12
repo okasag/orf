@@ -2,4 +2,5 @@
 
 export(timesTwo)
 importFrom(Rcpp,sourceCpp)
+importFrom(stats,predict)
 useDynLib(orf, .registration = TRUE)

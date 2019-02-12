@@ -2,7 +2,7 @@
 % Please edit documentation in R/RcppExports.R
 \name{pred_weights_C}
 \alias{pred_weights_C}
-\title{Predict honest weights}
+\title{Predict honest weights (C++)}
 \usage{
 pred_weights_C(x, y, z)
 }

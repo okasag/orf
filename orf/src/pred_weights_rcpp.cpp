@@ -1,7 +1,7 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 
-//' Predict honest weights
+//' Predict honest weights (C++)
 //'
 //' Computes honest weights from the random forest as in Wager & Athey (2019)
 //' for the test sample based on the honest training sample

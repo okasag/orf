@@ -23,6 +23,7 @@ Imports:
     gridExtra,
     ranger,
     Rcpp,
+    stats,
     xtable
 RoxygenNote: 6.1.1
 Suggests: 

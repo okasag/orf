@@ -8,6 +8,7 @@
 #' @param train_data train dataframe
 #'
 #' @importFrom stats predict
+#' @import ranger
 #'
 #' @return vector of honest forest predictions
 get_honest <- function(forest, honest_data, train_data) {

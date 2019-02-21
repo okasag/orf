@@ -3,5 +3,6 @@
 export(timesTwo)
 import(ranger)
 importFrom(Rcpp,sourceCpp)
+importFrom(stats,ave)
 importFrom(stats,predict)
 useDynLib(orf, .registration = TRUE)

@@ -5,17 +5,6 @@
 
 using namespace Rcpp;
 
-// timesTwo
-NumericVector timesTwo(NumericVector x);
-RcppExport SEXP _orf_timesTwo(SEXP xSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
-    rcpp_result_gen = Rcpp::wrap(timesTwo(x));
-    return rcpp_result_gen;
-END_RCPP
-}
 // get_honest_C
 NumericVector get_honest_C(List x, NumericVector y, NumericMatrix z, NumericMatrix w);
 RcppExport SEXP _orf_get_honest_C(SEXP xSEXP, SEXP ySEXP, SEXP zSEXP, SEXP wSEXP) {
@@ -72,7 +61,6 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_orf_timesTwo", (DL_FUNC) &_orf_timesTwo, 1},
     {"_orf_get_honest_C", (DL_FUNC) &_orf_get_honest_C, 4},
     {"_orf_get_weights_C", (DL_FUNC) &_orf_get_weights_C, 3},
     {"_orf_pred_honest_C", (DL_FUNC) &_orf_pred_honest_C, 4},

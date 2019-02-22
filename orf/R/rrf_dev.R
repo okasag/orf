@@ -8,7 +8,6 @@
 #' @param honest_outcomes vector of real outcomes for the honest sample
 #'
 #' @return vector of variances
-
 get_variance <- function(honest_pred, honest_weights, honest_outcomes) {
 
   # needed inputs for the function: honest_pred - vector of honest forest predictions

@@ -191,6 +191,10 @@ rrf <- function(X, Y, ntree, mtry, nmin, honesty, inference) {
 
   }
 
+  ## Set the name for the class
+  class(output) <- "rrf"
+
+  # -------------------------------------------------------------------------------- #
   # return the output of the function
   return(output)
 
@@ -199,3 +203,419 @@ rrf <- function(X, Y, ntree, mtry, nmin, honesty, inference) {
 }
 
 
+#' predict.rrf
+#'
+#' Prediction for new observations based on estimated forest of type \code{rrf}
+#'
+#' @param object estimated forest object of type \code{rrf}
+#' @param new_data matrix X containing the observations to predict
+#' @param ... further arguments (currently ignored)
+#'
+#' @import ranger
+#'
+#' @return object of class \code{rrf.prediction} with elements
+##'   \tabular{ll}{
+##'       \code{forestInfo}    \tab info containing forest inputs and data used \cr
+##'       \code{forestPredictions} \tab predicted values \cr
+##'       \code{forestVariances} \tab variances of predicted values (only if \code{inference=TRUE} in the passed \code{rrf object}) \cr
+##'   }
+#'
+#' @export
+predict.rrf <- function(object, new_data, ...) {
+  # needed inputs for the function: forest - forest object coming from random_forest function
+  #                                 newdata - matrix X containing the observations to predict
+
+  # -------------------------------------------------------------------------------- #
+
+  ## get forest as na object
+  forest <- object
+  ## save forest inputs
+  inputs <- forest$forestInfo$inputs
+  honesty <- inputs$honesty
+  inference <- inputs$inference
+  honest_data <- forest$forestInfo$honestData
+  train_data <- forest$forestInfo$trainData
+
+  # take out ranger object
+  forest <- forest$trainForest
+
+  ## get train data names (only X)
+  train_data_name <- colnames(train_data)[2:ncol(train_data)]
+
+  ## get X matrix as dataframe and check colnames
+  # X
+  if (is.null(colnames(new_data))) { colnames(new_data) <- paste0("X", rep(1:ncol(new_data))) } # check if X has name
+  new_data_name <- colnames(new_data) # save the name of X
+  new_data <- as.data.frame(new_data) # as dataframe
+
+  # -------------------------------------------------------------------------------- #
+
+  # check if its compatible with the data used for training
+  if (all(train_data_name != new_data_name) | (ncol(new_data) != ncol(train_data)-1)) {
+
+    stop("New data are not compatible with the training data. Check supplied data. Program terminated.")
+
+  }
+
+  # -------------------------------------------------------------------------------- #
+
+  # check if honest forest was estimated and predict accordingly
+  if (honesty == TRUE & inference == TRUE) {
+
+    ## run new Xs through estimated train forest and compute predictions based on honest sample
+    # predict weights by using forest train, honest data and new_data
+    forest_weights_pred <- predict_forest_weights(forest, honest_data, new_data)
+
+    # get predictions by matrix multiplication of weights with honest responses
+    forest_pred <- as.numeric(forest_weights_pred%*%honest_data[, 1])
+    # -------------------------------------------------------------------------------- #
+
+    ## now do the inference based on the weights
+
+    forest_pred_variance <- get_variance(forest_pred, forest_weights_pred, honest_data[, 1])
+
+    # -------------------------------------------------------------------------------- #
+
+    # save forest information
+    forest_info <- list(inputs, new_data)
+    names(forest_info) <- c("inputs", "newData")
+
+    # define output of the function
+    output <- list(forest_info, forest_pred, forest_pred_variance)
+    names(output) <- c("forestInfo", "forestPredictions", "forestVariances")
+
+    # -------------------------------------------------------------------------------- #
+
+  } else if (honesty == TRUE & inference == FALSE) {
+
+    # -------------------------------------------------------------------------------- #
+
+    ## run new Xs through estimated train forest and compute predictions based on honest sample
+    # no need to predict weights, get predictions directly through leaves
+    forest_pred <- predict_honest(forest, honest_data, new_data)
+
+    # -------------------------------------------------------------------------------- #
+
+    # save forest information
+    forest_info <- list(inputs, new_data)
+    names(forest_info) <- c("inputs", "newData")
+
+    # define output of the function
+    output <- list(forest_info, forest_pred)
+    names(output) <- c("forestInfo", "forestPredictions")
+
+    # -------------------------------------------------------------------------------- #
+
+  } else {
+
+    ## no honest splitting, i.e. use all data
+
+    # predict standard random forest as in ranger default
+    forest_pred <- predict(forest, data = new_data)$predictions
+
+    # -------------------------------------------------------------------------------- #
+
+    # save forest information
+    forest_info <- list(inputs, new_data)
+    names(forest_info) <- c("inputs", "newData")
+
+    # define output of the function
+    output <- list(forest_info, forest_pred)
+    names(output) <- c("forestInfo", "forestPredictions")
+
+    # -------------------------------------------------------------------------------- #
+
+  }
+
+  ## Set the name for the class
+  class(output) <- "rrf.prediction"
+  # return the output
+  return(output)
+
+  # -------------------------------------------------------------------------------- #
+
+}
+
+
+#' plot.rrf
+#'
+#' plot forest object of class \code{rrf}
+#'
+#' @param x estimated forest object of type \code{rrf}
+#' @param ... further arguments (currently ignored)
+#'
+#' @import ggplot2
+#'
+#' @export
+plot.rrf <- function(x, ...) {
+
+  # needed inputs for the function: forest - forest object coming from rrf function
+
+  # -------------------------------------------------------------------------------- #
+
+  ## get forest as x
+  forest <- x
+  ## save forest inputs
+  inputs <- forest$forestInfo$inputs
+  honesty <- inputs$honesty
+  inference <- inputs$inference
+  honest_data <- forest$forestInfo$honestData
+  train_data <- forest$forestInfo$trainData
+
+  # -------------------------------------------------------------------------------- #
+
+  # check if honest forest was estimated and predict accordingly
+  if (honesty == TRUE & inference == TRUE) {
+
+    # -------------------------------------------------------------------------------- #
+
+    # put data back together
+    all_data <- rbind(honest_data, train_data)
+    # combine the two into a complete dataset (first honest rownames, then train rownames)
+    rownames(all_data) <- c(rownames(honest_data), rownames(train_data)) # put original rownames in
+    #forest_fitted_values <- rbind(train_fitted_values, honest_fitted_values) # put the sample together
+    all_data <- all_data[order(as.numeric(row.names(all_data))), ] #
+
+    # -------------------------------------------------------------------------------- #
+
+    # take out predictions
+    forest_pred <- forest$honestPredictions
+    # take out standard deviations
+    forest_sd <- sqrt(forest$honestVariance)
+    # take out outcomes
+    forest_outcomes <- as.numeric(all_data[, 1])
+    # put it into dataframe
+    df_plot <- as.data.frame(cbind(forest_outcomes, forest_pred, forest_sd))
+    colnames(df_plot) <- c("Observed", "Predicted", "StdDev")
+
+    # -------------------------------------------------------------------------------- #
+
+    ## plot true against predicted values
+    forest_plot <- ggplot(df_plot, aes(x = forest_outcomes, y = forest_pred))
+    forest_plot + geom_errorbar(aes(ymin=forest_pred-forest_sd, ymax=forest_pred+forest_sd), width=.1, color="grey") +
+      geom_point(color="black") +
+      geom_abline(intercept=0, slope=1, linetype=2, color="red") +
+      xlab("Observed Y") +
+      ylab("Predicted Y") +
+      ggtitle("Honest RF Predictions with CI")+
+      coord_fixed()+
+      expand_limits(x = min(df_plot[, 1]), y = min(df_plot[, 2]))+
+      theme_bw()+
+      theme(plot.title = element_text(hjust = 0.5))
+
+    # -------------------------------------------------------------------------------- #
+
+  } else if (honesty == TRUE & inference == FALSE) {
+
+    # -------------------------------------------------------------------------------- #
+
+    # put data back together
+    all_data <- rbind(honest_data, train_data)
+    # combine the two into a complete dataset (first honest rownames, then train rownames)
+    rownames(all_data) <- c(rownames(honest_data), rownames(train_data)) # put original rownames in
+    #forest_fitted_values <- rbind(train_fitted_values, honest_fitted_values) # put the sample together
+    all_data <- all_data[order(as.numeric(row.names(all_data))), ] #
+
+    # -------------------------------------------------------------------------------- #
+
+    # take out predictions
+    forest_pred <- forest$honestPredictions
+    # take out outcomes
+    forest_outcomes <- as.numeric(all_data[, 1])
+    # put it into dataframe
+    df_plot <- as.data.frame(cbind(forest_outcomes, forest_pred))
+    #colnames(df_plot) <- c("Observed", "Predicted")
+
+    # -------------------------------------------------------------------------------- #
+
+    ## plot true against predicted values
+    forest_plot <- ggplot(df_plot, aes(x = forest_outcomes, y = forest_pred))
+    forest_plot + geom_point(color="black") +
+      geom_abline(intercept=0, slope=1, linetype=2, color="red") +
+      xlab("Observed Y") +
+      ylab("Predicted Y") +
+      ggtitle("Honest RF Predictions")+
+      coord_fixed()+
+      expand_limits(x = min(df_plot[, 1]), y = min(df_plot[, 2]))+
+      theme_bw()+
+      theme(plot.title = element_text(hjust = 0.5))
+
+    # -------------------------------------------------------------------------------- #
+
+  } else {
+
+    # -------------------------------------------------------------------------------- #
+
+    ## no honest splitting, i.e. use all data
+    # take out predictions
+    forest_pred <- forest$oobPredictions
+    # take out outcomes
+    forest_outcomes <- as.numeric(train_data[, 1])
+    # put it into dataframe
+    df_plot <- as.data.frame(cbind(forest_outcomes, forest_pred))
+    #colnames(df_plot) <- c("Observed", "Predicted")
+
+    # -------------------------------------------------------------------------------- #
+
+    ## plot true against predicted values
+    forest_plot <- ggplot(df_plot, aes(x = forest_outcomes, y = forest_pred))
+    forest_plot + geom_point(color="black") +
+      geom_abline(intercept=0, slope=1, linetype=2, color="red") +
+      xlab("Observed Y") +
+      ylab("Predicted Y") +
+      ggtitle("RF Predictions")+
+      coord_fixed()+
+      expand_limits(x = min(df_plot[, 1]), y = min(df_plot[, 2]))+
+      theme_bw()+
+      theme(plot.title = element_text(hjust = 0.5))
+
+    # -------------------------------------------------------------------------------- #
+
+  }
+
+  # no output to return for plot
+
+}
+
+
+#' summary.rrf
+#'
+#' summary of a forest object of class \code{rrf}
+#'
+#' @param object estimated forest object of type \code{rrf}
+#' @param latex logical, TRUE if latex summary should be generated
+#' @param ... further arguments (currently ignored)
+#'
+#' @importFrom xtable xtable
+#'
+#' @export
+summary.rrf <- function(object, latex, ...) {
+
+  # needed inputs for the function: forest - forest object coming from random_forest function
+  #                                        - latex : logical if the output should be printed in latex code
+
+  # -------------------------------------------------------------------------------- #
+
+  ## get forest as object
+  forest <- object
+  ## save forest inputs
+  inputs <- forest$forestInfo$inputs
+  honesty <- inputs$honesty
+  inference <- inputs$inference
+  mtry <- inputs$mtry
+  ntree <- inputs$ntree
+  nmin <- inputs$nmin
+  honest_data <- forest$forestInfo$honestData
+  train_data <- forest$forestInfo$trainData
+  type <- "Regression"
+
+  # -------------------------------------------------------------------------------- #
+
+  # check if honest forest was estimated and predict accordingly
+  if (honesty == TRUE & inference == TRUE) {
+
+    # -------------------------------------------------------------------------------- #
+
+    ## honest splitting, i.e. use honest data
+    # take out summary statistics
+    mse <- round(forest$honestMSE, 5)
+    trainsize <- nrow(train_data)
+    honestsize <- nrow(honest_data)
+    features <- ncol(train_data)-1 # take out the response
+    # check if subsampling or bootstrapping was used
+    if (forest$trainForest$replace == TRUE) { build <- "Bootstrap" } else { build <- "Subsampling" }
+
+    # -------------------------------------------------------------------------------- #
+
+    # structure summary into a list
+    output <- list(type, build, ntree, mtry, nmin, honesty, inference, trainsize, honestsize, features, mse)
+    names(output) <- c("type", "build", "ntree", "mtry", "nmin", "honesty", "inference", "trainsize", "honestsize", "features", "mse")
+
+    # output matrix
+    output_matrix <- matrix(NA, ncol = 1, nrow = length(output))
+    # populate output matrix
+    rownames(output_matrix) <- names(output) # rownames are names
+    colnames(output_matrix) <- "" # no colname
+    output_matrix[, 1] <- unlist(output) # column 2 are values
+
+    # generate latex output if selected
+    if (latex == TRUE) { colnames(output_matrix) <- "Attributes"
+    output_matrix <- xtable(output_matrix, caption = "Random Forest Summary")
+    }
+
+    # -------------------------------------------------------------------------------- #
+
+    # -------------------------------------------------------------------------------- #
+
+  } else if (honesty == TRUE & inference == FALSE) {
+
+    # -------------------------------------------------------------------------------- #
+
+    ## honest splitting, i.e. use honest data
+    # take out summary statistics
+    mse <- round(forest$honestMSE, 5)
+    trainsize <- nrow(train_data)
+    honestsize <- nrow(honest_data)
+    features <- ncol(train_data)-1 # take out the response
+    # check if subsampling or bootstrapping was used
+    if (forest$trainForest$replace == TRUE) { build <- "Bootstrap" } else { build <- "Subsampling" }
+
+    # -------------------------------------------------------------------------------- #
+
+    # structure summary into a list
+    output <- list(type, build, ntree, mtry, nmin, honesty, inference, trainsize, honestsize, features, mse)
+    names(output) <- c("type", "build", "ntree", "mtry", "nmin", "honesty", "inference", "trainsize", "honestsize", "features", "mse")
+
+    # output matrix
+    output_matrix <- matrix(NA, ncol = 1, nrow = length(output))
+    # populate output matrix
+    rownames(output_matrix) <- names(output) # rownames are names
+    colnames(output_matrix) <- "" # no colname
+    output_matrix[, 1] <- unlist(output) # column 2 are values
+
+    # generate latex output if selected
+    if (latex == TRUE) { colnames(output_matrix) <- "Attributes"
+    output_matrix <- xtable(output_matrix, caption = "Random Forest Summary")
+    }
+
+    # -------------------------------------------------------------------------------- #
+
+  } else {
+
+    # -------------------------------------------------------------------------------- #
+
+    ## no honest splitting, i.e. use all data
+    # take out summary statistics
+    mse <- round(forest$oobMSE, 5)
+    trainsize <- nrow(train_data)
+    honestsize <- 0
+    features <- ncol(train_data)-1 # take out the response
+    # check if subsampling or bootstrapping was used
+    if (forest$trainForest$replace == TRUE) { build <- "Bootstrap" } else { build <- "Subsampling" }
+
+    # -------------------------------------------------------------------------------- #
+
+    # structure summary into a list
+    output <- list(type, build, ntree, mtry, nmin, honesty, inference, trainsize, honestsize, features, mse)
+    names(output) <- c("type", "build", "ntree", "mtry", "nmin", "honesty", "inference", "trainsize", "honestsize", "features", "mse")
+
+    # output matrix
+    output_matrix <- matrix(NA, ncol = 1, nrow = length(output))
+    # populate output matrix
+    rownames(output_matrix) <- names(output) # rownames are names
+    colnames(output_matrix) <- "" # no colname
+    output_matrix[, 1] <- unlist(output) # column 2 are values
+
+    # generate latex output if selected
+    if (latex == TRUE) { colnames(output_matrix) <- "Attributes"
+    output_matrix <- xtable(output_matrix, caption = "Random Forest Summary")
+    }
+
+    # -------------------------------------------------------------------------------- #
+
+  }
+
+  # return output
+  return(output_matrix)
+
+}

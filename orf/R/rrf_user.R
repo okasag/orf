@@ -195,6 +195,7 @@ rrf <- function(X, Y, ntree, mtry, nmin, honesty, inference) {
   class(output) <- "rrf"
 
   # -------------------------------------------------------------------------------- #
+
   # return the output of the function
   return(output)
 

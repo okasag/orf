@@ -90,3 +90,77 @@ get_mrf_variance <- function(honest_pred, honest_weights, train_pred, train_weig
   # ----------------------------------------------------------------------------------- #
 
 }
+
+
+#' Predict MRF Variance
+#'
+#' predict variance of multinomial random forest predictions based on honest sample
+#' splitting as described in Lechner (2018)
+#'
+#' @param honest_pred list of vectors of honest forest predictions
+#' @param honest_weights list of n x n matrices of honest forest weights
+#' @param Y_ind_honest list of vectors of 0-1 outcomes for the honest sample
+#'
+#' @return vector of MRF variances
+pred_mrf_variance <- function(honest_pred, honest_weights, Y_ind_honest) {
+
+  # needed inputs for the function: honest_pred - list of vectors of honest forest predictions
+  #                                 honest_weights - list of n x n matrices of honest forest weights
+  #                                 Y_ind_honest - list of vectors of 0-1 outcomes for the honest sample
+
+  # ----------------------------------------------------------------------------------- #
+
+  # get also categories
+  categories <- seq(1:(length(Y_ind_honest)))
+
+  # ----------------------------------------------------------------------------------- #
+
+  ### variance for the orf predictions
+  ## compute prerequisities for variance of honest orf predictions
+  ## compute the conditional means (predictions): already have this as forest_pred
+  # divide it by N to get the "mean"
+  honest_pred_mean <- lapply(honest_pred, function(x) x/length(Y_ind_honest[[1]]))
+
+  # calculate standard multiplication of weights and outcomes: honest_weights*y_ind_honest (be careful with seq_along!) you have to go as many rows as honest_pred or honest_weights have
+  honest_multi <- mapply(function(x,y) lapply(seq_along(x[, 1]), function(i) x[i, ] * y), honest_weights, Y_ind_honest, SIMPLIFY = FALSE)  # subtract the mean from each obs i
+
+  # subtract the mean from each obs i
+  honest_multi_demeaned <- mapply(function(x,y) mapply(function(x,y) x-y, x, y, SIMPLIFY = FALSE), honest_multi, honest_pred_mean, SIMPLIFY = FALSE)
+
+  ## now do the single variances for each category m
+  # square the demeaned
+  honest_multi_demeaned_sq <- lapply(honest_multi_demeaned, function(x) lapply(x, function(x) x^2))
+
+  # sum all obs i together
+  honest_multi_demeaned_sq_sum <- lapply(honest_multi_demeaned_sq, function(x) lapply(x, function(x) sum(x)))
+
+  # multiply by N/N-1 (normalize)
+  honest_multi_demeaned_sq_sum_norm <- lapply(honest_multi_demeaned_sq_sum, function(x) lapply(x, function(x) x*(length(honest_pred[[1]])/(length(honest_pred[[1]])-1)) ))
+
+  # put it into a shorter named object
+  honest_variance <- honest_multi_demeaned_sq_sum_norm
+  # single variances done
+  ## no covariances needed for MRF
+
+  # ----------------------------------------------------------------------------------- #
+
+  ## output for final variances
+  # coerce to a matrix
+  honest_var <- sapply(honest_variance, function(x) sapply(x, function(x) as.matrix(x)))
+
+  # save as forest_var
+  forest_variance <- honest_var
+
+  # add names
+  colnames(forest_variance) <- sapply(categories, function(x) paste("Category", x, sep = " "))
+
+  # ----------------------------------------------------------------------------------- #
+
+  ## return the matrix
+  output <- forest_variance
+  # output
+  return(output)
+
+  # ----------------------------------------------------------------------------------- #
+
+}

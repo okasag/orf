@@ -1,7 +1,7 @@
-#' orf
+#' mrf
 #'
-#' Ordered Random Forests for semi-parametric estimation of ordered choice model
-#' as proposed in Lechner & Okasa (2019)
+#' Multinomial Random Forests for semi-parametric estimation of multinomial
+#' choice model as proposed in Lechner & Okasa (2019)
 #'
 #' @param X matrix of features
 #' @param Y vector of outcomes (as.matrix acceptable too)
@@ -14,10 +14,10 @@
 #'
 #' @import ranger
 #'
-#' @return object of type orf
+#' @return object of type mrf
 #'
 #' @export
-orf <- function(X, Y, ntree, mtry, nmin, honesty, inference, margins){
+mrf <- function(X, Y, ntree, mtry, nmin, honesty, inference, margins){
 
   # needed inputs for the function: X - matrix of features
   #                                 Y - vector of outcomes (as.matrix acceptable too)
@@ -62,8 +62,8 @@ orf <- function(X, Y, ntree, mtry, nmin, honesty, inference, margins){
 
   # parameters (categories)
   categories <- as.numeric(sort(unique(Y))) # sequence of categories
-  ncat <- as.numeric(length(categories)) # number of categories
-  cat <- categories[1:(ncat-1)] # cat to esitmate / without the last category (not needed cuz P(Y_ind<=last_cat)=1)
+  ncat <- as.numeric(length(categories)) # number of categories (for mrf we need all)
+  #cat <- categories[1:(ncat-1)] # cat to esitmate / without the last category (not needed cuz P(Y_ind<=last_cat)=1)
 
   # --------------------------------------------------------------------------------------- #
 
@@ -79,7 +79,7 @@ orf <- function(X, Y, ntree, mtry, nmin, honesty, inference, margins){
 
     ## create variables needed for orf estimations
     # create indicator variables (outcomes)
-    Y_ind <- lapply(cat, function(x) ifelse((Y <= x), 1, 0))
+    Y_ind <- lapply(categories, function(x) ifelse((Y == x), 1, 0))
 
     # create dataset for ranger estimation
     data_ind <- lapply(Y_ind, function(x) as.data.frame(cbind(as.matrix(unlist(x)), X)))
@@ -95,18 +95,11 @@ orf <- function(X, Y, ntree, mtry, nmin, honesty, inference, margins){
 
     # collect predictions for each forest based on whole sample (oob predictions)
     pred <- lapply(forest, function(x) x$predictions) # collect forest predictions
-    # add the probability for the last outcome (always 1)
-    pred_1 <- append(pred, list(rep(1, n)))
-    # prepend zero vector to predictions for later differencing
-    pred_0 <- append(list(rep(0, n)), pred) # append a first 0 elemnt for the list
 
     # --------------------------------------------------------------------------------------- #
 
-    # total predictions (make sure it returns a list)
-    pred_total <- as.list(mapply(function(x,y) x-y, pred_1, pred_0, SIMPLIFY = F))
-
-    # avoid negative predictions
-    pred_total <- lapply(pred_total, function(x) ifelse((x < 0), 0, x))
+    # avoid negative predictions (should not / cannot happen at all here)
+    pred_total <- lapply(pred, function(x) ifelse((x < 0), 0, x))
 
     # coerce to final matrix
     pred_total <- sapply(pred_total, function(x) as.matrix(x))
@@ -167,8 +160,8 @@ orf <- function(X, Y, ntree, mtry, nmin, honesty, inference, margins){
 
     ## create variables needed for orf estimations
     # create indicator variables (outcomes)
-    Y_ind_train <- lapply(cat, function(x) ifelse((Y_train <= x), 1, 0)) # train
-    Y_ind_honest <- lapply(cat, function(x) ifelse((Y_honest <= x), 1, 0))
+    Y_ind_train <- lapply(categories, function(x) ifelse((Y_train == x), 1, 0)) # train
+    Y_ind_honest <- lapply(categories, function(x) ifelse((Y_honest == x), 1, 0))
 
     # create dataset for ranger estimation
     data_ind_train <- lapply(Y_ind_train, function(x) as.data.frame(cbind(as.matrix(unlist(x)), X_train)))
@@ -185,18 +178,11 @@ orf <- function(X, Y, ntree, mtry, nmin, honesty, inference, margins){
 
     # compute honest predictions based on honest sample
     pred <- mapply(function(x,y,z) get_honest(x, y, z), forest, data_ind_honest, data_ind_train, SIMPLIFY = F)
-    # add the probability for the last outcome (always 1)
-    pred_1 <- append(pred, list(rep(1, n)))
-    # prepend zero vector to predictions for later differencing
-    pred_0 <- append(list(rep(0, n)), pred) # append a first 0 elemnt for the list
 
     # --------------------------------------------------------------------------------------- #
 
-    # total predictions (make sure it returns a list)
-    pred_total <- as.list(mapply(function(x,y) x-y, pred_1, pred_0, SIMPLIFY = F))
-
     # avoid negative predictions
-    pred_total <- lapply(pred_total, function(x) ifelse((x < 0), 0, x))
+    pred_total <- lapply(pred, function(x) ifelse((x < 0), 0, x))
 
     # coerce to final matrix
     pred_total <- sapply(pred_total, function(x) as.matrix(x))
@@ -257,8 +243,8 @@ orf <- function(X, Y, ntree, mtry, nmin, honesty, inference, margins){
 
     ## create variables needed for orf estimations
     # create indicator variables (outcomes)
-    Y_ind_train <- lapply(cat, function(x) ifelse((Y_train <= x), 1, 0)) # train
-    Y_ind_honest <- lapply(cat, function(x) ifelse((Y_honest <= x), 1, 0))
+    Y_ind_train <- lapply(categories, function(x) ifelse((Y_train == x), 1, 0)) # train
+    Y_ind_honest <- lapply(categories, function(x) ifelse((Y_honest == x), 1, 0))
 
     # create dataset for ranger estimation
     data_ind_train <- lapply(Y_ind_train, function(x) as.data.frame(cbind(as.matrix(unlist(x)), X_train)))
@@ -290,18 +276,10 @@ orf <- function(X, Y, ntree, mtry, nmin, honesty, inference, margins){
     # sort according to rownames
     forest_pred <- lapply(forest_pred, function(x) as.numeric(x[order(as.numeric(row.names(x))), ]))
 
-    # add the probability for the last outcome (always 1)
-    pred_1 <- append(forest_pred, list(rep(1, n)))
-    # prepend zero vector to predictions for later differencing
-    pred_0 <- append(list(rep(0, n)), forest_pred) # append a first 0 elemnt for the list
-
     # --------------------------------------------------------------------------------------- #
 
-    # total predictions (make sure it returns a list)
-    pred_total <- as.list(mapply(function(x,y) x-y, pred_1, pred_0, SIMPLIFY = F))
-
     # avoid negative predictions
-    pred_total <- lapply(pred_total, function(x) ifelse((x < 0), 0, x))
+    pred_total <- lapply(forest_pred, function(x) ifelse((x < 0), 0, x))
 
     # coerce to final matrix
     pred_total <- sapply(pred_total, function(x) as.matrix(x))
@@ -327,9 +305,7 @@ orf <- function(X, Y, ntree, mtry, nmin, honesty, inference, margins){
     # --------------------------------------------------------------------------------------- #
 
     # compute the variances for the categorical predictions
-    var_final <- get_orf_variance(honest_pred, honest_weights, train_pred, train_weights, Y_ind_honest)
-    # check for normalization
-    #sd_final <- sqrt(var_final)
+    var_final <- get_mrf_variance(honest_pred, honest_weights, train_pred, train_weights, Y_ind_honest)
 
     # --------------------------------------------------------------------------------------- #
 
@@ -352,17 +328,13 @@ orf <- function(X, Y, ntree, mtry, nmin, honesty, inference, margins){
 
     # --------------------------------------------------------------------------------------- #
 
-    # do the estimation of probabilities as usual
-
-    # --------------------------------------------------------------------------------------- #
-
     # no honest splitting, i.e. use all data
     train_data <- dat
     honest_data <- NULL
 
     ## create variables needed for orf estimations
     # create indicator variables (outcomes)
-    Y_ind <- lapply(cat, function(x) ifelse((Y <= x), 1, 0))
+    Y_ind <- lapply(categories, function(x) ifelse((Y == x), 1, 0))
 
     # create dataset for ranger estimation
     data_ind <- lapply(Y_ind, function(x) as.data.frame(cbind(as.matrix(unlist(x)), X)))
@@ -378,18 +350,11 @@ orf <- function(X, Y, ntree, mtry, nmin, honesty, inference, margins){
 
     # collect predictions for each forest based on whole sample (oob predictions)
     pred <- lapply(forest, function(x) x$predictions) # collect forest predictions
-    # add the probability for the last outcome (always 1)
-    pred_1 <- append(pred, list(rep(1, n)))
-    # prepend zero vector to predictions for later differencing
-    pred_0 <- append(list(rep(0, n)), pred) # append a first 0 elemnt for the list
 
     # --------------------------------------------------------------------------------------- #
 
-    # total predictions (make sure it returns a list)
-    pred_total <- as.list(mapply(function(x,y) x-y, pred_1, pred_0, SIMPLIFY = F))
-
     # avoid negative predictions
-    pred_total <- lapply(pred_total, function(x) ifelse((x < 0), 0, x))
+    pred_total <- lapply(pred, function(x) ifelse((x < 0), 0, x))
 
     # coerce to final matrix
     pred_total <- sapply(pred_total, function(x) as.matrix(x))
@@ -418,7 +383,7 @@ orf <- function(X, Y, ntree, mtry, nmin, honesty, inference, margins){
 
     # --------------------------------------------------------------------------------------- #
 
-    marginal_effects <- orf_margins(forest, data_ind, honesty, inference)
+    marginal_effects <- mrf_margins(forest, data_ind, honesty, inference)
 
     # --------------------------------------------------------------------------------------- #
 
@@ -462,8 +427,8 @@ orf <- function(X, Y, ntree, mtry, nmin, honesty, inference, margins){
 
     ## create variables needed for orf estimations
     # create indicator variables (outcomes)
-    Y_ind_train <- lapply(cat, function(x) ifelse((Y_train <= x), 1, 0)) # train
-    Y_ind_honest <- lapply(cat, function(x) ifelse((Y_honest <= x), 1, 0))
+    Y_ind_train <- lapply(categories, function(x) ifelse((Y_train == x), 1, 0)) # train
+    Y_ind_honest <- lapply(categories, function(x) ifelse((Y_honest == x), 1, 0))
 
     # create dataset for ranger estimation
     data_ind_train <- lapply(Y_ind_train, function(x) as.data.frame(cbind(as.matrix(unlist(x)), X_train)))
@@ -480,18 +445,11 @@ orf <- function(X, Y, ntree, mtry, nmin, honesty, inference, margins){
 
     # compute honest predictions based on honest sample
     pred <- mapply(function(x,y,z) get_honest(x, y, z), forest, data_ind_honest, data_ind_train, SIMPLIFY = F)
-    # add the probability for the last outcome (always 1)
-    pred_1 <- append(pred, list(rep(1, n)))
-    # prepend zero vector to predictions for later differencing
-    pred_0 <- append(list(rep(0, n)), pred) # append a first 0 elemnt for the list
 
     # --------------------------------------------------------------------------------------- #
 
-    # total predictions (make sure it returns a list)
-    pred_total <- as.list(mapply(function(x,y) x-y, pred_1, pred_0, SIMPLIFY = F))
-
     # avoid negative predictions
-    pred_total <- lapply(pred_total, function(x) ifelse((x < 0), 0, x))
+    pred_total <- lapply(pred, function(x) ifelse((x < 0), 0, x))
 
     # coerce to final matrix
     pred_total <- sapply(pred_total, function(x) as.matrix(x))
@@ -520,7 +478,7 @@ orf <- function(X, Y, ntree, mtry, nmin, honesty, inference, margins){
 
     # --------------------------------------------------------------------------------------- #
 
-    marginal_effects <- orf_margins(forest, data_ind_honest, honesty, inference)
+    marginal_effects <- mrf_margins(forest, data_ind_honest, honesty, inference)
 
     # --------------------------------------------------------------------------------------- #
 
@@ -560,8 +518,8 @@ orf <- function(X, Y, ntree, mtry, nmin, honesty, inference, margins){
 
     ## create variables needed for orf estimations
     # create indicator variables (outcomes)
-    Y_ind_train <- lapply(cat, function(x) ifelse((Y_train <= x), 1, 0)) # train
-    Y_ind_honest <- lapply(cat, function(x) ifelse((Y_honest <= x), 1, 0))
+    Y_ind_train <- lapply(categories, function(x) ifelse((Y_train == x), 1, 0)) # train
+    Y_ind_honest <- lapply(categories, function(x) ifelse((Y_honest == x), 1, 0))
 
     # create dataset for ranger estimation
     data_ind_train <- lapply(Y_ind_train, function(x) as.data.frame(cbind(as.matrix(unlist(x)), X_train)))
@@ -593,18 +551,10 @@ orf <- function(X, Y, ntree, mtry, nmin, honesty, inference, margins){
     # sort according to rownames
     forest_pred <- lapply(forest_pred, function(x) as.numeric(x[order(as.numeric(row.names(x))), ]))
 
-    # add the probability for the last outcome (always 1)
-    pred_1 <- append(forest_pred, list(rep(1, n)))
-    # prepend zero vector to predictions for later differencing
-    pred_0 <- append(list(rep(0, n)), forest_pred) # append a first 0 elemnt for the list
-
     # --------------------------------------------------------------------------------------- #
 
-    # total predictions (make sure it returns a list)
-    pred_total <- as.list(mapply(function(x,y) x-y, pred_1, pred_0, SIMPLIFY = F))
-
     # avoid negative predictions
-    pred_total <- lapply(pred_total, function(x) ifelse((x < 0), 0, x))
+    pred_total <- lapply(forest_pred, function(x) ifelse((x < 0), 0, x))
 
     # coerce to final matrix
     pred_total <- sapply(pred_total, function(x) as.matrix(x))
@@ -630,7 +580,7 @@ orf <- function(X, Y, ntree, mtry, nmin, honesty, inference, margins){
     # --------------------------------------------------------------------------------------- #
 
     # compute the variances for the categorical predictions
-    var_final <- get_orf_variance(honest_pred, honest_weights, train_pred, train_weights, Y_ind_honest)
+    var_final <- get_mrf_variance(honest_pred, honest_weights, train_pred, train_weights, Y_ind_honest)
 
     # --------------------------------------------------------------------------------------- #
 
@@ -638,7 +588,7 @@ orf <- function(X, Y, ntree, mtry, nmin, honesty, inference, margins){
 
     # --------------------------------------------------------------------------------------- #
 
-    marginal_effects <- orf_margins(forest, data_ind_honest, honesty, inference)
+    marginal_effects <- mrf_margins(forest, data_ind_honest, honesty, inference)
 
     # --------------------------------------------------------------------------------------- #
 
@@ -655,45 +605,47 @@ orf <- function(X, Y, ntree, mtry, nmin, honesty, inference, margins){
   # -------------------------------------------------------------------------------- #
 
   ## Set the name for the class
-  class(output) <- "orf"
+  class(output) <- "mrf"
 
   # -------------------------------------------------------------------------------- #
 
   # return the output of the function
   return(output)
 
+  # -------------------------------------------------------------------------------- #
+
 }
 
 
-#' predict.orf
+#' predict.mrf
 #'
-#' Prediction for new observations based on estimated ordered random forest
-#' of type \code{orf}
+#' Prediction for new observations based on estimated multinomial random forest
+#' of class \code{mrf}
 #'
-#' @param object estimated forest object of type \code{orf}
+#' @param object estimated forest object of type \code{mrf}
 #' @param new_data matrix X containing the observations to predict
 #' @param ... further arguments (currently ignored)
 #'
 #' @import ranger
 #'
-#' @return object of class \code{orf.prediction} with elements
+#' @return object of class \code{mrf.prediction} with elements
 ##'   \tabular{ll}{
-##'       \code{trainForests}  \tab saved forests trained for ORF estimations (inherited from \code{ranger}) \cr
+##'       \code{trainForests}  \tab saved forests trained for MRF estimations (inherited from \code{ranger}) \cr
 ##'       \code{forestInfo}    \tab info containing forest inputs and data used \cr
 ##'       \code{forestPredictions} \tab predicted values \cr
-##'       \code{forestVariances} \tab variances of predicted values (only if \code{inference=TRUE} in the passed \code{orf object}) \cr
-##'       \code{predictedCategories} \tab categories predicted with ORF based on maximum probability \cr
-##'       \code{marginalEffects} \tab estimated marginal effects from ORF (optionally with inference) \cr
+##'       \code{forestVariances} \tab variances of predicted values (only if \code{inference=TRUE} in the passed \code{mrf object}) \cr
+##'       \code{predictedCategories} \tab categories predicted with MRF based on maximum probability \cr
+##'       \code{marginalEffects} \tab estimated marginal effects from MRF (optionally with inference) \cr
 ##'   }
 #'
 #' @export
-predict.orf <- function(object, new_data, ...) {
-  # needed inputs for the function: forest - orf object coming from orf function
+predict.mrf <- function(object, new_data, ...) {
+  # needed inputs for the function: forest - mrf object coming from orf function
   #                                 new_data - matrix X containing the observations to predict
 
   # -------------------------------------------------------------------------------- #
 
-  ## get forest as na object
+  ## get forest as object
   forest <- object
   ## save forest inputs
   inputs <- forest$forestInfo$inputs
@@ -704,6 +656,8 @@ predict.orf <- function(object, new_data, ...) {
   honest_data <- forest$forestInfo$honestData
   train_data <- forest$forestInfo$trainData
   honest_ind_data <- forest$forestInfo$indicatorData # indicator data needed for indicator predictions
+
+  # -------------------------------------------------------------------------------- #
 
   # take out list of ranger objects (be careful, its Forests with S at the end!)
   forest <- forest$trainForests
@@ -735,23 +689,13 @@ predict.orf <- function(object, new_data, ...) {
 
     ## no honest splitting, i.e. use all data, no inference and no margins
 
-    # predict with ncat-1 forests as in ranger default
+    # predict with ncat forests as in ranger default
     pred <- lapply(forest, function(x) predict(x, data = new_data)$predictions)
 
     # -------------------------------------------------------------------------------- #
 
-    # add the probability for the last outcome (always 1)
-    pred_1 <- append(pred, list(rep(1, n_new_data)))
-    # prepend zero vector to predictions for later differencing
-    pred_0 <- append(list(rep(0, n_new_data)), pred) # append a first 0 elemnt for the list
-
-    # --------------------------------------------------------------------------------------- #
-
-    # total predictions (make sure it returns a list)
-    pred_total <- as.list(mapply(function(x,y) x-y, pred_1, pred_0, SIMPLIFY = F))
-
     # avoid negative predictions
-    pred_total <- lapply(pred_total, function(x) ifelse((x < 0), 0, x))
+    pred_total <- lapply(pred, function(x) ifelse((x < 0), 0, x))
 
     # coerce to final matrix
     pred_total <- sapply(pred_total, function(x) as.matrix(x))
@@ -772,7 +716,7 @@ predict.orf <- function(object, new_data, ...) {
 
     # save forest information
     forest_info <- list(inputs, categories, new_data)
-    names(forest_info) <- c("inputs", "categories","newData")
+    names(forest_info) <- c("inputs", "categories", "newData")
 
     # define output of the function
     output <- list(forest_info, pred_final, pred_class)
@@ -791,18 +735,8 @@ predict.orf <- function(object, new_data, ...) {
 
     # -------------------------------------------------------------------------------- #
 
-    # add the probability for the last outcome (always 1)
-    pred_1 <- append(pred, list(rep(1, n_new_data)))
-    # prepend zero vector to predictions for later differencing
-    pred_0 <- append(list(rep(0, n_new_data)), pred) # append a first 0 elemnt for the list
-
-    # --------------------------------------------------------------------------------------- #
-
-    # total predictions (make sure it returns a list)
-    pred_total <- as.list(mapply(function(x,y) x-y, pred_1, pred_0, SIMPLIFY = F))
-
     # avoid negative predictions
-    pred_total <- lapply(pred_total, function(x) ifelse((x < 0), 0, x))
+    pred_total <- lapply(pred, function(x) ifelse((x < 0), 0, x))
 
     # coerce to final matrix
     pred_total <- sapply(pred_total, function(x) as.matrix(x))
@@ -823,7 +757,7 @@ predict.orf <- function(object, new_data, ...) {
 
     # save forest information
     forest_info <- list(inputs, categories, new_data)
-    names(forest_info) <- c("inputs", "categories","newData")
+    names(forest_info) <- c("inputs", "categories", "newData")
 
     # define output of the function
     output <- list(forest_info, pred_final, pred_class)
@@ -843,18 +777,8 @@ predict.orf <- function(object, new_data, ...) {
 
     # -------------------------------------------------------------------------------- #
 
-    # add the probability for the last outcome (always 1)
-    pred_1 <- append(forest_pred, list(rep(1, n_new_data)))
-    # prepend zero vector to predictions for later differencing
-    pred_0 <- append(list(rep(0, n_new_data)), forest_pred) # append a first 0 elemnt for the list
-
-    # --------------------------------------------------------------------------------------- #
-
-    # total predictions (make sure it returns a list)
-    pred_total <- as.list(mapply(function(x,y) x-y, pred_1, pred_0, SIMPLIFY = F))
-
     # avoid negative predictions
-    pred_total <- lapply(pred_total, function(x) ifelse((x < 0), 0, x))
+    pred_total <- lapply(forest_pred, function(x) ifelse((x < 0), 0, x))
 
     # coerce to final matrix
     pred_total <- sapply(pred_total, function(x) as.matrix(x))
@@ -877,7 +801,7 @@ predict.orf <- function(object, new_data, ...) {
     Y_ind_honest <- lapply(honest_ind_data, function(x) x[, 1])
 
     # compute the variances for the categorical predictions
-    var_final <- pred_orf_variance(forest_pred, forest_weights_pred, Y_ind_honest)
+    var_final <- pred_mrf_variance(forest_pred, forest_weights_pred, Y_ind_honest)
 
     # --------------------------------------------------------------------------------------- #
 
@@ -896,23 +820,13 @@ predict.orf <- function(object, new_data, ...) {
     # -------------------------------------------------------------------------------- #
 
     ## no honest splitting, i.e. use all data, no inference and no margins
-    # predict with ncat-1 forests as in ranger default
+    # predict with ncat forests as in ranger default
     pred <- lapply(forest, function(x) predict(x, data = new_data)$predictions)
 
     # -------------------------------------------------------------------------------- #
 
-    # add the probability for the last outcome (always 1)
-    pred_1 <- append(pred, list(rep(1, n_new_data)))
-    # prepend zero vector to predictions for later differencing
-    pred_0 <- append(list(rep(0, n_new_data)), pred) # append a first 0 elemnt for the list
-
-    # --------------------------------------------------------------------------------------- #
-
-    # total predictions (make sure it returns a list)
-    pred_total <- as.list(mapply(function(x,y) x-y, pred_1, pred_0, SIMPLIFY = F))
-
     # avoid negative predictions
-    pred_total <- lapply(pred_total, function(x) ifelse((x < 0), 0, x))
+    pred_total <- lapply(pred, function(x) ifelse((x < 0), 0, x))
 
     # coerce to final matrix
     pred_total <- sapply(pred_total, function(x) as.matrix(x))
@@ -935,7 +849,7 @@ predict.orf <- function(object, new_data, ...) {
 
     # --------------------------------------------------------------------------------------- #
 
-    marginal_effects <- pred_orf_margins(forest, honest_ind_data, new_data, honesty, inference)
+    marginal_effects <- pred_mrf_margins(forest, honest_ind_data, new_data, honesty, inference)
 
     # --------------------------------------------------------------------------------------- #
 
@@ -960,18 +874,8 @@ predict.orf <- function(object, new_data, ...) {
 
     # -------------------------------------------------------------------------------- #
 
-    # add the probability for the last outcome (always 1)
-    pred_1 <- append(pred, list(rep(1, n_new_data)))
-    # prepend zero vector to predictions for later differencing
-    pred_0 <- append(list(rep(0, n_new_data)), pred) # append a first 0 elemnt for the list
-
-    # --------------------------------------------------------------------------------------- #
-
-    # total predictions (make sure it returns a list)
-    pred_total <- as.list(mapply(function(x,y) x-y, pred_1, pred_0, SIMPLIFY = F))
-
     # avoid negative predictions
-    pred_total <- lapply(pred_total, function(x) ifelse((x < 0), 0, x))
+    pred_total <- lapply(pred, function(x) ifelse((x < 0), 0, x))
 
     # coerce to final matrix
     pred_total <- sapply(pred_total, function(x) as.matrix(x))
@@ -994,7 +898,7 @@ predict.orf <- function(object, new_data, ...) {
 
     # --------------------------------------------------------------------------------------- #
 
-    marginal_effects <- pred_orf_margins(forest, honest_ind_data, new_data, honesty, inference)
+    marginal_effects <- pred_mrf_margins(forest, honest_ind_data, new_data, honesty, inference)
 
     # --------------------------------------------------------------------------------------- #
 
@@ -1020,18 +924,8 @@ predict.orf <- function(object, new_data, ...) {
 
     # -------------------------------------------------------------------------------- #
 
-    # add the probability for the last outcome (always 1)
-    pred_1 <- append(forest_pred, list(rep(1, n_new_data)))
-    # prepend zero vector to predictions for later differencing
-    pred_0 <- append(list(rep(0, n_new_data)), forest_pred) # append a first 0 elemnt for the list
-
-    # --------------------------------------------------------------------------------------- #
-
-    # total predictions (make sure it returns a list)
-    pred_total <- as.list(mapply(function(x,y) x-y, pred_1, pred_0, SIMPLIFY = F))
-
     # avoid negative predictions
-    pred_total <- lapply(pred_total, function(x) ifelse((x < 0), 0, x))
+    pred_total <- lapply(forest_pred, function(x) ifelse((x < 0), 0, x))
 
     # coerce to final matrix
     pred_total <- sapply(pred_total, function(x) as.matrix(x))
@@ -1054,7 +948,7 @@ predict.orf <- function(object, new_data, ...) {
     Y_ind_honest <- lapply(honest_ind_data, function(x) x[, 1])
 
     # compute the variances for the categorical predictions
-    var_final <- pred_orf_variance(forest_pred, forest_weights_pred, Y_ind_honest)
+    var_final <- pred_mrf_variance(forest_pred, forest_weights_pred, Y_ind_honest)
 
     # --------------------------------------------------------------------------------------- #
 
@@ -1062,7 +956,7 @@ predict.orf <- function(object, new_data, ...) {
 
     # --------------------------------------------------------------------------------------- #
 
-    marginal_effects <- pred_orf_margins(forest, honest_ind_data, new_data, honesty, inference)
+    marginal_effects <- pred_mrf_margins(forest, honest_ind_data, new_data, honesty, inference)
 
     # --------------------------------------------------------------------------------------- #
 
@@ -1081,7 +975,7 @@ predict.orf <- function(object, new_data, ...) {
   # -------------------------------------------------------------------------------- #
 
   ## Set the name for the class
-  class(output) <- "orf.prediction"
+  class(output) <- "mrf.prediction"
 
   # return output
   return(output)
@@ -1091,18 +985,18 @@ predict.orf <- function(object, new_data, ...) {
 }
 
 
-#' plot.orf
+#' plot.mrf
 #'
-#' plot ordered random forest object of class \code{orf}
+#' plot multinomial random forest object of class \code{mrf}
 #'
-#' @param x estimated ordered random forest object of type \code{orf}
+#' @param x estimated ordered random forest object of type \code{mrf}
 #' @param ... further arguments (currently ignored)
 #'
 #' @import ggplot2
 #' @importFrom utils stack
 #'
 #' @export
-plot.orf <- function(x, ...) {
+plot.mrf <- function(x, ...) {
 
   # needed inputs for the function: forest - forest object coming from orf function
 
@@ -1136,7 +1030,7 @@ plot.orf <- function(x, ...) {
 
   # -------------------------------------------------------------------------------- #
 
-  ### plot ORF ###
+  ### plot MRF ###
 
   ## plot realized categories overlayed with predicted category probabilities
   # new colnames
@@ -1190,18 +1084,18 @@ plot.orf <- function(x, ...) {
 }
 
 
-#' summary.orf
+#' summary.mrf
 #'
-#' summary of an ordered random forest object of class \code{orf}
+#' summary of an multinomial random forest object of class \code{mrf}
 #'
-#' @param object estimated ordered random forest object of type \code{orf}
+#' @param object estimated multinomial random forest object of class \code{mrf}
 #' @param latex logical, TRUE if latex summary should be generated
 #' @param ... further arguments (currently ignored)
 #'
 #' @importFrom xtable xtable
 #'
 #' @export
-summary.orf <- function(object, latex, ...) {
+summary.mrf <- function(object, latex, ...) {
 
   # needed inputs for the function: forest - forest object coming from random_forest function
   #                                        - latex : logical if the output should be printed in latex code
@@ -1221,7 +1115,7 @@ summary.orf <- function(object, latex, ...) {
   honest_data <- forest$forestInfo$honestData
   train_data <- forest$forestInfo$trainData
   categories <- length(forest$forestInfo$categories)
-  type <- "Ordered Random Forest"
+  type <- "Multinomial Random Forest"
 
   # -------------------------------------------------------------------------------- #
 
@@ -1255,7 +1149,7 @@ summary.orf <- function(object, latex, ...) {
 
     # generate latex output if selected
     if (latex == TRUE) { colnames(output_matrix) <- "Attributes"
-    output_matrix <- xtable(output_matrix, caption = "Ordered Random Forest Summary")
+    output_matrix <- xtable(output_matrix, caption = "Multinomial Random Forest Summary")
     }
 
     # -------------------------------------------------------------------------------- #
@@ -1269,7 +1163,7 @@ summary.orf <- function(object, latex, ...) {
     coef_table <- coefstars(coefs, pvalues)
 
     if (latex == TRUE) {
-      coef_table <- xtable(coef_table, caption = "ORF Marginal Effects")
+      coef_table <- xtable(coef_table, caption = "MRF Marginal Effects")
     }
 
     # pack it into output
@@ -1307,7 +1201,7 @@ summary.orf <- function(object, latex, ...) {
 
     # generate latex output if selected
     if (latex == TRUE) { colnames(output_matrix) <- "Attributes"
-    output_matrix <- xtable(output_matrix, caption = "Ordered Random Forest Summary")
+    output_matrix <- xtable(output_matrix, caption = "Multinomial Random Forest Summary")
     }
 
     # pack it into output
@@ -1344,7 +1238,7 @@ summary.orf <- function(object, latex, ...) {
 
     # generate latex output if selected
     if (latex == TRUE) { colnames(output_matrix) <- "Attributes"
-    output_matrix <- xtable(output_matrix, caption = "Ordered Random Forest Summary")
+    output_matrix <- xtable(output_matrix, caption = "Multinomial Random Forest Summary")
     }
 
     # put it into output
@@ -1381,7 +1275,7 @@ summary.orf <- function(object, latex, ...) {
 
     # generate latex output if selected
     if (latex == TRUE) { colnames(output_matrix) <- "Attributes"
-    output_matrix <- xtable(output_matrix, caption = "Ordered Random Forest Summary")
+    output_matrix <- xtable(output_matrix, caption = "Multinomial Random Forest Summary")
     }
 
     # -------------------------------------------------------------------------------- #
@@ -1392,7 +1286,7 @@ summary.orf <- function(object, latex, ...) {
 
     # chekc latex
     if (latex == TRUE) {
-      coef_table <- xtable(coef_table, caption = "ORF Marginal Effects", digits = 3)
+      coef_table <- xtable(coef_table, caption = "MRF Marginal Effects", digits = 3)
     }
 
     # pack it into output
@@ -1430,7 +1324,7 @@ summary.orf <- function(object, latex, ...) {
 
     # generate latex output if selected
     if (latex == TRUE) { colnames(output_matrix) <- "Attributes"
-    output_matrix <- xtable(output_matrix, caption = "Ordered Random Forest Summary")
+    output_matrix <- xtable(output_matrix, caption = "Multinomial Random Forest Summary")
     }
 
     # -------------------------------------------------------------------------------- #
@@ -1440,7 +1334,7 @@ summary.orf <- function(object, latex, ...) {
     coef_table <- round(forest$marginalEffects, 3)
 
     if (latex == TRUE) {
-      coef_table <- xtable(coef_table, caption = "ORF Marginal Effects", digits = 3)
+      coef_table <- xtable(coef_table, caption = "MRF Marginal Effects", digits = 3)
     }
 
     # pack it into output
@@ -1478,7 +1372,7 @@ summary.orf <- function(object, latex, ...) {
 
     # generate latex output if selected
     if (latex == TRUE) { colnames(output_matrix) <- "Attributes"
-    output_matrix <- xtable(output_matrix, caption = "Ordered Random Forest Summary")
+    output_matrix <- xtable(output_matrix, caption = "Multinomial Random Forest Summary")
     }
 
     # -------------------------------------------------------------------------------- #

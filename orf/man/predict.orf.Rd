@@ -7,7 +7,7 @@
 \method{predict}{orf}(object, new_data, ...)
 }
 \arguments{
-\item{object}{estimated forest object of type \code{rrf}}
+\item{object}{estimated forest object of type \code{orf}}
 
 \item{new_data}{matrix X containing the observations to predict}
 
@@ -16,7 +16,6 @@
 \value{
 object of class \code{orf.prediction} with elements
   \tabular{ll}{
-  "trainForests",  "forestInfo", "honestPredictions", "honestVariances", "predictedCategories", "marginalEffects")
       \code{trainForests}  \tab saved forests trained for ORF estimations (inherited from \code{ranger}) \cr
       \code{forestInfo}    \tab info containing forest inputs and data used \cr
       \code{forestPredictions} \tab predicted values \cr

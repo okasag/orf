@@ -425,7 +425,7 @@ plot.rrf <- function(x, ...) {
     forest_outcomes <- as.numeric(all_data[, 1])
     # put it into dataframe
     df_plot <- as.data.frame(cbind(forest_outcomes, forest_pred))
-    #colnames(df_plot) <- c("Observed", "Predicted")
+    colnames(df_plot) <- c("Observed", "Predicted")
 
     # -------------------------------------------------------------------------------- #
 
@@ -454,7 +454,7 @@ plot.rrf <- function(x, ...) {
     forest_outcomes <- as.numeric(train_data[, 1])
     # put it into dataframe
     df_plot <- as.data.frame(cbind(forest_outcomes, forest_pred))
-    #colnames(df_plot) <- c("Observed", "Predicted")
+    colnames(df_plot) <- c("Observed", "Predicted")
 
     # -------------------------------------------------------------------------------- #
 

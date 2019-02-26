@@ -24,6 +24,7 @@ Imports:
     ranger,
     Rcpp,
     stats,
+    utils,
     xtable
 RoxygenNote: 6.1.1
 Suggests: 

@@ -1099,6 +1099,7 @@ predict.orf <- function(object, new_data, ...) {
 #' @param ... further arguments (currently ignored)
 #'
 #' @import ggplot2
+#' @importFrom gridExtra grid.arrange
 #' @importFrom utils stack
 #'
 #' @export
@@ -1170,9 +1171,9 @@ plot.orf <- function(x, ...) {
   ## generate plot objects
   # Use semi-transparent fill
   plots <- lapply(seq_along(df_plot_prob), function(i) {
-    ggplot(df_plot_prob[[i]], aes(x=df_plot_prob[[i]][, 1], fill=df_plot_prob[[i]][, 2])) +
+    ggplot(df_plot_prob[[i]], aes_string(x="Probability", fill="Category")) +
       geom_density(alpha=0.4) +
-      geom_vline(data=df_plot_mean[[i]], aes(xintercept=df_plot_mean[[i]][, 1], color=df_plot_mean[[i]][, 2]), linetype="dashed") +
+      geom_vline(data=df_plot_mean[[i]], aes_string(xintercept="Probability", color="Category"), linetype="dashed") +
       ggtitle(paste("Category", i, sep = " ")) +
       xlab("Predicted Probability") +
       ylab("Probability Mass") +

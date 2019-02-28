@@ -1,18 +1,52 @@
 #' margins
 #'
-#'estimate marginal effects of various discrete choice models based on the
-#'random forests algorithm. Applicable classes are \code{orf}, \code{mrf} and
-#'\code{brf}.
+#' margins is an S3 generic with methods to estimate marginal effects
+#' of various discrete choice models based on the random forests algorithm.
+#' Applicable classes are \code{orf}, \code{mrf} and \code{brf}.
 #'
-#' @param forest trained forest object of class \code{orf}/\code{mrf}/\code{brf}
+#' @param forest estimated forest object of class \code{orf}, \code{mrf} or \code{brf}
+#' @param eval string defining evaluation point for marginal effects. These can be one of "mean", "atmean", or "atmedian"
+#' @param newdata matrix of new Xs (currently not supported)
+#'
+#' @export
+margins <- function(forest, eval, newdata) UseMethod("margins")
+
+
+#' margins.default
+#'
+#' margins.default is a default for S3 generic with methods to estimate marginal effects
+#' of various discrete choice models based on the random forests algorithm.
+#' Applicable classes are \code{orf}, \code{mrf} and \code{brf}.
+#'
+#' @param forest estimated forest object of class \code{orf}, \code{mrf} or \code{brf}
+#' @param eval string defining evaluation point for marginal effects. These can be one of "mean", "atmean", or "atmedian"
+#' @param newdata matrix of new Xs (currently not supported)
+#'
+#' @export
+margins.default <- function(forest, eval, newdata) {
+
+  warning(paste("margins does not know how to handle object of class ",
+                class(forest),
+                ". The supported classes are one of the following: orf/mrf/brf/rrf."))
+
+}
+
+
+#' margins.orf
+#'
+#' estimate marginal effects of the ordered random forest
+#'
+#' @param forest trained ordered random forest object of class \code{orf}
 #' @param eval string defining evaluation point for marginal effects. These can be one of "mean", "atmean", or "atmedian"
 #' @param newdata matrix of new Xs (currently not supported)
 #'
 #' @importFrom stats predict median pnorm sd
 #' @import ranger
 #'
+#' @return object of type \code{margins.orf}
+#'
 #' @export
-margins <- function(forest, eval, newdata) {
+margins.orf <- function(forest, eval, newdata) {
 
   # needed inputs for the function: forest - trained forest object of class orf/mrf/brf
   #                                 eval - string defining evaluation point for marginal effects
@@ -354,7 +388,13 @@ margins <- function(forest, eval, newdata) {
 
   }
 
+  # ----------------------------------------------------------------------------------- #
+
+  class(results) <- "margins.orf"
+
   # return results
   return(results)
+
+  # ----------------------------------------------------------------------------------- #
 
 }

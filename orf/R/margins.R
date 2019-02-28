@@ -307,36 +307,48 @@ margins <- function(forest, eval, newdata) {
     # shift variances accordingly for ease of next computations (covariance already has the desired format)
     variance_last <- append(variance, list(rep(list(rep(0, length(variance[[1]][[1]]))), X_cols))) # append zero element list
     variance_first <- append(list(rep(list(rep(0, length(variance[[1]][[1]]))), X_cols)), variance) # prepend zero element list
-    # put everything together according to formula: var_last + var_first - cov (mean doesnt change anything for atmean and atmedian evaluations)
-    variance_me <- mapply(function(x,y,z) mapply(function(x,y,z) mean(x+y-z), x, y, z, SIMPLIFY = FALSE), variance_last, variance_first, covariance, SIMPLIFY = F)
+    # put everything together according to formula: var_last + var_first - cov
+    variance_me <- mapply(function(x,y,z) mapply(function(x,y,z) (x+y-z), x, y, z, SIMPLIFY = FALSE), variance_last, variance_first, covariance, SIMPLIFY = F)
 
     # ----------------------------------------------------------------------------------- #
 
-    ## output for final variances of marginal effects
-    # coerce to a matrix
-    variance_me <- sapply(variance_me, function(x) sapply(x, function(x) as.matrix(x)))
-    # add names
-    colnames(variance_me) <- sapply(categories, function(x) paste("Category", x, sep = " "))
-    rownames(variance_me) <- colnames(X)
+    ## sd, tvalues, pvalues
 
-    # ----------------------------------------------------------------------------------- #
-
-    ## standard deviations
     # take square root of variance
-    sd_me <- sqrt(variance_me)
-
-    #### z scores and p values ####
-    t_value <- (marginal_effects)/(sd_me)
+    sd_me <- lapply(variance_me, function(x) lapply(x, function(x) sqrt(x)))
+    # t and p values
+    t_value <- mapply(function(x,y) mapply(function(x,y) x/y, x, y, SIMPLIFY = FALSE), marginal_effects_scaled, sd_me, SIMPLIFY = F)
     # control for dividing zero by zero
-    t_value[is.nan(t_value)] = 0
+    t_value <- rapply(t_value, function(x) ifelse(is.nan(x), 0, x), how = "replace")
     # p values
-    p_values <- 2*pnorm(-abs(t_value))
+    p_values <- lapply(t_value, function(x) lapply(x, function(x) 2*pnorm(-abs(x))))
+
+    # ----------------------------------------------------------------------------------- #
+
+    ## take mean values of statistics and coerce output into matrix
+    # variance
+    variance_me_mean <- sapply(variance_me, function(x) sapply(x, function(x) as.matrix(mean(x))))
+    # sd
+    sd_me_mean <- sapply(sd_me, function(x) sapply(x, function(x) as.matrix(mean(x))))
+    # tvalue
+    t_value_mean <- sapply(t_value, function(x) sapply(x, function(x) as.matrix(mean(x))))
+    # pvalue
+    pvalues_mean <- sapply(p_values, function(x) sapply(x, function(x) as.matrix(mean(x))))
 
     # ----------------------------------------------------------------------------------- #
 
     # put everything into a list of results
-    results <- list(marginal_effects, variance_me, sd_me, t_value, p_values)
+    results <- list(marginal_effects, variance_me_mean, sd_me_mean, t_value_mean, pvalues_mean)
     names(results) <- c("MarginalEffects", "Variances", "StandardErrors", "tValues", "pValues")
+
+    # add names of output matrices
+    results <- lapply(results, function(x) {
+
+      colnames(x) <- sapply(categories, function(x) paste("Category", x, sep = " "))
+      rownames(x) <- colnames(X)
+      x
+
+    })
 
     # ----------------------------------------------------------------------------------- #
 

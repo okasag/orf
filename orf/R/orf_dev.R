@@ -1188,6 +1188,7 @@ predict_forest_preds_for_ME <- function(forest, data, pred_data) {
 
   # get number of observations
   n_col <- ncol(data[[1]])-1 # number of X variables
+  n_row <- nrow(pred_data[[1]]) # number of evaluation points rows
   # stack pred_data together and make predictions at once
   pred_data <- do.call(rbind, pred_data)
   # prepare empty list
@@ -1198,12 +1199,16 @@ predict_forest_preds_for_ME <- function(forest, data, pred_data) {
 
   # predict for desired Xs up
   for (forest_index in seq_along(forest)) {
+    # start index for observations of X
+    start_index <- 0
     # make honest predictions
     forest_preds_up_together[[forest_index]] <- predict_honest(forest[[forest_index]], data[[forest_index]], pred_data)
     # now assign for each X into respective forest as list entries
     for (X_index in seq_along(pred_data[1,])) {
 
-      forest_preds_up[[forest_index]][[X_index]] <- forest_preds_up_together[[forest_index]][X_index]
+      stop_index <- (n_row*X_index)
+      forest_preds_up[[forest_index]][[X_index]] <- forest_preds_up_together[[forest_index]][(1+start_index):stop_index]
+      start_index <- stop_index
 
     }
   }
@@ -1251,7 +1256,7 @@ predict_forest_weights_for_ME <- function(forest, data, pred_data) {
       # foreach(X_index=seq_along(pred_data)) %do% {
 
       # now do the same for your prediction data
-      leaf_IDs_pred <- predict(forest[[forest_index]], as.data.frame(t(as.matrix(pred_data[[X_index]]))), type = "terminalNodes")$predictions
+      leaf_IDs_pred <- predict(forest[[forest_index]], as.matrix(pred_data[[X_index]]), type = "terminalNodes")$predictions
       # put leaf_IDs into a list
       leaf_IDs_pred <- lapply(seq_along(leaf_IDs_pred[1,]), function(i) leaf_IDs_pred[,i])
 

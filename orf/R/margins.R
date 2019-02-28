@@ -105,7 +105,7 @@ margins.orf <- function(forest, eval, newdata) {
 
   ### marginal effects preparation
   # share of SD to be used
-  h_std <- 1
+  h_std <- 0.1
   # check if X is continuous or dummy or categorical
   X_type <- apply(X, 2, function(x) length(unique(x)))
   # now determine the type of X

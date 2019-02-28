@@ -300,10 +300,10 @@ orf_margins <- function(forest, data, honesty, inference){
     # decide if the marginal effects should be computed at mean or at median
     if (eval=="mean") {
       # variable of interest: X_1 to X_last, ME at mean
-      X_mean <- lapply(1:ncol(X), function(x) colMeans(X)) # set all Xs to their mean values (so many times as we have Xs)
+      X_mean <- lapply(1:ncol(X), function(x) t(as.matrix(colMeans(X)))) # set all Xs to their mean values (so many times as we have Xs)
     } else if (eval=="median") {
       # variable of interest: X_1 to X_last, ME at median
-      X_mean <- lapply(1:ncol(X), function(x) apply(X, 2, median)) # set all Xs to their median values (so many times as we have Xs)
+      X_mean <- lapply(1:ncol(X), function(x) t(as.matrix(apply(X, 2, median)))) # set all Xs to their median values (so many times as we have Xs)
     } else {
       stop("Incorrect evaluation point. Programme terminated.")
     }
@@ -410,10 +410,10 @@ orf_margins <- function(forest, data, honesty, inference){
     # decide if the marginal effects should be computed at mean or at median
     if (eval=="mean") {
       # variable of interest: X_1 to X_last, ME at mean
-      X_mean <- lapply(1:ncol(X), function(x) colMeans(X)) # set all Xs to their mean values (so many times as we have Xs)
+      X_mean <- lapply(1:ncol(X), function(x) t(as.matrix(colMeans(X)))) # set all Xs to their mean values (so many times as we have Xs)
     } else if (eval=="median") {
       # variable of interest: X_1 to X_last, ME at median
-      X_mean <- lapply(1:ncol(X), function(x) apply(X, 2, median)) # set all Xs to their median values (so many times as we have Xs)
+      X_mean <- lapply(1:ncol(X), function(x) t(as.matrix(apply(X, 2, median)))) # set all Xs to their median values (so many times as we have Xs)
     } else {
       stop("Incorrect evaluation point. Programme terminated.")
     }
@@ -524,10 +524,10 @@ orf_margins <- function(forest, data, honesty, inference){
     # decide if the marginal effects should be computed at mean or at median
     if (eval=="mean") {
       # variable of interest: X_1 to X_last, ME at mean
-      X_mean <- lapply(1:ncol(X), function(x) colMeans(X)) # set all Xs to their mean values (so many times as we have Xs)
+      X_mean <- lapply(1:ncol(X), function(x) t(as.matrix(colMeans(X)))) # set all Xs to their mean values (so many times as we have Xs)
     } else if (eval=="median") {
       # variable of interest: X_1 to X_last, ME at median
-      X_mean <- lapply(1:ncol(X), function(x) apply(X, 2, median)) # set all Xs to their median values (so many times as we have Xs)
+      X_mean <- lapply(1:ncol(X), function(x) t(as.matrix(apply(X, 2, median)))) # set all Xs to their median values (so many times as we have Xs)
     } else {
       stop("Incorrect evaluation point. Programme terminated.")
     }

@@ -295,7 +295,7 @@ mrf_margins <- function(forest, data, honesty, inference){
     # compute the scaling factor: X_up-X_down=2*X_sd
     scaling_factor <- as.list(X_up - X_down)
     # set scaling factor to zero for categorical and dummy variables
-    for (i in X_categorical & X_dummy) {
+    for (i in (union(X_categorical, X_dummy))) {
       scaling_factor[[i]] <- 0
     }
 
@@ -409,7 +409,7 @@ mrf_margins <- function(forest, data, honesty, inference){
     # compute the scaling factor: X_up-X_down=2*X_sd
     scaling_factor <- as.list(X_up - X_down)
     # set scaling factor to zero for categorical and dummy variables
-    for (i in X_categorical & X_dummy) {
+    for (i in (union(X_categorical, X_dummy))) {
       scaling_factor[[i]] <- 0
     }
 
@@ -530,7 +530,7 @@ mrf_margins <- function(forest, data, honesty, inference){
     # compute the scaling factor: X_up-X_down=2*X_sd
     scaling_factor <- as.list(X_up - X_down)
     # set scaling factor to zero for categorical and dummy variables
-    for (i in X_categorical & X_dummy) {
+    for (i in (union(X_categorical, X_dummy))) {
       scaling_factor[[i]] <- 0
     }
 
@@ -743,7 +743,7 @@ pred_mrf_margins <- function(forest, data, newdata, honesty, inference){
     # compute the scaling factor: X_up-X_down=2*X_sd
     scaling_factor <- as.list(X_up - X_down)
     # set scaling factor to zero for categorical and dummy variables
-    for (i in X_categorical & X_dummy) {
+    for (i in (union(X_categorical, X_dummy))) {
       scaling_factor[[i]] <- 0
     }
 
@@ -857,7 +857,7 @@ pred_mrf_margins <- function(forest, data, newdata, honesty, inference){
     # compute the scaling factor: X_up-X_down=2*X_sd
     scaling_factor <- as.list(X_up - X_down)
     # set scaling factor to zero for categorical and dummy variables
-    for (i in X_categorical & X_dummy) {
+    for (i in (union(X_categorical, X_dummy))) {
       scaling_factor[[i]] <- 0
     }
 
@@ -979,7 +979,7 @@ pred_mrf_margins <- function(forest, data, newdata, honesty, inference){
     # compute the scaling factor: X_up-X_down=2*X_sd
     scaling_factor <- as.list(X_up - X_down)
     # set scaling factor to zero for categorical and dummy variables
-    for (i in X_categorical & X_dummy) {
+    for (i in (union(X_categorical, X_dummy))) {
       scaling_factor[[i]] <- 0
     }
 

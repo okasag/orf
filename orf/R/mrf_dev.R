@@ -296,7 +296,7 @@ mrf_margins <- function(forest, data, honesty, inference){
     scaling_factor <- as.list(X_up - X_down)
     # set scaling factor to zero for categorical and dummy variables
     for (i in (union(X_categorical, X_dummy))) {
-      scaling_factor[[i]] <- 0
+      scaling_factor[[i]] <- 1
     }
 
     # scale marginal effects
@@ -410,7 +410,7 @@ mrf_margins <- function(forest, data, honesty, inference){
     scaling_factor <- as.list(X_up - X_down)
     # set scaling factor to zero for categorical and dummy variables
     for (i in (union(X_categorical, X_dummy))) {
-      scaling_factor[[i]] <- 0
+      scaling_factor[[i]] <- 1
     }
 
     # scale marginal effects
@@ -531,7 +531,7 @@ mrf_margins <- function(forest, data, honesty, inference){
     scaling_factor <- as.list(X_up - X_down)
     # set scaling factor to zero for categorical and dummy variables
     for (i in (union(X_categorical, X_dummy))) {
-      scaling_factor[[i]] <- 0
+      scaling_factor[[i]] <- 1
     }
 
     # scale marginal effects
@@ -744,7 +744,7 @@ pred_mrf_margins <- function(forest, data, newdata, honesty, inference){
     scaling_factor <- as.list(X_up - X_down)
     # set scaling factor to zero for categorical and dummy variables
     for (i in (union(X_categorical, X_dummy))) {
-      scaling_factor[[i]] <- 0
+      scaling_factor[[i]] <- 1
     }
 
     # scale marginal effects
@@ -858,7 +858,7 @@ pred_mrf_margins <- function(forest, data, newdata, honesty, inference){
     scaling_factor <- as.list(X_up - X_down)
     # set scaling factor to zero for categorical and dummy variables
     for (i in (union(X_categorical, X_dummy))) {
-      scaling_factor[[i]] <- 0
+      scaling_factor[[i]] <- 1
     }
 
     # scale marginal effects
@@ -980,7 +980,7 @@ pred_mrf_margins <- function(forest, data, newdata, honesty, inference){
     scaling_factor <- as.list(X_up - X_down)
     # set scaling factor to zero for categorical and dummy variables
     for (i in (union(X_categorical, X_dummy))) {
-      scaling_factor[[i]] <- 0
+      scaling_factor[[i]] <- 1
     }
 
     # scale marginal effects

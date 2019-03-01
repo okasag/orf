@@ -252,7 +252,7 @@ margins.orf <- function(forest, eval, newdata) {
   # compute the scaling factor: X_up-X_down=2*X_sd
   scaling_factor <- split((X_up - X_down), 1:X_cols) # save it as separate list vectors
   # set scaling factor to zero for categorical and dummy variables
-  for (i in X_categorical & X_dummy) {
+  for (i in (union(X_categorical, X_dummy))) {
     scaling_factor[[i]] <- rep(0, X_rows)
   }
   # scale the differences to get marginal effects

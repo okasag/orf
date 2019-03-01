@@ -398,3 +398,31 @@ margins.orf <- function(forest, eval, newdata) {
   # ----------------------------------------------------------------------------------- #
 
 }
+
+
+
+#' print.margins.orf
+#'
+#' print estimated marginal effects from ordered random forest of class \code{orf}
+#'
+#' @param x object of type \code{margins.orf}
+#' @param ... further arguments (currently ignored)
+#'
+#' @export
+print.margins.orf <- function(x, ...) {
+
+  # chekc if inference has been done
+  if (length(x) > 1) {
+
+    # print inference output table
+    margins_output(x)
+
+  } else {
+
+    # print just the marginal effects
+    print(x$MarginalEffects)
+
+  }
+
+
+}

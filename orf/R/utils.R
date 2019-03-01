@@ -89,3 +89,57 @@ coefstars <- function(coefs, pvalues) {
 
 }
 
+
+#' Formatted output for marginal effects with inference
+#'
+#' function for creating inference table output for estimated effects which
+#' can be passed into \code{print.margins.orf}
+#'
+#' @param x object of type \code{margins.orf}
+#'
+margins_output <- function(x) {
+
+  output_matrix <- matrix(NA, nrow = 1, ncol = 4)
+
+  cat("ORF Marginal Effects: \n\n")
+  cat("--------------------------------------------------------------------")
+
+  for (var_idx in 1:nrow(x$MarginalEffects)) {
+
+    cat(rownames(x$MarginalEffects)[var_idx], "\n")
+    cat("                    Cat ", "    Effect", " StdDev", " tValue ", "pValue", "     ", "\n")
+
+    for (cat_idx in 1:ncol(x$MarginalEffects)) {
+
+      # generate stars (thanks to:
+      # http://myowelt.blogspot.com/2008/04/beautiful-correlation-tables-in-r.html)
+      stars <- ifelse(x$pValues[var_idx, cat_idx] < .001, "***",
+                      ifelse(x$pValues[var_idx, cat_idx] < .01, "** ",
+                             ifelse(x$pValues[var_idx, cat_idx] < .05, "*  ", "   ")))
+
+      # print estimates for each category iteratively
+      output_matrix[1, 1] <- x$MarginalEffects[var_idx, cat_idx]
+      output_matrix[1, 2] <- x$StandardErrors[var_idx, cat_idx]
+      output_matrix[1, 3] <- x$tValues[var_idx, cat_idx]
+      output_matrix[1, 4] <- x$pValues[var_idx, cat_idx]
+
+
+      cat("                 |  ", cat_idx, "  |  ") # prit out the categories
+
+      cat(format(sprintf("% .4f", round(output_matrix, 4))), stars, "  |  ") # print out the estimates
+
+      cat("\n") # break the line
+
+
+    }
+
+  }
+
+  cat("--------------------------------------------------------------------", "\n")
+  cat("Significance levels correspond to: *** .< 0.01, ** .< 0.05, * .< 0.1 \n")
+  cat("--------------------------------------------------------------------", "\n")
+
+
+}
+
+

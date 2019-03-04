@@ -102,12 +102,12 @@ margins_output <- function(x) {
   output_matrix <- matrix(NA, nrow = 1, ncol = 4)
 
   cat("ORF Marginal Effects: \n\n")
-  cat("--------------------------------------------------------------------")
+  cat("---------------------------------------------------------------------------------", "\n")
 
   for (var_idx in 1:nrow(x$MarginalEffects)) {
 
     cat(rownames(x$MarginalEffects)[var_idx], "\n")
-    cat("                    Cat ", "    Effect", " StdDev", " tValue ", "pValue", "     ", "\n")
+    cat("                    Cat ", "     Effect", "    StdDev", "    tValue ", "   pValue", "     ", "\n")
 
     for (cat_idx in 1:ncol(x$MarginalEffects)) {
 
@@ -126,7 +126,7 @@ margins_output <- function(x) {
 
       cat("                 |  ", cat_idx, "  |  ") # prit out the categories
 
-      cat(format(sprintf("% .4f", round(output_matrix, 4))), stars, "  |  ") # print out the estimates
+      cat(format(sprintf("%8.4f", round(output_matrix, 4)), width = 10), stars, "  |  ") # print out the estimates
 
       cat("\n") # break the line
 
@@ -135,10 +135,9 @@ margins_output <- function(x) {
 
   }
 
-  cat("--------------------------------------------------------------------", "\n")
+  cat("---------------------------------------------------------------------------------", "\n")
   cat("Significance levels correspond to: *** .< 0.01, ** .< 0.05, * .< 0.1 \n")
-  cat("--------------------------------------------------------------------", "\n")
-
+  cat("---------------------------------------------------------------------------------", "\n")
 
 }
 

@@ -142,3 +142,65 @@ margins_output <- function(x) {
 }
 
 
+#' Formatted latex output for marginal effects with inference
+#'
+#' function for creating latex inference table output for estimated effects which
+#' can be passed into \code{print.margins.orf}
+#'
+#' @param x object of type \code{margins.orf}
+#'
+#' @importFrom xtable xtable print.xtable
+#'
+margins_output_latex <- function(x) {
+
+  # get number of categories
+  ncat <- ncol(x$MarginalEffects)
+  # get number of variables
+  nvar <- nrow(x$MarginalEffects)
+  # get variable names
+  varnames <- rownames(x$MarginalEffects)
+
+  # create empty output matrix
+  output_matrix <- matrix("", nrow = (nvar*ncat), ncol = 7)
+
+  for (var_idx in 0:(nvar-1)) {
+
+
+    for (cat_idx in 1:ncat) {
+
+      # generate stars (thanks to:
+      # http://myowelt.blogspot.com/2008/04/beautiful-correlation-tables-in-r.html)
+      stars <- ifelse(x$pValues[var_idx+1, cat_idx] < .01, "***",
+                      ifelse(x$pValues[var_idx+1, cat_idx] < .05, "** ",
+                             ifelse(x$pValues[var_idx+1, cat_idx] < .1, "*  ", "   ")))
+
+      # print estimates for each category iteratively
+      output_matrix[1+(var_idx*ncat), 1] <- varnames[var_idx+1] # fit in variable name
+      output_matrix[(var_idx*ncat)+cat_idx, 2] <- cat_idx # fit in category
+      output_matrix[(var_idx*ncat)+cat_idx, 3] <- x$MarginalEffects[var_idx+1, cat_idx]
+      output_matrix[(var_idx*ncat)+cat_idx, 4] <- x$StandardErrors[var_idx+1, cat_idx]
+      output_matrix[(var_idx*ncat)+cat_idx, 5] <- x$tValues[var_idx+1, cat_idx]
+      output_matrix[(var_idx*ncat)+cat_idx, 6] <- x$pValues[var_idx+1, cat_idx]
+      output_matrix[(var_idx*ncat)+cat_idx, 7] <- stars
+
+
+
+    }
+
+  }
+
+  # add colnames
+  colnames(output_matrix) <- c("Variable", "Category", "Effect", "Std.Error", "t-Value", "p-Value", " ")
+  # define as data.frame
+  output_matrix <- as.data.frame(output_matrix)
+  # format the output matrix
+  for (i in 3:6) {
+    output_matrix[, i] <- as.character(output_matrix[, i])
+    output_matrix[, i] <- round(as.numeric(output_matrix[, i]), 4)
+  }
+  # put caption an latex environment
+  xoutput <- xtable(output_matrix, digits = 4, caption = "ORF Marginal Effects")
+  # put hline after each variable
+  print.xtable(xoutput, hline.after = seq(ncat, ncat*nvar, ncat), type = "latex", include.rownames=FALSE)
+
+}

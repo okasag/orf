@@ -406,16 +406,22 @@ margins.orf <- function(forest, eval, newdata) {
 #' print estimated marginal effects from ordered random forest of class \code{orf}
 #'
 #' @param x object of type \code{margins.orf}
+#' @param latex logical, if latex output should be generated (\code{default = FALSE})
 #' @param ... further arguments (currently ignored)
 #'
 #' @export
-print.margins.orf <- function(x, ...) {
+print.margins.orf <- function(x, latex = FALSE, ...) {
 
   # chekc if inference has been done
-  if (length(x) > 1) {
+  if (length(x) > 1 & latex == FALSE) {
 
     # print inference output table
     margins_output(x)
+
+   } else if (length(x) > 1 & latex == TRUE) {
+
+    # print inference output table latex
+    margins_output_latex(x)
 
   } else {
 

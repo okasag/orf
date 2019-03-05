@@ -4,10 +4,12 @@
 \alias{print.margins.orf}
 \title{print.margins.orf}
 \usage{
-\method{print}{margins.orf}(x, ...)
+\method{print}{margins.orf}(x, latex = FALSE, ...)
 }
 \arguments{
 \item{x}{object of type \code{margins.orf}}
+
+\item{latex}{logical, if latex output should be generated (\code{default = FALSE})}
 
 \item{...}{further arguments (currently ignored)}
 }

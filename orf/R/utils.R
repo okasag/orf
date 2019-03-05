@@ -113,9 +113,9 @@ margins_output <- function(x) {
 
       # generate stars (thanks to:
       # http://myowelt.blogspot.com/2008/04/beautiful-correlation-tables-in-r.html)
-      stars <- ifelse(x$pValues[var_idx, cat_idx] < .001, "***",
-                      ifelse(x$pValues[var_idx, cat_idx] < .01, "** ",
-                             ifelse(x$pValues[var_idx, cat_idx] < .05, "*  ", "   ")))
+      stars <- ifelse(x$pValues[var_idx, cat_idx] < .01, "***",
+                      ifelse(x$pValues[var_idx, cat_idx] < .05, "** ",
+                             ifelse(x$pValues[var_idx, cat_idx] < .1, "*  ", "   ")))
 
       # print estimates for each category iteratively
       output_matrix[1, 1] <- x$MarginalEffects[var_idx, cat_idx]

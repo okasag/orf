@@ -204,3 +204,18 @@ margins_output_latex <- function(x) {
   print.xtable(xoutput, hline.after = seq(ncat, ncat*nvar, ncat), type = "latex", include.rownames=FALSE)
 
 }
+
+
+#' repeat rows of a matrix
+#'
+#' function for replicating rows of a matrix n number of times
+#'
+#' @param matrix matrix which rows should be replicated
+#' @param n number of times to repeat
+#'
+rep_row<-function(matrix, n){
+  # thanks to: https://www.r-bloggers.com/a-quick-way-to-do-row-repeat-and-col-repeat-rep-row-rep-col/
+  matrix(rep(matrix, each = n), nrow = n)
+}
+
+

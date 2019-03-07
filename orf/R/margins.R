@@ -141,7 +141,7 @@ margins.orf <- function(forest, eval, newdata) {
   # get number of Xs
   X_cols <- ncol(X_mean[[1]])
   # get SD of Xs
-  X_sd <- apply(X, 2, sd)
+  X_sd <- rep_row(apply(X, 2, sd), n = X_rows)
   # create X_up (X_mean + 0.1 * X_sd)
   X_up <- X_mean[[1]] + h_std*X_sd
   # create X_down (X_mean - 0.1 * X_sd)
@@ -149,16 +149,26 @@ margins.orf <- function(forest, eval, newdata) {
 
   ## now check for the support of X
   # check X_max
-  X_max <- apply(X, 2, max)
+  X_max <- rep_row(apply(X, 2, max), n = X_rows)
   # check X_min
-  X_min <- apply(X, 2, min)
+  X_min <- rep_row(apply(X, 2, min), n = X_rows)
   # check if X_up is within the range X_min and X_max
   X_up <- (X_up < X_max) * X_up + (X_up >= X_max) * X_max
   X_up <- (X_up > X_min) * X_up + (X_up <= X_min) * (X_min + h_std * X_sd)
   # check if X_down is within the range X_min and X_max
   X_down <- (X_down > X_min) * X_down + (X_down <= X_min) * X_min
   X_down <- (X_down < X_max) * X_down + (X_down >= X_max) * (X_max - h_std * X_sd)
-  # some additional checks
+  # check if X_up and X_down are same
+  if (any(X_up == X_down)) {
+    # adjust to higher share of SD
+    X_up   <- (X_up > X_down) * X_up   + (X_up == X_down) * (X_up   + 0.5 * h_std * X_sd)
+    X_down <- (X_up > X_down) * X_down + (X_up == X_down) * (X_down - 0.5 * h_std * X_sd)
+    # check the min max range again
+    X_up   <- (X_up < X_max) * X_up + (X_up >= X_max) * X_max
+    X_down <- (X_down > X_min) * X_down + (X_down <= X_min) * X_min
+
+  }
+  # checks for support of X done
 
   # ----------------------------------------------------------------------------------- #
 
@@ -250,7 +260,7 @@ margins.orf <- function(forest, eval, newdata) {
   ### now subtract the predictions according to the ME formula
   forest_pred_diff_up_down <- mapply(function(x,y) mapply(function(x,y) x-y, x, y,  SIMPLIFY = F), forest_pred_up, forest_pred_down, SIMPLIFY = F)
   # compute the scaling factor: X_up-X_down=2*X_sd
-  scaling_factor <- split((X_up - X_down), 1:X_cols) # save it as separate list vectors
+  scaling_factor <- lapply(1:X_cols, function(i) as.numeric((X_up - X_down)[, i])) # save it as separate list vectors
   # set scaling factor to zero for categorical and dummy variables
   for (i in (union(X_categorical, X_dummy))) {
     scaling_factor[[i]] <- rep(1, X_rows)
@@ -279,51 +289,37 @@ margins.orf <- function(forest, eval, newdata) {
 
     ### variance for the marginal effects
     ## compute prerequisities for variance of honest marginal effects
-    # scaling factor squared
-    scaling_factor_squared <- lapply(scaling_factor, function(x) x^2)
+    # mean of scaling factor and squared afterwards (for atmean and atmedian the averaging doesnt change anything)
+    scaling_factor_squared <- lapply(scaling_factor, function(x) (mean(x))^2)
 
     # now subtract the weights according to the ME formula
     forest_weights_diff_up_down <- mapply(function(x,y) mapply(function(x,y) x-y, x, y,  SIMPLIFY = F), forest_weights_up, forest_weights_down, SIMPLIFY = F)
 
-    # compute the conditional means: 1/N(weights%*%y) (predictions are based on honest sample)
-    forest_cond_means <- mapply(function(x,y) lapply(x, function(x) (x%*%y)/nrow(Y_ind[[1]])), forest_weights_diff_up_down, Y_ind, SIMPLIFY = FALSE)
     # calculate standard multiplication of weights and outcomes: honest_weights*y_ind_honest
     if (eval == "mean") {
-      forest_multi <- mapply(function(x,y) lapply(x, function(x) apply(t(x), 2, function(x) x*y)), forest_weights_diff_up_down, Y_ind, SIMPLIFY = FALSE)
-      # subtract the mean from each obs i
-      forest_multi_demeaned <- mapply(function(x,y) mapply(function(x,y) {
-        # demean each and every observation
-        sapply(seq_along(y[, 1]), function(i) x[, i] - matrix(y[i, 1], nrow = nrow(x))) # sapply as we want to keep matrix structure
 
-        }, x, y, SIMPLIFY = FALSE), forest_multi, forest_cond_means, SIMPLIFY = F)
+      ### take an average of the weights
+      forest_weights_diff_up_down <- lapply(forest_weights_diff_up_down, function(x) lapply(x, function(x) matrix(colMeans(x), nrow = 1, ncol = ncol(x))))
 
-      ## now do the single variances for each category m
-      # square the demeaned and sum it and normalize (colSums as eahc column represents one observations)
-      forest_multi_demeaned_sq_sum_norm <- lapply(forest_multi_demeaned, function(x) lapply(x, function(x) (colSums(x^2))*(nrow(Y_ind[[1]])/(nrow(Y_ind[[1]])-1))))
-
-      ## now compute the prerequisites for covariances
-      # multiply forest_var_multi_demeaned according to formula for covariance (shifted categories needed for computational convenience)
-      forest_multi_demeaned_0_last <- append(forest_multi_demeaned, list(rep(list(matrix(0, ncol = ncol(forest_multi_demeaned[[1]][[1]]), nrow = nrow(forest_multi_demeaned[[1]][[1]]))), ncol(X)))) # append zero matrix list
-      forest_multi_demeaned_0_first <- append(list(rep(list(matrix(0, ncol = ncol(forest_multi_demeaned[[1]][[1]]), nrow = nrow(forest_multi_demeaned[[1]][[1]]))), ncol(X))), forest_multi_demeaned) # prepend zero matrix list
-      # compute the multiplication of category m with m-1 according to the covariance formula (sum, normalize and multiply by 2)
-      forest_multi_demeaned_cov_sum_norm_mult2 <- mapply(function(x,y) mapply(function(x,y) (colSums(x*y))*(nrow(Y_ind[[1]])/(nrow(Y_ind[[1]])-1))*2, x, y, SIMPLIFY = FALSE), forest_multi_demeaned_0_first, forest_multi_demeaned_0_last, SIMPLIFY = F)
-
-    } else {
-      forest_multi <- mapply(function(x,y) lapply(x, function(x) t(x)*y), forest_weights_diff_up_down, Y_ind, SIMPLIFY = FALSE)
-      # subtract the mean from each obs i
-      forest_multi_demeaned <- mapply(function(x,y) mapply(function(x,y) x-matrix(y, nrow = nrow(x)), x, y, SIMPLIFY = FALSE), forest_multi, forest_cond_means, SIMPLIFY = F)
-
-      ## now do the single variances for each category m
-      # square the demeaned and sum it and normalize
-      forest_multi_demeaned_sq_sum_norm <- lapply(forest_multi_demeaned, function(x) lapply(x, function(x) (sum(x^2))*(nrow(Y_ind[[1]])/(nrow(Y_ind[[1]])-1))))
-
-      ## now compute the prerequisites for covariances
-      # multiply forest_var_multi_demeaned according to formula for covariance (shifted categories needed for computational convenience)
-      forest_multi_demeaned_0_last <- append(forest_multi_demeaned, list(rep(list(matrix(0, ncol = ncol(forest_multi_demeaned[[1]][[1]]), nrow = nrow(forest_multi_demeaned[[1]][[1]]))), ncol(X)))) # append zero matrix list
-      forest_multi_demeaned_0_first <- append(list(rep(list(matrix(0, ncol = ncol(forest_multi_demeaned[[1]][[1]]), nrow = nrow(forest_multi_demeaned[[1]][[1]]))), ncol(X))), forest_multi_demeaned) # prepend zero matrix list
-      # compute the multiplication of category m with m-1 according to the covariance formula (sum, normalize and multiply by 2)
-      forest_multi_demeaned_cov_sum_norm_mult2 <- mapply(function(x,y) mapply(function(x,y) (sum(x*y))*(nrow(Y_ind[[1]])/(nrow(Y_ind[[1]])-1))*2, x, y, SIMPLIFY = FALSE), forest_multi_demeaned_0_first, forest_multi_demeaned_0_last, SIMPLIFY = F)
     }
+
+    # compute the conditional means: 1/N(weights%*%y) (predictions are based on honest sample)
+    forest_cond_means <- mapply(function(x,y) lapply(x, function(x) (x%*%y)/nrow(Y_ind[[1]])), forest_weights_diff_up_down, Y_ind, SIMPLIFY = FALSE)
+    # compute standard multiplication
+    forest_multi <- mapply(function(x,y) lapply(x, function(x) t(x)*y), forest_weights_diff_up_down, Y_ind, SIMPLIFY = FALSE)
+    # subtract the mean from each obs i
+    forest_multi_demeaned <- mapply(function(x,y) mapply(function(x,y) x-matrix(y, nrow = nrow(x)), x, y, SIMPLIFY = FALSE), forest_multi, forest_cond_means, SIMPLIFY = F)
+
+    ## now do the single variances for each category m
+    # square the demeaned and sum it and normalize
+    forest_multi_demeaned_sq_sum_norm <- lapply(forest_multi_demeaned, function(x) lapply(x, function(x) (sum(x^2))*(nrow(Y_ind[[1]])/(nrow(Y_ind[[1]])-1))))
+
+    ## now compute the prerequisites for covariances
+    # multiply forest_var_multi_demeaned according to formula for covariance (shifted categories needed for computational convenience)
+    forest_multi_demeaned_0_last <- append(forest_multi_demeaned, list(rep(list(matrix(0, ncol = ncol(forest_multi_demeaned[[1]][[1]]), nrow = nrow(forest_multi_demeaned[[1]][[1]]))), ncol(X)))) # append zero matrix list
+    forest_multi_demeaned_0_first <- append(list(rep(list(matrix(0, ncol = ncol(forest_multi_demeaned[[1]][[1]]), nrow = nrow(forest_multi_demeaned[[1]][[1]]))), ncol(X))), forest_multi_demeaned) # prepend zero matrix list
+    # compute the multiplication of category m with m-1 according to the covariance formula (sum, normalize and multiply by 2)
+    forest_multi_demeaned_cov_sum_norm_mult2 <- mapply(function(x,y) mapply(function(x,y) (sum(x*y))*(nrow(Y_ind[[1]])/(nrow(Y_ind[[1]])-1))*2, x, y, SIMPLIFY = FALSE), forest_multi_demeaned_0_first, forest_multi_demeaned_0_last, SIMPLIFY = F)
 
     # divide by scaling factor to get the variance
     variance <- lapply(forest_multi_demeaned_sq_sum_norm, function(x) mapply(function(x,y) x/y, x, scaling_factor_squared, SIMPLIFY = FALSE) )
@@ -346,43 +342,31 @@ margins.orf <- function(forest, eval, newdata) {
 
     # ----------------------------------------------------------------------------------- #
 
-    ## sd, tvalues, pvalues
-
-    # take square root of variance
-    sd_me <- lapply(variance_me, function(x) lapply(x, function(x) sqrt(x)))
-    # t and p values
-    t_value <- mapply(function(x,y) mapply(function(x,y) x/y, x, y, SIMPLIFY = FALSE), marginal_effects_scaled, sd_me, SIMPLIFY = F)
-    # control for dividing zero by zero
-    t_value <- rapply(t_value, function(x) ifelse(is.nan(x), 0, x), how = "replace")
-    # p values
-    p_values <- lapply(t_value, function(x) lapply(x, function(x) 2*pnorm(-abs(x))))
+    ## output for final variances of marginal effects
+    # coerce to a matrix
+    variance_me <- sapply(variance_me, function(x) sapply(x, function(x) as.matrix(x)))
+    # add names
+    colnames(variance_me) <- sapply(categories, function(x) paste("Category", x, sep = " "))
+    rownames(variance_me) <- colnames(X)
 
     # ----------------------------------------------------------------------------------- #
 
-    ## take mean values of statistics and coerce output into matrix
-    # variance
-    variance_me_mean <- sapply(variance_me, function(x) sapply(x, function(x) as.matrix(mean(x))))
-    # sd
-    sd_me_mean <- sapply(sd_me, function(x) sapply(x, function(x) as.matrix(mean(x))))
-    # tvalue
-    t_value_mean <- sapply(t_value, function(x) sapply(x, function(x) as.matrix(mean(x))))
-    # pvalue
-    pvalues_mean <- sapply(p_values, function(x) sapply(x, function(x) as.matrix(mean(x))))
+    ## standard deviations
+    # take square root of variance
+    sd_me <- sqrt(variance_me)
+
+    #### z scores and p values ####
+    t_value <- (marginal_effects)/(sd_me)
+    # control for dividing zero by zero
+    t_value[is.nan(t_value)] = 0
+    # p values
+    p_values <- 2*pnorm(-abs(t_value))
 
     # ----------------------------------------------------------------------------------- #
 
     # put everything into a list of results
-    results <- list(marginal_effects, variance_me_mean, sd_me_mean, t_value_mean, pvalues_mean)
+    results <- list(marginal_effects, variance_me, sd_me, t_value, p_values)
     names(results) <- c("MarginalEffects", "Variances", "StandardErrors", "tValues", "pValues")
-
-    # add names of output matrices
-    results <- lapply(results, function(x) {
-
-      colnames(x) <- sapply(categories, function(x) paste("Category", x, sep = " "))
-      rownames(x) <- colnames(X)
-      x
-
-    })
 
     # ----------------------------------------------------------------------------------- #
 

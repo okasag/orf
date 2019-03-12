@@ -61,6 +61,15 @@ NumericVector pred_weights_C(List x, List y, List z) {
     }
   }
 
-  return forest_out;
+  // take colmeans of weights for saving memory in R
+
+  NumericMatrix forest_out_mean(1, nf_cols); // create output matrix for mean weights
+
+  for(int i = 0; i < nf_cols; ++i) {
+
+    forest_out_mean(0, i) = mean(forest_out(_, i));
+  }
+
+  return forest_out_mean;
 
 }

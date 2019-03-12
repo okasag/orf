@@ -234,25 +234,25 @@ margins.orf <- function(forest, eval, newdata) {
 
   ### form ORF predictions
   # prepare up
-  forest_pred_up_1 <- append(forest_pred_up, list(rep(list(rep(1, X_rows)), X_cols))) # append 1
-  forest_pred_up_0 <- append(list(rep(list(rep(0, X_rows)), X_cols)), forest_pred_up) # prepend 0
+  forest_pred_up_1 <- append(forest_pred_up, list(rep(list(rep(1, 1)), X_cols))) # append 1
+  forest_pred_up_0 <- append(list(rep(list(rep(0, 1)), X_cols)), forest_pred_up) # prepend 0
   # isolate predictions
   forest_pred_up <- mapply(function(x,y) mapply(function(x,y) x-y, x, y,  SIMPLIFY = F), forest_pred_up_1, forest_pred_up_0, SIMPLIFY = F)
   # avoid negative predictions
   forest_pred_up <- lapply(forest_pred_up, function(x) lapply(x, function(x) ifelse((x < 0), 0, x)))
   # normalize predictions
-  forest_pred_up_rowsum <- lapply(seq_along(forest_pred_up[[1]]), function(i) rowSums(matrix(sapply(forest_pred_up, "[[", i), ncol = length(categories), nrow = nrow(X_mean_up[[1]])))) # build rowsums with respect to categories
+  forest_pred_up_rowsum <- lapply(seq_along(forest_pred_up[[1]]), function(i) rowSums(matrix(sapply(forest_pred_up, "[[", i), ncol = length(categories), nrow = 1))) # build rowsums with respect to categories
   forest_pred_up <- lapply(forest_pred_up, function(x) mapply(function(x,y) x/y, x, forest_pred_up_rowsum, SIMPLIFY = FALSE)) # normalize to sum up to 1 (very rare but just to be sure)
 
   # prepare down
-  forest_pred_down_1 <- append(forest_pred_down, list(rep(list(rep(1, X_rows)), X_cols))) # append 1
-  forest_pred_down_0 <- append(list(rep(list(rep(0, X_rows)), X_cols)), forest_pred_down) # prepend 0
+  forest_pred_down_1 <- append(forest_pred_down, list(rep(list(rep(1, 1)), X_cols))) # append 1
+  forest_pred_down_0 <- append(list(rep(list(rep(0, 1)), X_cols)), forest_pred_down) # prepend 0
   # isolate predictions
   forest_pred_down <- mapply(function(x,y) mapply(function(x,y) x-y, x, y,  SIMPLIFY = F), forest_pred_down_1, forest_pred_down_0, SIMPLIFY = F)
   # avoid negative predictions
   forest_pred_down <- lapply(forest_pred_down, function(x) lapply(x, function(x) ifelse((x < 0), 0, x)))
   # normalize predictions
-  forest_pred_down_rowsum <- lapply(seq_along(forest_pred_down[[1]]), function(i) rowSums(matrix(sapply(forest_pred_down, "[[", i), ncol = length(categories), nrow = nrow(X_mean_down[[1]])))) # build rowsums with respect to categories
+  forest_pred_down_rowsum <- lapply(seq_along(forest_pred_down[[1]]), function(i) rowSums(matrix(sapply(forest_pred_down, "[[", i), ncol = length(categories), nrow = 1))) # build rowsums with respect to categories
   forest_pred_down <- lapply(forest_pred_down, function(x) mapply(function(x,y) x/y, x, forest_pred_down_rowsum, SIMPLIFY = FALSE)) # normalize to sum up to 1 (very rare but just to be sure)
 
   # ----------------------------------------------------------------------------------- #
@@ -260,20 +260,18 @@ margins.orf <- function(forest, eval, newdata) {
   ### now subtract the predictions according to the ME formula
   forest_pred_diff_up_down <- mapply(function(x,y) mapply(function(x,y) x-y, x, y,  SIMPLIFY = F), forest_pred_up, forest_pred_down, SIMPLIFY = F)
   # compute the scaling factor: X_up-X_down=2*X_sd
-  scaling_factor <- lapply(1:X_cols, function(i) as.numeric((X_up - X_down)[, i])) # save it as separate list vectors
+  scaling_factor <- lapply(1:X_cols, function(i) mean(as.numeric((X_up - X_down)[, i]))) # save it as separate list vectors (mean doesnt change anything for "atmean" option)
   # set scaling factor to zero for categorical and dummy variables
   for (i in (union(X_categorical, X_dummy))) {
-    scaling_factor[[i]] <- rep(1, X_rows)
+    scaling_factor[[i]] <- 1
   }
   # scale the differences to get marginal effects
   marginal_effects_scaled <- lapply(forest_pred_diff_up_down, function(x) mapply(function(x,y) x/y, x, scaling_factor, SIMPLIFY = FALSE) )
-  # take means fo marginal effects for each X (for atmean or atmedian this doesnt change anything)
-  marginal_effects_mean <- lapply(marginal_effects_scaled, function(x) lapply(x, function(x) mean(x)))
 
   # ----------------------------------------------------------------------------------- #
 
   # coerce to a matrix
-  marginal_effects <- sapply(marginal_effects_mean, function(x) sapply(x, function(x) as.matrix(x)))
+  marginal_effects <- sapply(marginal_effects_scaled, function(x) sapply(x, function(x) as.matrix(x)))
   # add names
   colnames(marginal_effects) <- sapply(categories, function(x) paste("Category", x, sep = " "))
   rownames(marginal_effects) <- colnames(X)
@@ -294,14 +292,6 @@ margins.orf <- function(forest, eval, newdata) {
 
     # now subtract the weights according to the ME formula
     forest_weights_diff_up_down <- mapply(function(x,y) mapply(function(x,y) x-y, x, y,  SIMPLIFY = F), forest_weights_up, forest_weights_down, SIMPLIFY = F)
-
-    # calculate standard multiplication of weights and outcomes: honest_weights*y_ind_honest
-    if (eval == "mean") {
-
-      ### take an average of the weights
-      forest_weights_diff_up_down <- lapply(forest_weights_diff_up_down, function(x) lapply(x, function(x) matrix(colMeans(x), nrow = 1, ncol = ncol(x))))
-
-    }
 
     # compute the conditional means: 1/N(weights%*%y) (predictions are based on honest sample)
     forest_cond_means <- mapply(function(x,y) lapply(x, function(x) (x%*%y)/nrow(Y_ind[[1]])), forest_weights_diff_up_down, Y_ind, SIMPLIFY = FALSE)

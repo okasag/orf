@@ -1261,10 +1261,7 @@ predict_forest_weights_for_ME <- function(forest, data, pred_data) {
       leaf_IDs_pred <- lapply(seq_along(leaf_IDs_pred[1,]), function(i) leaf_IDs_pred[,i])
 
       # now average over the bootstraps, i.e. over trees to get final weights
-      #forest_weights_pred_final <- Reduce("+", forest_weights_pred) / length(forest_weights_pred)
-      forest_weights_pred_final <- pred_weights_C(leaf_IDs_pred, leaf_IDs, leaf_size)
-
-      forest_weights_up[[forest_index]][[X_index]] <- forest_weights_pred_final
+      forest_weights_up[[forest_index]][[X_index]] <- pred_weights_C(leaf_IDs_pred, leaf_IDs, leaf_size)
 
     }
 

@@ -162,6 +162,7 @@ margins_output_latex <- function(x) {
 
   # create empty output matrix
   output_matrix <- matrix("", nrow = (nvar*ncat), ncol = 7)
+  rownames(output_matrix) <- rep("default", (nvar*ncat)) # generate unique identifier
 
   for (var_idx in 0:(nvar-1)) {
 
@@ -175,6 +176,7 @@ margins_output_latex <- function(x) {
                              ifelse(x$pValues[var_idx+1, cat_idx] < .1, "*  ", "   ")))
 
       # print estimates for each category iteratively
+      rownames(output_matrix)[(var_idx*ncat)+cat_idx] <- paste0(varnames[var_idx+1], cat_idx)
       output_matrix[1+(var_idx*ncat), 1] <- varnames[var_idx+1] # fit in variable name
       output_matrix[(var_idx*ncat)+cat_idx, 2] <- cat_idx # fit in category
       output_matrix[(var_idx*ncat)+cat_idx, 3] <- x$MarginalEffects[var_idx+1, cat_idx]
@@ -201,8 +203,12 @@ margins_output_latex <- function(x) {
   # put caption an latex environment
   xoutput <- xtable(output_matrix, digits = 4, caption = "ORF Marginal Effects")
   # put hline after each variable
-  print.xtable(xoutput, hline.after = seq(ncat, ncat*nvar, ncat), type = "latex", include.rownames=FALSE)
+  print.xtable(xoutput, hline.after = c(0, seq(ncat, ncat*nvar, ncat)), type = "latex", include.rownames = FALSE, comment = FALSE)
 
+  #kable(output_matrix, "latex", booktabs = T, caption = "ORF Marginal Effects", linesep = "") %>%
+  #  row_spec(seq(ncat, ncat*nvar, ncat), hline_after = TRUE) %>%
+  #  kable_styling(latex_options =c("scale_down"))
+  #output_matrix
 }
 
 

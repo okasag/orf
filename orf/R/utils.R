@@ -224,4 +224,4 @@ rep_row<-function(matrix, n){
   matrix(rep(matrix, each = n), nrow = n)
 }
 
-
+### safety edit: 14 June 2019 ###

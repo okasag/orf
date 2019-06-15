@@ -87,7 +87,7 @@ predict_forest_weights <- function(forest, data, pred_data) {
   # --------------------------------------------------------------------------------------------------- #
 
   # predict weights for the whole prediction sample based on train/honest data
-  forest_weights <- pred_weights_C(leaf_IDs_pred, leaf_IDs, leaf_size)
+  forest_weights <- pred_weights_C(leaf_IDs_pred, leaf_IDs, leaf_size, 0)
 
   # --------------------------------------------------------------------------------------------------- #
 

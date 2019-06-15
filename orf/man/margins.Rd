@@ -7,7 +7,7 @@
 margins(forest, eval, newdata)
 }
 \arguments{
-\item{forest}{estimated forest object of class \code{orf}, \code{mrf} or \code{brf}}
+\item{forest}{estimated forest object of class \code{orf} or \code{mrf}}
 
 \item{eval}{string defining evaluation point for marginal effects. These can be one of "mean", "atmean", or "atmedian"}
 
@@ -16,5 +16,5 @@ margins(forest, eval, newdata)
 \description{
 margins is an S3 generic with methods to estimate marginal effects
 of various discrete choice models based on the random forests algorithm.
-Applicable classes are \code{orf}, \code{mrf} and \code{brf}.
+Applicable classes are \code{orf} and \code{mrf}.
 }

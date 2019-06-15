@@ -2,9 +2,9 @@
 #'
 #' margins is an S3 generic with methods to estimate marginal effects
 #' of various discrete choice models based on the random forests algorithm.
-#' Applicable classes are \code{orf}, \code{mrf} and \code{brf}.
+#' Applicable classes are \code{orf} and \code{mrf}.
 #'
-#' @param forest estimated forest object of class \code{orf}, \code{mrf} or \code{brf}
+#' @param forest estimated forest object of class \code{orf} or \code{mrf}
 #' @param eval string defining evaluation point for marginal effects. These can be one of "mean", "atmean", or "atmedian"
 #' @param newdata matrix of new Xs (currently not supported)
 #'
@@ -16,9 +16,8 @@ margins <- function(forest, eval, newdata) UseMethod("margins")
 #'
 #' margins.default is a default for S3 generic with methods to estimate marginal effects
 #' of various discrete choice models based on the random forests algorithm.
-#' Applicable classes are \code{orf}, \code{mrf} and \code{brf}.
-#'
-#' @param forest estimated forest object of class \code{orf}, \code{mrf} or \code{brf}
+#' Applicable classes are \code{orf} or \code{mrf} .#'
+#' @param forest estimated forest object of class \code{orf} or \code{mrf}
 #' @param eval string defining evaluation point for marginal effects. These can be one of "mean", "atmean", or "atmedian"
 #' @param newdata matrix of new Xs (currently not supported)
 #'
@@ -27,7 +26,7 @@ margins.default <- function(forest, eval, newdata) {
 
   warning(paste("margins does not know how to handle object of class ",
                 class(forest),
-                ". The supported classes are one of the following: orf/mrf/brf/rrf."))
+                ". The supported classes are one of the following: orf/mrf."))
 
 }
 
@@ -114,7 +113,7 @@ margins.orf <- function(forest, eval, newdata) {
   X_categorical <- which(X_type > 2 & X_type <= 10)
   # additional check for constant variables which are nonsensical
   if (any(X_type == 1) | any(X_type == 0)) {
-    stop("Some of the covariates are constant. This is non-sensical for evaluation of marginal effects. Programme terminated.")
+    stop("Some of the covariates are constant. This makes no sense for evaluation of marginal effects. Programme terminated.")
   }
 
   # ----------------------------------------------------------------------------------- #
@@ -130,7 +129,7 @@ margins.orf <- function(forest, eval, newdata) {
     # # variable of interest: X_1 to X_last, mean ME
     X_mean <- lapply(1:ncol(X), function(x) X) # set all Xs to their exact values (so many times as we have Xs)
   } else {
-    stop("Incorrect evaluation point. Programme terminated.")
+    stop("Incorrect evaluation point. This must be one of be one of mean, atmean, or atmedian. Programme terminated.")
   }
 
   # ----------------------------------------------------------------------------------- #
@@ -201,10 +200,10 @@ margins.orf <- function(forest, eval, newdata) {
   if (forest$forestInfo$inputs$honesty == FALSE & forest$forestInfo$inputs$inference == FALSE) {
 
     #### now we do not need weights if we do not need inference (based on out of bag predictions)
-    # forest prediction for X_mean_up
-    forest_pred_up <- lapply(forest$trainForests, function(x) lapply(X_mean_up, function(y) predict(x, data = y)$predictions))
-    # forest prediction for X_mean_down
-    forest_pred_down <- lapply(forest$trainForests, function(x) lapply(X_mean_down, function(y) predict(x, data = y)$predictions))
+    # forest prediction for X_mean_up (mean doesnt matter for atmean or atmedian)
+    forest_pred_up <- lapply(forest$trainForests, function(x) lapply(X_mean_up, function(y) mean(predict(x, data = y)$predictions)))
+    # forest prediction for X_mean_down (mean doesnt matter for atmean or atmedian)
+    forest_pred_down <- lapply(forest$trainForests, function(x) lapply(X_mean_down, function(y) mean(predict(x, data = y)$predictions)))
 
   } else if (forest$forestInfo$inputs$honesty == TRUE & forest$forestInfo$inputs$inference == FALSE) {
 

@@ -47,15 +47,16 @@ BEGIN_RCPP
 END_RCPP
 }
 // pred_weights_C
-NumericVector pred_weights_C(List x, List y, List z);
-RcppExport SEXP _orf_pred_weights_C(SEXP xSEXP, SEXP ySEXP, SEXP zSEXP) {
+NumericVector pred_weights_C(List x, List y, List z, int w);
+RcppExport SEXP _orf_pred_weights_C(SEXP xSEXP, SEXP ySEXP, SEXP zSEXP, SEXP wSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< List >::type x(xSEXP);
     Rcpp::traits::input_parameter< List >::type y(ySEXP);
     Rcpp::traits::input_parameter< List >::type z(zSEXP);
-    rcpp_result_gen = Rcpp::wrap(pred_weights_C(x, y, z));
+    Rcpp::traits::input_parameter< int >::type w(wSEXP);
+    rcpp_result_gen = Rcpp::wrap(pred_weights_C(x, y, z, w));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -64,7 +65,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_orf_get_honest_C", (DL_FUNC) &_orf_get_honest_C, 4},
     {"_orf_get_weights_C", (DL_FUNC) &_orf_get_weights_C, 3},
     {"_orf_pred_honest_C", (DL_FUNC) &_orf_pred_honest_C, 4},
-    {"_orf_pred_weights_C", (DL_FUNC) &_orf_pred_weights_C, 3},
+    {"_orf_pred_weights_C", (DL_FUNC) &_orf_pred_weights_C, 4},
     {NULL, NULL, 0}
 };
 

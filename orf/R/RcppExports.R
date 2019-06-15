@@ -47,7 +47,8 @@ pred_honest_C <- function(x, y, z, w) {
 #' @param x leaf_IDs_test - list of leaf IDs in test data
 #' @param y leaf_IDs - list of leaf IDs in honest data
 #' @param z leaf_size - list of leaf sizes in honest data
-pred_weights_C <- function(x, y, z) {
-    .Call(`_orf_pred_weights_C`, x, y, z)
+#' @param w binary indicator - equal 1 if marginal effects are being computed, 0 otherwise for normal prediction
+pred_weights_C <- function(x, y, z, w) {
+    .Call(`_orf_pred_weights_C`, x, y, z, w)
 }
 

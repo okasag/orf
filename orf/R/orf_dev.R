@@ -1207,7 +1207,7 @@ predict_forest_preds_for_ME <- function(forest, data, pred_data) {
     for (X_index in seq_along(pred_data[1,])) {
 
       stop_index <- (n_row*X_index)
-      forest_preds_up[[forest_index]][[X_index]] <- forest_preds_up_together[[forest_index]][(1+start_index):stop_index]
+      forest_preds_up[[forest_index]][[X_index]] <- mean(forest_preds_up_together[[forest_index]][(1+start_index):stop_index]) # mean doesnt matter for atmean or atmedian
       start_index <- stop_index
 
     }
@@ -1261,7 +1261,7 @@ predict_forest_weights_for_ME <- function(forest, data, pred_data) {
       leaf_IDs_pred <- lapply(seq_along(leaf_IDs_pred[1,]), function(i) leaf_IDs_pred[,i])
 
       # now average over the bootstraps, i.e. over trees to get final weights
-      forest_weights_up[[forest_index]][[X_index]] <- pred_weights_C(leaf_IDs_pred, leaf_IDs, leaf_size)
+      forest_weights_up[[forest_index]][[X_index]] <- pred_weights_C(leaf_IDs_pred, leaf_IDs, leaf_size, 1)
 
     }
 

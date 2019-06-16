@@ -278,7 +278,8 @@ margins.orf <- function(forest, eval, newdata) {
   # ----------------------------------------------------------------------------------- #
 
   # put marginal effects into results
-  results <- marginal_effects
+  results <- list(marginal_effects)
+  names(results) <- c("MarginalEffects")
 
   # ----------------------------------------------------------------------------------- #
 

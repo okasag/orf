@@ -30,6 +30,14 @@ orf <- function(X, Y, ntree, mtry, nmin, honesty, inference, margins){
 
   # -------------------------------------------------------------------------------- #
 
+  ## standard checks for input data
+  check_X(X)
+  Y <- check_Y(Y, X)
+  mtry <- check_mtry(mtry, X)
+  nmin <- check_nmin(nmin, X)
+  honesty <- check_honesty(honesty)
+  inference <- check_inference(inference)
+
   ## check for plausibility of options first:
   if (honesty == FALSE & inference == TRUE) {
 
@@ -693,6 +701,11 @@ predict.orf <- function(object, new_data, ...) {
 
   # -------------------------------------------------------------------------------- #
 
+  ## standard checks for input data
+  if (class(object) != "orf") {
+    stop("Forest object is not of class orf. Programme temrinated.")
+  }
+
   ## get forest as na object
   forest <- object
   ## save forest inputs
@@ -1202,12 +1215,15 @@ plot.orf <- function(x, ...) {
 #' @importFrom xtable xtable
 #'
 #' @export
-summary.orf <- function(object, latex, ...) {
+summary.orf <- function(object, latex = FALSE, ...) {
 
   # needed inputs for the function: forest - forest object coming from random_forest function
   #                                        - latex : logical if the output should be printed in latex code
 
   # -------------------------------------------------------------------------------- #
+
+  ## check user inputs
+  latex <- check_latex(latex)
 
   ## get forest as object
   forest <- object

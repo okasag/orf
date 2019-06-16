@@ -4,7 +4,7 @@
 \alias{summary.orf}
 \title{summary.orf}
 \usage{
-\method{summary}{orf}(object, latex, ...)
+\method{summary}{orf}(object, latex = FALSE, ...)
 }
 \arguments{
 \item{object}{estimated ordered random forest object of type \code{orf}}

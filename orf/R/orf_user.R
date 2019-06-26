@@ -703,7 +703,7 @@ predict.orf <- function(object, new_data, ...) {
 
   ## standard checks for input data
   if (class(object) != "orf") {
-    stop("Forest object is not of class orf. Programme temrinated.")
+    stop("Forest object is not of class orf. Programme terminated.")
   }
 
   ## get forest as na object

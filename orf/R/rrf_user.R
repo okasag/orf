@@ -27,6 +27,14 @@ rrf <- function(X, Y, ntree, mtry, nmin, honesty, inference) {
 
   # -------------------------------------------------------------------------------- #
 
+  ## standard checks for input data
+  check_X(X)
+  Y <- check_Y(Y, X)
+  mtry <- check_mtry(mtry, X)
+  nmin <- check_nmin(nmin, X)
+  honesty <- check_honesty(honesty)
+  inference <- check_inference(inference)
+
   ## check for plausibility of options first:
   if (honesty == FALSE & inference == TRUE) {
 

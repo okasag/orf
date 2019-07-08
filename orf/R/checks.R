@@ -57,6 +57,32 @@ check_Y <- function(Y, X) {
 
 }
 
+#' check if Y is discrete
+#'
+#' Checks the input data as discrete outcome
+#'
+#' @param Y matrix of input outcomes Y
+#'
+#' @return Y
+#'
+check_discrete_Y <- function(Y) {
+
+  if (all((Y %% 1) != 0)) {
+    stop("The input matrix Y must be coded without containing decimals. Recode the inputs. Example: Y = {1,2,3}.")
+  }
+
+  if (length(unique(Y)) > 10) {
+    warning("The input matrix Y contains more than 10 distinct values. This might be not optimal for an Ordered Choice Model.
+            Consider recoding your outcome into less categories.")
+  }
+
+  if (any(table(Y)/nrow(Y) < 0.05)) {
+    warning("At least one of the categories of the input matrix Y contains less than 5% of observations.
+            This might be not optimal for an Ordered Choice Model. Consider recoding your outcome into less categories.")
+  }
+
+}
+
 #' check mtry
 #'
 #' Checks the input data of mtry

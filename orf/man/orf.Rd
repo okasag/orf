@@ -6,7 +6,7 @@
 \alias{orf-package}
 \title{orf: An Implementation of the Ordered Random Forest Algorithm}
 \usage{
-orf(X, Y, ntree, mtry, nmin, honesty, inference, margins)
+orf(X, Y, ntree, mtry, nmin, honesty, inference)
 }
 \arguments{
 \item{X}{matrix of features}
@@ -22,8 +22,6 @@ orf(X, Y, ntree, mtry, nmin, honesty, inference, margins)
 \item{honesty}{logical, if TRUE honest forest is built using 50:50 data split}
 
 \item{inference}{logical, if TRUE the weight based inference is conducted}
-
-\item{margins}{logical, if TRUE marginal effects at mean are estimated}
 }
 \value{
 object of type orf

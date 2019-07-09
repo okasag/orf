@@ -10,14 +10,13 @@
 #' @param nmin scalar, minimum node size
 #' @param honesty logical, if TRUE honest forest is built using 50:50 data split
 #' @param inference logical, if TRUE the weight based inference is conducted
-#' @param margins logical, if TRUE marginal effects at mean are estimated
 #'
 #' @import ranger
 #'
 #' @return object of type orf
 #'
 #' @export
-orf <- function(X, Y, ntree, mtry, nmin, honesty, inference, margins){
+orf <- function(X, Y, ntree, mtry, nmin, honesty, inference){
 
   # needed inputs for the function: X - matrix of features
   #                                 Y - vector of outcomes (as.matrix acceptable too)
@@ -26,7 +25,6 @@ orf <- function(X, Y, ntree, mtry, nmin, honesty, inference, margins){
   #                                 nmin - minimum node size
   #                                 honesty - logical, if TRUE honest forest is built using 50:50 data split
   #                                 inference - logical, if TRUE the weight based inference is conducted (honesty has to be TRUE)
-  #                                 margins - logical, if TRUE the marginal effects at mean will be computed
 
   # -------------------------------------------------------------------------------- #
 
@@ -51,8 +49,8 @@ orf <- function(X, Y, ntree, mtry, nmin, honesty, inference, margins){
   # --------------------------------------------------------------------------------------- #
 
   ## save the inputs:
-  inputs <- list(ntree, mtry, nmin, honesty, inference, margins)
-  names(inputs) <- c("ntree", "mtry", "nmin", "honesty", "inference", "margins")
+  inputs <- list(ntree, mtry, nmin, honesty, inference)
+  names(inputs) <- c("ntree", "mtry", "nmin", "honesty", "inference")
 
   ## save colnames
   # Y - numeric response as only regression is supported (so far)
@@ -78,7 +76,7 @@ orf <- function(X, Y, ntree, mtry, nmin, honesty, inference, margins){
 
   ## proceed with estimations
   # decide if honest forest should be estimated
-  if (honesty == FALSE & inference == FALSE & margins == FALSE) {
+  if (honesty == FALSE & inference == FALSE) {
 
     # --------------------------------------------------------------------------------------- #
 
@@ -150,7 +148,7 @@ orf <- function(X, Y, ntree, mtry, nmin, honesty, inference, margins){
 
     # -------------------------------------------------------------------------------- #
 
-  } else if (honesty == TRUE & inference == FALSE & margins == FALSE) {
+  } else if (honesty == TRUE & inference == FALSE) {
 
     # --------------------------------------------------------------------------------------- #
 
@@ -240,7 +238,7 @@ orf <- function(X, Y, ntree, mtry, nmin, honesty, inference, margins){
 
     # -------------------------------------------------------------------------------- #
 
-  } else if (honesty == TRUE & inference == TRUE & margins == FALSE) {
+  } else if (honesty == TRUE & inference == TRUE) {
 
     # --------------------------------------------------------------------------------------- #
 
@@ -352,313 +350,6 @@ orf <- function(X, Y, ntree, mtry, nmin, honesty, inference, margins){
 
     # --------------------------------------------------------------------------------------- #
 
-  } else if (honesty == FALSE & inference == FALSE & margins == TRUE) {
-
-    # --------------------------------------------------------------------------------------- #
-
-    # put warning that marginal effects are preffered with honesty
-    warning("Estimation of marginal effects without honesty might not be optimal.")
-
-    # --------------------------------------------------------------------------------------- #
-
-    # do the estimation of probabilities as usual
-
-    # --------------------------------------------------------------------------------------- #
-
-    # no honest splitting, i.e. use all data
-    train_data <- dat
-    honest_data <- NULL
-
-    ## create variables needed for orf estimations
-    # create indicator variables (outcomes)
-    Y_ind <- lapply(cat, function(x) ifelse((Y <= x), 1, 0))
-
-    # create dataset for ranger estimation
-    data_ind <- lapply(Y_ind, function(x) as.data.frame(cbind(as.matrix(unlist(x)), X)))
-
-    # --------------------------------------------------------------------------------------- #
-
-    # estimate ncat-1 forests (everything on the same data: placing splits and effect estimation), no subsampling
-    forest <- lapply(data_ind, function(x) ranger(dependent.variable.name = paste(Y_name), data = x,
-                                                  num.trees = ntree, mtry = mtry, replace = TRUE,
-                                                  min.node.size = nmin, importance = "none"))
-
-    # --------------------------------------------------------------------------------------- #
-
-    # collect predictions for each forest based on whole sample (oob predictions)
-    pred <- lapply(forest, function(x) x$predictions) # collect forest predictions
-    # add the probability for the last outcome (always 1)
-    pred_1 <- append(pred, list(rep(1, n)))
-    # prepend zero vector to predictions for later differencing
-    pred_0 <- append(list(rep(0, n)), pred) # append a first 0 elemnt for the list
-
-    # --------------------------------------------------------------------------------------- #
-
-    # total predictions (make sure it returns a list)
-    pred_total <- as.list(mapply(function(x,y) x-y, pred_1, pred_0, SIMPLIFY = F))
-
-    # avoid negative predictions
-    pred_total <- lapply(pred_total, function(x) ifelse((x < 0), 0, x))
-
-    # coerce to final matrix
-    pred_total <- sapply(pred_total, function(x) as.matrix(x))
-
-    # normalize predictions
-    pred_final <- matrix(apply(pred_total, 1, function(x) (x)/(sum(x))), ncol = ncat, byrow = T)
-
-    # add names
-    colnames(pred_final) <- sapply(categories, function(x) paste("Category", x, sep = " "))
-
-    # compute OOB MSE based on whole sample
-    oob_mse <- mse(pred_final, Y)
-
-    # compute OOB RPS based on whole sample
-    oob_rps <- rps(pred_final, Y)
-
-    # --------------------------------------------------------------------------------------- #
-
-    ## convert probabilities into class predictions ("classification")
-    pred_class <- as.matrix(apply(pred_final, 1, which.max))
-    colnames(pred_class) <- "Category"
-
-    # --------------------------------------------------------------------------------------- #
-
-    ## now compute marginal effects at mean (without honesty and without inference - not optimal!)
-
-    # --------------------------------------------------------------------------------------- #
-
-    marginal_effects <- orf_margins(forest, data_ind, honesty, inference)
-
-    # --------------------------------------------------------------------------------------- #
-
-    # save forest information
-    forest_info <- list(inputs, train_data, honest_data, categories, data_ind)
-    names(forest_info) <- c("inputs", "trainData", "honestData", "categories", "indicatorData")
-
-    # define output of the function
-    output <- list(forest, forest_info, pred_final, pred_class, oob_mse, oob_rps, marginal_effects)
-    names(output) <- c("trainForests",  "forestInfo", "oobPredictions", "predictedCategories", "oobMSE", "oobRPS", "marginalEffects")
-
-    # -------------------------------------------------------------------------------- #
-
-  } else if (honesty == TRUE & inference == FALSE & margins == TRUE) {
-
-    # --------------------------------------------------------------------------------------- #
-
-    # do the estimation of probabilities as usual
-
-    # --------------------------------------------------------------------------------------- #
-
-    ## do honest forest estimation here using 50:50 data split as in Lechner (2018)
-    # devide into 50:50 honesty sets
-    split_data <- honest_split(dat)
-    # take care of train data
-    train_data <- split_data$trainData # take out training data
-    rows_train_data <- as.numeric(rownames(train_data)) # take rownames of train data as numeric
-    Y_train <- as.matrix(train_data[, 1]) # take out Y train
-    colnames(Y_train) <- Y_name # add column name
-    X_train <- train_data[, -1] # take out X
-    colnames(X_train) <- X_name # add column names
-    # take care of honest data
-    honest_data <- split_data$honestData # take out honest data
-    rows_honest_data <- as.numeric(rownames(honest_data)) # take rownames of train data as numeric
-    Y_honest <- as.matrix(honest_data[, 1]) # take out Y train
-    colnames(Y_honest) <- Y_name # add column name
-    X_honest <- honest_data[, -1] # take out X
-    colnames(X_honest) <- X_name # add column names
-
-    # --------------------------------------------------------------------------------------- #
-
-    ## create variables needed for orf estimations
-    # create indicator variables (outcomes)
-    Y_ind_train <- lapply(cat, function(x) ifelse((Y_train <= x), 1, 0)) # train
-    Y_ind_honest <- lapply(cat, function(x) ifelse((Y_honest <= x), 1, 0))
-
-    # create dataset for ranger estimation
-    data_ind_train <- lapply(Y_ind_train, function(x) as.data.frame(cbind(as.matrix(unlist(x)), X_train)))
-    data_ind_honest <- lapply(Y_ind_honest, function(x) as.data.frame(cbind(as.matrix(unlist(x)), X_honest)))
-
-    # --------------------------------------------------------------------------------------- #
-
-    # estimate ncat-1 forests (everything on the same data: placing splits and effect estimation), no subsampling
-    forest <- lapply(data_ind_train, function(x) ranger(dependent.variable.name = paste(Y_name), data = x,
-                                                        num.trees = ntree, mtry = mtry, replace = FALSE,
-                                                        sample.fraction = 0.5, min.node.size = nmin, importance = "none"))
-
-    # --------------------------------------------------------------------------------------- #
-
-    # compute honest predictions based on honest sample
-    pred <- mapply(function(x,y,z) get_honest(x, y, z), forest, data_ind_honest, data_ind_train, SIMPLIFY = F)
-    # add the probability for the last outcome (always 1)
-    pred_1 <- append(pred, list(rep(1, n)))
-    # prepend zero vector to predictions for later differencing
-    pred_0 <- append(list(rep(0, n)), pred) # append a first 0 elemnt for the list
-
-    # --------------------------------------------------------------------------------------- #
-
-    # total predictions (make sure it returns a list)
-    pred_total <- as.list(mapply(function(x,y) x-y, pred_1, pred_0, SIMPLIFY = F))
-
-    # avoid negative predictions
-    pred_total <- lapply(pred_total, function(x) ifelse((x < 0), 0, x))
-
-    # coerce to final matrix
-    pred_total <- sapply(pred_total, function(x) as.matrix(x))
-
-    # normalize predictions
-    pred_final <- matrix(apply(pred_total, 1, function(x) (x)/(sum(x))), ncol = ncat, byrow = T)
-
-    # add names
-    colnames(pred_final) <- sapply(categories, function(x) paste("Category", x, sep = " "))
-
-    # compute OOB MSE based on whole sample
-    honest_mse <- mse(pred_final, Y)
-
-    # compute OOB RPS based on whole sample
-    honest_rps <- rps(pred_final, Y)
-
-    # --------------------------------------------------------------------------------------- #
-
-    ## convert probabilities into class predictions ("classification")
-    pred_class <- as.matrix(apply(pred_final, 1, which.max))
-    colnames(pred_class) <- "Category"
-
-    # --------------------------------------------------------------------------------------- #
-
-    ## now compute marginal effects at mean (with honesty and without inference)
-
-    # --------------------------------------------------------------------------------------- #
-
-    marginal_effects <- orf_margins(forest, data_ind_honest, honesty, inference)
-
-    # --------------------------------------------------------------------------------------- #
-
-    # save forest information
-    forest_info <- list(inputs, train_data, honest_data, categories, data_ind_honest)
-    names(forest_info) <- c("inputs", "trainData", "honestData", "categories", "indicatorData")
-
-    # define output of the function
-    output <- list(forest, forest_info, pred_final, pred_class, honest_mse, honest_rps, marginal_effects)
-    names(output) <- c("trainForests",  "forestInfo", "honestPredictions", "predictedCategories", "honestMSE", "honestRPS", "marginalEffects")
-
-    # -------------------------------------------------------------------------------- #
-
-  } else if (honesty == TRUE & inference == TRUE & margins == TRUE) {
-
-    # --------------------------------------------------------------------------------------- #
-
-    ## do honest forest estimation here using 50:50 data split as in Lechner (2018)
-    # devide into 50:50 honesty sets
-    split_data <- honest_split(dat)
-    # take care of train data
-    train_data <- split_data$trainData # take out training data
-    rows_train_data <- as.numeric(rownames(train_data)) # take rownames of train data as numeric
-    Y_train <- as.matrix(train_data[, 1]) # take out Y train
-    colnames(Y_train) <- Y_name # add column name
-    X_train <- train_data[, -1] # take out X
-    colnames(X_train) <- X_name # add column names
-    # take care of honest data
-    honest_data <- split_data$honestData # take out honest data
-    rows_honest_data <- as.numeric(rownames(honest_data)) # take rownames of train data as numeric
-    Y_honest <- as.matrix(honest_data[, 1]) # take out Y train
-    colnames(Y_honest) <- Y_name # add column name
-    X_honest <- honest_data[, -1] # take out X
-    colnames(X_honest) <- X_name # add column names
-
-    # --------------------------------------------------------------------------------------- #
-
-    ## create variables needed for orf estimations
-    # create indicator variables (outcomes)
-    Y_ind_train <- lapply(cat, function(x) ifelse((Y_train <= x), 1, 0)) # train
-    Y_ind_honest <- lapply(cat, function(x) ifelse((Y_honest <= x), 1, 0))
-
-    # create dataset for ranger estimation
-    data_ind_train <- lapply(Y_ind_train, function(x) as.data.frame(cbind(as.matrix(unlist(x)), X_train)))
-    data_ind_honest <- lapply(Y_ind_honest, function(x) as.data.frame(cbind(as.matrix(unlist(x)), X_honest)))
-
-    # --------------------------------------------------------------------------------------- #
-
-    # estimate ncat-1 forests (everything on the same data: placing splits and effect estimation), no subsampling
-    forest <- lapply(data_ind_train, function(x) ranger(dependent.variable.name = paste(Y_name), data = x,
-                                                        num.trees = ntree, mtry = mtry, replace = FALSE,
-                                                        sample.fraction = 0.5, min.node.size = nmin, importance = "none"))
-
-    # --------------------------------------------------------------------------------------- #
-
-    # get honest weights
-    forest_weights <- mapply(function(x,y,z) get_forest_weights(x, y, z), forest, data_ind_honest, data_ind_train, SIMPLIFY = F)
-    honest_weights <- lapply(forest_weights, function(x) x[rows_honest_data, ]) # take out honest sample honest weights
-    train_weights <- lapply(forest_weights, function(x) x[rows_train_data, ]) # take out train sample honest weights
-
-    # --------------------------------------------------------------------------------------- #
-
-    ## make honest predictions, i.e. fitted values based on honest sample
-    # honest sample predictions
-    honest_pred <- mapply(function(x,y) as.matrix(x %*% y[, 1]), honest_weights, data_ind_honest, SIMPLIFY = F) # honest weights for honest data
-    # train sample predictions
-    train_pred <- mapply(function(x,y) as.matrix(x %*% y[, 1]), train_weights, data_ind_honest, SIMPLIFY = F) # honest weights for train data
-    # put the prediction together for whole sample and order them as original data
-    forest_pred <- mapply(function(x,y) rbind(x, y), honest_pred, train_pred, SIMPLIFY = F)
-    # sort according to rownames
-    forest_pred <- lapply(forest_pred, function(x) as.numeric(x[order(as.numeric(row.names(x))), ]))
-
-    # add the probability for the last outcome (always 1)
-    pred_1 <- append(forest_pred, list(rep(1, n)))
-    # prepend zero vector to predictions for later differencing
-    pred_0 <- append(list(rep(0, n)), forest_pred) # append a first 0 elemnt for the list
-
-    # --------------------------------------------------------------------------------------- #
-
-    # total predictions (make sure it returns a list)
-    pred_total <- as.list(mapply(function(x,y) x-y, pred_1, pred_0, SIMPLIFY = F))
-
-    # avoid negative predictions
-    pred_total <- lapply(pred_total, function(x) ifelse((x < 0), 0, x))
-
-    # coerce to final matrix
-    pred_total <- sapply(pred_total, function(x) as.matrix(x))
-
-    # normalize predictions
-    pred_final <- matrix(apply(pred_total, 1, function(x) (x)/(sum(x))), ncol = ncat, byrow = T)
-
-    # add names
-    colnames(pred_final) <- sapply(categories, function(x) paste("Category", x, sep = " "))
-
-    # compute OOB MSE based on whole sample
-    honest_mse <- mse(pred_final, Y)
-
-    # compute OOB RPS based on whole sample
-    honest_rps <- rps(pred_final, Y)
-
-    # --------------------------------------------------------------------------------------- #
-
-    ## convert probabilities into class predictions ("classification")
-    pred_class <- as.matrix(apply(pred_final, 1, which.max))
-    colnames(pred_class) <- "Category"
-
-    # --------------------------------------------------------------------------------------- #
-
-    # compute the variances for the categorical predictions
-    var_final <- get_orf_variance(honest_pred, honest_weights, train_pred, train_weights, Y_ind_honest)
-
-    # --------------------------------------------------------------------------------------- #
-
-    ## now compute marginal effects at mean (with honesty and with inference - default)
-
-    # --------------------------------------------------------------------------------------- #
-
-    marginal_effects <- orf_margins(forest, data_ind_honest, honesty, inference)
-
-    # --------------------------------------------------------------------------------------- #
-
-    # save forest information
-    forest_info <- list(inputs, train_data, honest_data, categories, data_ind_honest)
-    names(forest_info) <- c("inputs", "trainData", "honestData", "categories", "indicatorData")
-
-    # define output of the function
-    output <- list(forest, forest_info, pred_final, var_final, pred_class, honest_mse, honest_rps, marginal_effects)
-    names(output) <- c("trainForests",  "forestInfo", "honestPredictions", "honestVariance", "predictedCategories", "honestMSE", "honestRPS", "marginalEffects")
-
   }
 
   # -------------------------------------------------------------------------------- #
@@ -692,7 +383,6 @@ orf <- function(X, Y, ntree, mtry, nmin, honesty, inference, margins){
 ##'       \code{forestPredictions} \tab predicted values \cr
 ##'       \code{forestVariances} \tab variances of predicted values (only if \code{inference=TRUE} in the passed \code{orf object}) \cr
 ##'       \code{predictedCategories} \tab categories predicted with ORF based on maximum probability \cr
-##'       \code{marginalEffects} \tab estimated marginal effects from ORF (optionally with inference) \cr
 ##'   }
 #'
 #' @export
@@ -714,7 +404,6 @@ predict.orf <- function(object, new_data, ...) {
   categories <- forest$forestInfo$categories
   honesty <- inputs$honesty
   inference <- inputs$inference
-  margins <- inputs$margins
   honest_data <- forest$forestInfo$honestData
   train_data <- forest$forestInfo$trainData
   honest_ind_data <- forest$forestInfo$indicatorData # indicator data needed for indicator predictions
@@ -745,9 +434,9 @@ predict.orf <- function(object, new_data, ...) {
   # -------------------------------------------------------------------------------- #
 
   # check if honest forest was estimated and predict accordingly
-  if (honesty == FALSE & inference == FALSE & margins == FALSE) {
+  if (honesty == FALSE & inference == FALSE) {
 
-    ## no honest splitting, i.e. use all data, no inference and no margins
+    ## no honest splitting, i.e. use all data, no inference
 
     # predict with ncat-1 forests as in ranger default
     pred <- lapply(forest, function(x) predict(x, data = new_data)$predictions)
@@ -794,7 +483,7 @@ predict.orf <- function(object, new_data, ...) {
 
     # -------------------------------------------------------------------------------- #
 
-  } else if (honesty == TRUE & inference == FALSE & margins == FALSE) {
+  } else if (honesty == TRUE & inference == FALSE) {
 
     # -------------------------------------------------------------------------------- #
 
@@ -845,7 +534,7 @@ predict.orf <- function(object, new_data, ...) {
 
     # -------------------------------------------------------------------------------- #
 
-  } else if (honesty == TRUE & inference == TRUE & margins == FALSE) {
+  } else if (honesty == TRUE & inference == TRUE) {
 
     # -------------------------------------------------------------------------------- #
 
@@ -902,191 +591,6 @@ predict.orf <- function(object, new_data, ...) {
     # define output of the function
     output <- list(forest_info, pred_final, var_final, pred_class)
     names(output) <- c("forestInfo", "forestPredictions", "forestVariances", "predictedCategories")
-
-    # -------------------------------------------------------------------------------- #
-
-  } else if (honesty == FALSE & inference == FALSE & margins == TRUE) {
-
-    # -------------------------------------------------------------------------------- #
-
-    ## no honest splitting, i.e. use all data, no inference and no margins
-    # predict with ncat-1 forests as in ranger default
-    pred <- lapply(forest, function(x) predict(x, data = new_data)$predictions)
-
-    # -------------------------------------------------------------------------------- #
-
-    # add the probability for the last outcome (always 1)
-    pred_1 <- append(pred, list(rep(1, n_new_data)))
-    # prepend zero vector to predictions for later differencing
-    pred_0 <- append(list(rep(0, n_new_data)), pred) # append a first 0 elemnt for the list
-
-    # --------------------------------------------------------------------------------------- #
-
-    # total predictions (make sure it returns a list)
-    pred_total <- as.list(mapply(function(x,y) x-y, pred_1, pred_0, SIMPLIFY = F))
-
-    # avoid negative predictions
-    pred_total <- lapply(pred_total, function(x) ifelse((x < 0), 0, x))
-
-    # coerce to final matrix
-    pred_total <- sapply(pred_total, function(x) as.matrix(x))
-
-    # normalize predictions
-    pred_final <- matrix(apply(pred_total, 1, function(x) (x)/(sum(x))), ncol = n_cat, byrow = T)
-
-    # add names
-    colnames(pred_final) <- sapply(categories, function(x) paste("Category", x, sep = " "))
-
-    # -------------------------------------------------------------------------------- #
-
-    ## convert probabilities into class predictions ("classification")
-    pred_class <- as.matrix(apply(pred_final, 1, which.max))
-    colnames(pred_class) <- "Category"
-
-    # --------------------------------------------------------------------------------------- #
-
-    ## now predict marginal effects at mean (without honesty and without inference - not optimal!)
-
-    # --------------------------------------------------------------------------------------- #
-
-    marginal_effects <- pred_orf_margins(forest, honest_ind_data, new_data, honesty, inference)
-
-    # --------------------------------------------------------------------------------------- #
-
-    # save forest information
-    forest_info <- list(inputs, train_data, honest_data, categories)
-    names(forest_info) <- c("inputs", "trainData", "honestData", "categories")
-
-    # define output of the function
-    output <- list(forest, forest_info, pred_final, pred_class, marginal_effects)
-    names(output) <- c("trainForests",  "forestInfo", "oobPredictions", "predictedCategories", "marginalEffects")
-
-    # --------------------------------------------------------------------------------------- #
-
-  } else if (honesty == TRUE & inference == FALSE & margins == TRUE) {
-
-    # -------------------------------------------------------------------------------- #
-
-    ## run new Xs through estimated train forest and compute predictions based on honest sample
-    # no need to predict weights, get predictions directly through leaves
-    # predict with ncat-1 forests
-    pred <- mapply(function(x,y) predict_honest(x, y, new_data), forest, honest_ind_data, SIMPLIFY = FALSE)
-
-    # -------------------------------------------------------------------------------- #
-
-    # add the probability for the last outcome (always 1)
-    pred_1 <- append(pred, list(rep(1, n_new_data)))
-    # prepend zero vector to predictions for later differencing
-    pred_0 <- append(list(rep(0, n_new_data)), pred) # append a first 0 elemnt for the list
-
-    # --------------------------------------------------------------------------------------- #
-
-    # total predictions (make sure it returns a list)
-    pred_total <- as.list(mapply(function(x,y) x-y, pred_1, pred_0, SIMPLIFY = F))
-
-    # avoid negative predictions
-    pred_total <- lapply(pred_total, function(x) ifelse((x < 0), 0, x))
-
-    # coerce to final matrix
-    pred_total <- sapply(pred_total, function(x) as.matrix(x))
-
-    # normalize predictions
-    pred_final <- matrix(apply(pred_total, 1, function(x) (x)/(sum(x))), ncol = n_cat, byrow = T)
-
-    # add names
-    colnames(pred_final) <- sapply(categories, function(x) paste("Category", x, sep = " "))
-
-    # --------------------------------------------------------------------------------------- #
-
-    ## convert probabilities into class predictions ("classification")
-    pred_class <- as.matrix(apply(pred_final, 1, which.max))
-    colnames(pred_class) <- "Category"
-
-    # --------------------------------------------------------------------------------------- #
-
-    ## now compute marginal effects at mean (with honesty and without inference)
-
-    # --------------------------------------------------------------------------------------- #
-
-    marginal_effects <- pred_orf_margins(forest, honest_ind_data, new_data, honesty, inference)
-
-    # --------------------------------------------------------------------------------------- #
-
-    # save forest information
-    forest_info <- list(inputs, train_data, honest_data, categories)
-    names(forest_info) <- c("inputs", "trainData", "honestData", "categories")
-
-    # define output of the function
-    output <- list(forest, forest_info, pred_final, pred_class, marginal_effects)
-    names(output) <- c("trainForests",  "forestInfo", "honestPredictions", "predictedCategories", "marginalEffects")
-
-    # -------------------------------------------------------------------------------- #
-
-  } else if (honesty == TRUE & inference == TRUE & margins == TRUE) {
-
-    # -------------------------------------------------------------------------------- #
-
-    # predict weights by using forest train, honest data and new_data (for each category except one)
-    forest_weights_pred <- lapply(forest, function(x) predict_forest_weights(x, honest_data, new_data))
-
-    # get predictions by matrix multiplication of weights with honest responses
-    forest_pred <- mapply(function(x,y) as.numeric(x%*%y[, 1]), forest_weights_pred, honest_ind_data, SIMPLIFY = FALSE)
-
-    # -------------------------------------------------------------------------------- #
-
-    # add the probability for the last outcome (always 1)
-    pred_1 <- append(forest_pred, list(rep(1, n_new_data)))
-    # prepend zero vector to predictions for later differencing
-    pred_0 <- append(list(rep(0, n_new_data)), forest_pred) # append a first 0 elemnt for the list
-
-    # --------------------------------------------------------------------------------------- #
-
-    # total predictions (make sure it returns a list)
-    pred_total <- as.list(mapply(function(x,y) x-y, pred_1, pred_0, SIMPLIFY = F))
-
-    # avoid negative predictions
-    pred_total <- lapply(pred_total, function(x) ifelse((x < 0), 0, x))
-
-    # coerce to final matrix
-    pred_total <- sapply(pred_total, function(x) as.matrix(x))
-
-    # normalize predictions
-    pred_final <- matrix(apply(pred_total, 1, function(x) (x)/(sum(x))), ncol = n_cat, byrow = T)
-
-    # add names
-    colnames(pred_final) <- sapply(categories, function(x) paste("Category", x, sep = " "))
-
-    # --------------------------------------------------------------------------------------- #
-
-    ## convert probabilities into class predictions ("classification")
-    pred_class <- as.matrix(apply(pred_final, 1, which.max))
-    colnames(pred_class) <- "Category"
-
-    # --------------------------------------------------------------------------------------- #
-
-    # get indicator outcomes out of honest indicator data
-    Y_ind_honest <- lapply(honest_ind_data, function(x) x[, 1])
-
-    # compute the variances for the categorical predictions
-    var_final <- pred_orf_variance(forest_pred, forest_weights_pred, Y_ind_honest)
-
-    # --------------------------------------------------------------------------------------- #
-
-    ## now compute marginal effects at mean (with honesty and with inference - default)
-
-    # --------------------------------------------------------------------------------------- #
-
-    marginal_effects <- pred_orf_margins(forest, honest_ind_data, new_data, honesty, inference)
-
-    # --------------------------------------------------------------------------------------- #
-
-    # save forest information
-    forest_info <- list(inputs, train_data, honest_data, categories)
-    names(forest_info) <- c("inputs", "trainData", "honestData", "categories")
-
-    # define output of the function
-    output <- list(forest, forest_info, pred_final, var_final, pred_class, marginal_effects)
-    names(output) <- c("trainForests",  "forestInfo", "honestPredictions", "honestVariances", "predictedCategories", "marginalEffects")
 
     # -------------------------------------------------------------------------------- #
 
@@ -1232,7 +736,6 @@ summary.orf <- function(object, latex = FALSE, ...) {
   inputs <- forest$forestInfo$inputs
   honesty <- inputs$honesty
   inference <- inputs$inference
-  margins <- inputs$margins
   mtry <- inputs$mtry
   ntree <- inputs$ntree
   nmin <- inputs$nmin
@@ -1243,8 +746,7 @@ summary.orf <- function(object, latex = FALSE, ...) {
 
   # -------------------------------------------------------------------------------- #
 
-  # check if honest forest was estimated and predict accordingly
-  if (honesty == TRUE & inference == TRUE & margins == TRUE) {
+  if (honesty == TRUE & inference == TRUE) {
 
     # -------------------------------------------------------------------------------- #
 
@@ -1261,60 +763,8 @@ summary.orf <- function(object, latex = FALSE, ...) {
     # -------------------------------------------------------------------------------- #
 
     # structure summary into a list
-    output <- list(type, categories, build, ntree, mtry, nmin, honesty, inference, margins, trainsize, honestsize, features, mse, rps)
-    names(output) <- c("type", "categories", "build", "ntree", "mtry", "nmin", "honesty", "inference", "margins", "trainsize", "honestsize", "features", "mse", "rps")
-
-    # output matrix
-    output_matrix <- matrix(NA, ncol = 1, nrow = length(output))
-    # populate output matrix
-    rownames(output_matrix) <- names(output) # rownames are names
-    colnames(output_matrix) <- "" # no colname
-    output_matrix[, 1] <- unlist(output) # column 2 are values
-
-    # generate latex output if selected
-    if (latex == TRUE) { colnames(output_matrix) <- "Attributes"
-    output_matrix <- xtable(output_matrix, caption = "Ordered Random Forest Summary")
-    }
-
-    # -------------------------------------------------------------------------------- #
-
-    ## summary of marginal effects
-    # take out coefficients with their p values
-    coefs <- forest$marginalEffects$MarginalEffects
-    pvalues <- forest$marginalEffects$pValues
-
-    # produce nice table (latex or no latex)
-    coef_table <- coefstars(coefs, pvalues)
-
-    if (latex == TRUE) {
-      coef_table <- xtable(coef_table, caption = "ORF Marginal Effects")
-    }
-
-    # pack it into output
-    output <- list(output_matrix, coef_table)
-    names(output) <- c("ForestSummary", "MarginalEffects")
-
-    # -------------------------------------------------------------------------------- #
-
-  } else if (honesty == TRUE & inference == TRUE & margins == FALSE) {
-
-    # -------------------------------------------------------------------------------- #
-
-    ## honest splitting, i.e. use honest data
-    # take out summary statistics
-    mse <- round(forest$honestMSE, 5)
-    rps <- round(forest$honestRPS, 5)
-    trainsize <- nrow(train_data)
-    honestsize <- nrow(honest_data)
-    features <- ncol(train_data)-1 # take out the response
-    # check if subsampling or bootstrapping was used
-    if (forest$trainForests[[1]]$replace == TRUE) { build <- "Bootstrap" } else { build <- "Subsampling" }
-
-    # -------------------------------------------------------------------------------- #
-
-    # structure summary into a list
-    output <- list(type, categories, build, ntree, mtry, nmin, honesty, inference, margins, trainsize, honestsize, features, mse, rps)
-    names(output) <- c("type", "categories", "build", "ntree", "mtry", "nmin", "honesty", "inference", "margins", "trainsize", "honestsize", "features", "mse", "rps")
+    output <- list(type, categories, build, ntree, mtry, nmin, honesty, inference, trainsize, honestsize, features, mse, rps)
+    names(output) <- c("type", "categories", "build", "ntree", "mtry", "nmin", "honesty", "inference", "trainsize", "honestsize", "features", "mse", "rps")
 
     # output matrix
     output_matrix <- matrix(NA, ncol = 1, nrow = length(output))
@@ -1333,7 +783,7 @@ summary.orf <- function(object, latex = FALSE, ...) {
 
     # -------------------------------------------------------------------------------- #
 
-  } else if (honesty == FALSE & inference == FALSE & margins == FALSE) {
+  } else if (honesty == FALSE & inference == FALSE) {
 
     # -------------------------------------------------------------------------------- #
 
@@ -1350,8 +800,8 @@ summary.orf <- function(object, latex = FALSE, ...) {
     # -------------------------------------------------------------------------------- #
 
     # structure summary into a list
-    output <- list(type, categories, build, ntree, mtry, nmin, honesty, inference, margins, trainsize, honestsize, features, mse, rps)
-    names(output) <- c("type", "categories", "build", "ntree", "mtry", "nmin", "honesty", "inference", "margins", "trainsize", "honestsize", "features", "mse", "rps")
+    output <- list(type, categories, build, ntree, mtry, nmin, honesty, inference, trainsize, honestsize, features, mse, rps)
+    names(output) <- c("type", "categories", "build", "ntree", "mtry", "nmin", "honesty", "inference", "trainsize", "honestsize", "features", "mse", "rps")
 
     # output matrix
     output_matrix <- matrix(NA, ncol = 1, nrow = length(output))
@@ -1370,56 +820,7 @@ summary.orf <- function(object, latex = FALSE, ...) {
 
     # -------------------------------------------------------------------------------- #
 
-  } else if (honesty == FALSE & inference == FALSE & margins == TRUE) {
-
-    # -------------------------------------------------------------------------------- #
-
-    ## no honest splitting, i.e. use all data
-    # take out summary statistics
-    mse <- round(forest$oobMSE, 5)
-    rps <- round(forest$oobRPS, 5)
-    trainsize <- nrow(train_data)
-    honestsize <- 0
-    features <- ncol(train_data)-1 # take out the response
-    # check if subsampling or bootstrapping was used
-    if (forest$trainForests[[1]]$replace == TRUE) { build <- "Bootstrap" } else { build <- "Subsampling" }
-
-    # -------------------------------------------------------------------------------- #
-
-    # structure summary into a list
-    output <- list(type, categories, build, ntree, mtry, nmin, honesty, inference, margins, trainsize, honestsize, features, mse, rps)
-    names(output) <- c("type", "categories", "build", "ntree", "mtry", "nmin", "honesty", "inference", "margins", "trainsize", "honestsize", "features", "mse", "rps")
-
-    # output matrix
-    output_matrix <- matrix(NA, ncol = 1, nrow = length(output))
-    # populate output matrix
-    rownames(output_matrix) <- names(output) # rownames are names
-    colnames(output_matrix) <- "" # no colname
-    output_matrix[, 1] <- unlist(output) # column 2 are values
-
-    # generate latex output if selected
-    if (latex == TRUE) { colnames(output_matrix) <- "Attributes"
-    output_matrix <- xtable(output_matrix, caption = "Ordered Random Forest Summary")
-    }
-
-    # -------------------------------------------------------------------------------- #
-
-    ## summary of marginal effects
-    # take out coefficients with their p values
-    coef_table <- round(forest$marginalEffects, 3)
-
-    # chekc latex
-    if (latex == TRUE) {
-      coef_table <- xtable(coef_table, caption = "ORF Marginal Effects", digits = 3)
-    }
-
-    # pack it into output
-    output <- list(output_matrix, coef_table)
-    names(output) <- c("ForestSummary", "MarginalEffects")
-
-    # -------------------------------------------------------------------------------- #
-
-  } else if (honesty == TRUE & inference == FALSE & margins == TRUE) {
+  } else if (honesty == TRUE & inference == FALSE) {
 
     # -------------------------------------------------------------------------------- #
 
@@ -1436,56 +837,8 @@ summary.orf <- function(object, latex = FALSE, ...) {
     # -------------------------------------------------------------------------------- #
 
     # structure summary into a list
-    output <- list(type, categories, build, ntree, mtry, nmin, honesty, inference, margins, trainsize, honestsize, features, mse, rps)
-    names(output) <- c("type", "categories", "build", "ntree", "mtry", "nmin", "honesty", "inference", "margins", "trainsize", "honestsize", "features", "mse", "rps")
-
-    # output matrix
-    output_matrix <- matrix(NA, ncol = 1, nrow = length(output))
-    # populate output matrix
-    rownames(output_matrix) <- names(output) # rownames are names
-    colnames(output_matrix) <- "" # no colname
-    output_matrix[, 1] <- unlist(output) # column 2 are values
-
-    # generate latex output if selected
-    if (latex == TRUE) { colnames(output_matrix) <- "Attributes"
-    output_matrix <- xtable(output_matrix, caption = "Ordered Random Forest Summary")
-    }
-
-    # -------------------------------------------------------------------------------- #
-
-    ## summary of marginal effects
-    # take out coefficients without their p values (no pvalues if no inference)
-    coef_table <- round(forest$marginalEffects, 3)
-
-    if (latex == TRUE) {
-      coef_table <- xtable(coef_table, caption = "ORF Marginal Effects", digits = 3)
-    }
-
-    # pack it into output
-    output <- list(output_matrix, coef_table)
-    names(output) <- c("ForestSummary", "MarginalEffects")
-
-    # -------------------------------------------------------------------------------- #
-
-  } else if (honesty == TRUE & inference == FALSE & margins == FALSE) {
-
-    # -------------------------------------------------------------------------------- #
-
-    ## honest splitting, i.e. use honest data
-    # take out summary statistics
-    mse <- round(forest$honestMSE, 5)
-    rps <- round(forest$honestRPS, 5)
-    trainsize <- nrow(train_data)
-    honestsize <- nrow(honest_data)
-    features <- ncol(train_data)-1 # take out the response
-    # check if subsampling or bootstrapping was used
-    if (forest$trainForests[[1]]$replace == TRUE) { build <- "Bootstrap" } else { build <- "Subsampling" }
-
-    # -------------------------------------------------------------------------------- #
-
-    # structure summary into a list
-    output <- list(type, categories, build, ntree, mtry, nmin, honesty, inference, margins, trainsize, honestsize, features, mse, rps)
-    names(output) <- c("type", "categories", "build", "ntree", "mtry", "nmin", "honesty", "inference", "margins", "trainsize", "honestsize", "features", "mse", "rps")
+    output <- list(type, categories, build, ntree, mtry, nmin, honesty, inference, trainsize, honestsize, features, mse, rps)
+    names(output) <- c("type", "categories", "build", "ntree", "mtry", "nmin", "honesty", "inference", "trainsize", "honestsize", "features", "mse", "rps")
 
     # output matrix
     output_matrix <- matrix(NA, ncol = 1, nrow = length(output))

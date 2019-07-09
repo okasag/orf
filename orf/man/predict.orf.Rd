@@ -21,7 +21,6 @@ object of class \code{orf.prediction} with elements
       \code{forestPredictions} \tab predicted values \cr
       \code{forestVariances} \tab variances of predicted values (only if \code{inference=TRUE} in the passed \code{orf object}) \cr
       \code{predictedCategories} \tab categories predicted with ORF based on maximum probability \cr
-      \code{marginalEffects} \tab estimated marginal effects from ORF (optionally with inference) \cr
   }
 }
 \description{

@@ -15,5 +15,5 @@ check_nmin(nmin, X)
 nmin
 }
 \description{
-Checks the input data of mtry
+Checks the input data of nmin
 }

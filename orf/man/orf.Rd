@@ -6,22 +6,25 @@
 \alias{orf-package}
 \title{orf: An Implementation of the Ordered Random Forest Algorithm}
 \usage{
-orf(X, Y, ntree, mtry, nmin, honesty, inference)
+orf(X, Y, ntree = 1000, mtry = NULL, nmin = NULL,
+  sample.fraction = NULL, honesty = FALSE, inference = FALSE)
 }
 \arguments{
 \item{X}{matrix of features}
 
 \item{Y}{vector of outcomes (as.matrix acceptable too)}
 
-\item{ntree}{scalar, number of trees in a forest, i.e. bootstrap replications}
+\item{ntree}{scalar, number of trees in a forest, i.e. bootstrap replications (default is 1000 trees)}
 
-\item{mtry}{scalar, number of randomly selected features}
+\item{mtry}{scalar, number of randomly selected features (default is the squared root of number of features, rounded up to the nearest integer)}
 
-\item{nmin}{scalar, minimum node size}
+\item{nmin}{scalar, minimum node size (default is 5 observations)}
 
-\item{honesty}{logical, if TRUE honest forest is built using 50:50 data split}
+\item{sample.fraction}{scalar, subsampling rate (default is 1 for bootstrap and 0.5 for subsampling)}
 
-\item{inference}{logical, if TRUE the weight based inference is conducted}
+\item{honesty}{logical, if TRUE honest forest is built using 50:50 data split (default is set to FALSE)}
+
+\item{inference}{logical, if TRUE the weight based inference is conducted (default is set to FALSE)}
 }
 \value{
 object of type orf

@@ -117,7 +117,7 @@ check_mtry <- function(mtry, X) {
 
 #' check nmin
 #'
-#' Checks the input data of mtry
+#' Checks the input data of nmin
 #'
 #' @param nmin scalar, minimum node size
 #' @param X matrix of input features X
@@ -136,6 +136,29 @@ if (is.null(nmin)) {
 }
 
 nmin
+
+}
+
+#' check sample.fraction
+#'
+#' Checks the input data of sample.fraction
+#'
+#' @param sample.fraction scalar, fraction of data used for subsampling
+#'
+#' @return nmin
+#'
+check_sample_fraction <- function(sample.fraction) {
+
+  if (is.null(sample.fraction)) {
+
+    sample.fraction <- 0.5
+
+  } else if (!is.numeric(sample.fraction) | sample.fraction <= 0 | sample.fraction > 1) {
+
+    stop("Error: Invalid input value for sample.fraction. The number must be within the interval of [0,1).")
+  }
+
+  sample.fraction
 
 }
 

@@ -78,8 +78,16 @@ check_discrete_Y <- function(Y) {
 
   if (any(table(Y)/nrow(Y) < 0.05)) {
     warning("At least one of the categories of the input matrix Y contains less than 5% of observations.
-            This might be not optimal for an Ordered Choice Model. Consider recoding your outcome into less categories.")
+            This might be not optimal for an Ordered/Multinomial Choice Model. Consider recoding your outcome into less categories.")
   }
+
+  if (!all(sort(unique(Y)) == seq_along(unique(Y)))) {
+    warning(paste(c("The input matrix Y has been recoded to: ", seq_along(unique(Y))), sep = " ", collapse = " "))
+    # recode Y
+    for(i in seq_along(unique(Y))) {Y <- replace(Y, Y == sort(unique(Y))[i], seq_along(unique(Y))[i]) }
+  }
+
+  Y
 
 }
 

@@ -33,7 +33,7 @@ mrf <- function(X, Y, ntree, mtry, nmin, honesty, inference, margins){
   ## standard checks for input data
   check_X(X)
   Y <- check_Y(Y, X)
-  check_discrete_Y(Y)
+  Y <- check_discrete_Y(Y)
   mtry <- check_mtry(mtry, X)
   nmin <- check_nmin(nmin, X)
   honesty <- check_honesty(honesty)

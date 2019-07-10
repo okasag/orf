@@ -4,12 +4,15 @@
 \alias{margins.orf}
 \title{margins.orf}
 \usage{
-\method{margins}{orf}(forest, eval, newdata)
+\method{margins}{orf}(forest, eval = "atmean", window = NULL,
+  newdata = NULL)
 }
 \arguments{
 \item{forest}{trained ordered random forest object of class \code{orf}}
 
 \item{eval}{string defining evaluation point for marginal effects. These can be one of "mean", "atmean", or "atmedian"}
+
+\item{window}{numeric, share of standard deviation of X to be used for evaluation of the marginal effect (default is 0.1)}
 
 \item{newdata}{matrix of new Xs (currently not supported)}
 }

@@ -225,7 +225,6 @@ check_honesty <- function(honesty) {
 
 }
 
-
 #' check inference
 #'
 #' Checks the input for inference
@@ -245,7 +244,6 @@ check_inference <- function(inference) {
   inference
 
 }
-
 
 #' check newdata
 #'
@@ -272,7 +270,6 @@ check_newdata <- function(new_data, X) {
 
 }
 
-
 #' check latex
 #'
 #' Checks the input for latex
@@ -293,3 +290,25 @@ check_latex <- function(latex) {
 
 }
 
+#' check window size
+#'
+#' Checks the input data of window in margins
+#'
+#' @param window scalar, share of SD of X used for margins
+#'
+#' @return window
+#'
+check_window <- function(window) {
+
+  if (is.null(window)) {
+
+    window <- 0.1
+
+  } else if (!is.numeric(window) | window <= 0 | window > 1) {
+
+    stop("Error: Invalid value for window. window must be within [0,1) interval.")
+  }
+
+  window
+
+}

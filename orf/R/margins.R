@@ -6,10 +6,11 @@
 #'
 #' @param forest estimated forest object of class \code{orf} or \code{mrf}
 #' @param eval string defining evaluation point for marginal effects. These can be one of "mean", "atmean", or "atmedian"
+#' @param window numeric, share of standard deviation of X to be used for evaluation of the marginal effect (default is 0.1)
 #' @param newdata matrix of new Xs (currently not supported)
 #'
 #' @export
-margins <- function(forest, eval, newdata) UseMethod("margins")
+margins <- function(forest, eval = "atmean", window = NULL, newdata = NULL) UseMethod("margins")
 
 
 #' margins.default
@@ -19,10 +20,11 @@ margins <- function(forest, eval, newdata) UseMethod("margins")
 #' Applicable classes are \code{orf} or \code{mrf} .#'
 #' @param forest estimated forest object of class \code{orf} or \code{mrf}
 #' @param eval string defining evaluation point for marginal effects. These can be one of "mean", "atmean", or "atmedian"
+#' @param window numeric, share of standard deviation of X to be used for evaluation of the marginal effect (default is 0.1)
 #' @param newdata matrix of new Xs (currently not supported)
 #'
 #' @export
-margins.default <- function(forest, eval, newdata) {
+margins.default <- function(forest, eval = "atmean", window = NULL, newdata = NULL) {
 
   warning(paste("margins does not know how to handle object of class ",
                 class(forest),
@@ -37,6 +39,7 @@ margins.default <- function(forest, eval, newdata) {
 #'
 #' @param forest trained ordered random forest object of class \code{orf}
 #' @param eval string defining evaluation point for marginal effects. These can be one of "mean", "atmean", or "atmedian"
+#' @param window numeric, share of standard deviation of X to be used for evaluation of the marginal effect (default is 0.1)
 #' @param newdata matrix of new Xs (currently not supported)
 #'
 #' @importFrom stats predict median pnorm sd
@@ -45,11 +48,11 @@ margins.default <- function(forest, eval, newdata) {
 #' @return object of type \code{margins.orf}
 #'
 #' @export
-margins.orf <- function(forest, eval, newdata) {
+margins.orf <- function(forest, eval = "atmean", window = NULL, newdata = NULL) {
 
   # needed inputs for the function: forest - trained forest object of class orf/mrf/brf
   #                                 eval - string defining evaluation point for marginal effects
-  #                                 newdata - matrix of new Xs
+  #                                 newdata - matrix of new Xs for which the marginal effects should be computed
   # ----------------------------------------------------------------------------------- #
 
   ### decide if prediction or in sample marginal effects should be evaluated
@@ -59,14 +62,14 @@ margins.orf <- function(forest, eval, newdata) {
     if (forest$forestInfo$inputs$honesty == FALSE) {
 
       data <- forest$forestInfo$trainData # take in-sample data
+      X_eval <- as.matrix(data[, -1])
 
     } else if (forest$forestInfo$inputs$honesty == TRUE) {
 
-      data <- forest$forestInfo$honestData
+      data <- forest$forestInfo$honestData # take honest data
+      X_eval <- as.matrix(data[, -1])
 
     }
-
-
 
   } else {
 
@@ -77,7 +80,19 @@ margins.orf <- function(forest, eval, newdata) {
 
     } else {
 
-      data = newdata
+      # newdata which will be used for evaluating marginal effects
+      X_eval <- as.matrix(newdata[, -1])
+
+      # get data which will be used for predicting the marginal effect
+      if (forest$forestInfo$inputs$honesty == FALSE) {
+
+        data <- forest$forestInfo$trainData # take in-sample data
+
+      } else if (forest$forestInfo$inputs$honesty == TRUE) {
+
+        data <- forest$forestInfo$honestData # take honest data
+
+      }
 
     }
 
@@ -87,6 +102,8 @@ margins.orf <- function(forest, eval, newdata) {
   # ----------------------------------------------------------------------------------- #
 
   ### data preparation and checks
+  # check the window size
+  window <- check_window(window)
   # get number of observations
   n_data <- as.numeric(nrow(data))
   # get categories
@@ -104,7 +121,7 @@ margins.orf <- function(forest, eval, newdata) {
 
   ### marginal effects preparation
   # share of SD to be used
-  h_std <- 0.1
+  h_std <- window
   # check if X is continuous or dummy or categorical
   X_type <- apply(X, 2, function(x) length(unique(x)))
   # now determine the type of X
@@ -121,13 +138,13 @@ margins.orf <- function(forest, eval, newdata) {
   ### check the evaluation point
   if (eval == "atmean") {
     # variable of interest: X_1 to X_last, ME at mean
-    X_mean <- lapply(1:ncol(X), function(x) t(as.matrix(colMeans(X)))) # set all Xs to their mean values (so many times as we have Xs)
+    X_mean <- lapply(1:ncol(X_eval), function(x) t(as.matrix(colMeans(X_eval)))) # set all Xs to their mean values (so many times as we have Xs)
   } else if (eval == "atmedian") {
     # variable of interest: X_1 to X_last, ME at median
-    X_mean <- lapply(1:ncol(X), function(x) t(as.matrix(apply(X, 2, median)))) # set all Xs to their median values (so many times as we have Xs)
+    X_mean <- lapply(1:ncol(X_eval), function(x) t(as.matrix(apply(X_eval, 2, median)))) # set all Xs to their median values (so many times as we have Xs)
   } else if (eval == "mean") {
     # # variable of interest: X_1 to X_last, mean ME
-    X_mean <- lapply(1:ncol(X), function(x) X) # set all Xs to their exact values (so many times as we have Xs)
+    X_mean <- lapply(1:ncol(X_eval), function(x) X_eval) # set all Xs to their exact values (so many times as we have Xs)
   } else {
     stop("Incorrect evaluation point. This must be one of be one of mean, atmean, or atmedian. Programme terminated.")
   }
@@ -182,10 +199,13 @@ margins.orf <- function(forest, eval, newdata) {
     X_mean_down[[i]][, i] <- X_down[, i]
   }
 
-  # adjust for categorical X (works also for zero categorical)
+  # adjust for categorical X (works also for zero categorical) (adjustment such that the difference is always 1)
   for (i in X_categorical) {
-    X_mean_up[[i]][, i] <- ceiling(mean(X[, i]))
-    X_mean_down[[i]][, i] <- floor(mean(X[, i]))
+    X_mean_up[[i]][, i] <- ceiling(X_mean_up[[i]][, i])
+    X_mean_down[[i]][, i] <- ifelse(ceiling(X_mean_down[[i]][, i]) == ceiling(X_mean_up[[i]][, i]),
+                                    floor(X_mean_down[[i]][, i]),
+                                    ceiling(X_mean_down[[i]][, i])
+                                    )
   }
 
   # adjust for dummies (works also for zero dummies)
@@ -306,8 +326,8 @@ margins.orf <- function(forest, eval, newdata) {
 
     ## now compute the prerequisites for covariances
     # multiply forest_var_multi_demeaned according to formula for covariance (shifted categories needed for computational convenience)
-    forest_multi_demeaned_0_last <- append(forest_multi_demeaned, list(rep(list(matrix(0, ncol = ncol(forest_multi_demeaned[[1]][[1]]), nrow = nrow(forest_multi_demeaned[[1]][[1]]))), ncol(X)))) # append zero matrix list
-    forest_multi_demeaned_0_first <- append(list(rep(list(matrix(0, ncol = ncol(forest_multi_demeaned[[1]][[1]]), nrow = nrow(forest_multi_demeaned[[1]][[1]]))), ncol(X))), forest_multi_demeaned) # prepend zero matrix list
+    forest_multi_demeaned_0_last <- append(forest_multi_demeaned, list(rep(list(matrix(0, ncol = ncol(forest_multi_demeaned[[1]][[1]]), nrow = nrow(forest_multi_demeaned[[1]][[1]]))), ncol(X_eval)))) # append zero matrix list
+    forest_multi_demeaned_0_first <- append(list(rep(list(matrix(0, ncol = ncol(forest_multi_demeaned[[1]][[1]]), nrow = nrow(forest_multi_demeaned[[1]][[1]]))), ncol(X_eval))), forest_multi_demeaned) # prepend zero matrix list
     # compute the multiplication of category m with m-1 according to the covariance formula (sum, normalize and multiply by 2)
     forest_multi_demeaned_cov_sum_norm_mult2 <- mapply(function(x,y) mapply(function(x,y) (sum(x*y))*(nrow(Y_ind[[1]])/(nrow(Y_ind[[1]])-1))*2, x, y, SIMPLIFY = FALSE), forest_multi_demeaned_0_first, forest_multi_demeaned_0_last, SIMPLIFY = F)
 
@@ -415,6 +435,7 @@ print.margins.orf <- function(x, latex = FALSE, ...) {
 #'
 #' @param forest trained multinomial random forest object of class \code{mrf}
 #' @param eval string defining evaluation point for marginal effects. These can be one of "mean", "atmean", or "atmedian". Default is "atmean".
+#' @param window numeric, share of standard deviation of X to be used for evaluation of the marginal effect (default is 0.1)
 #' @param newdata matrix of new Xs (currently not supported)
 #'
 #' @importFrom stats predict median pnorm sd
@@ -423,7 +444,7 @@ print.margins.orf <- function(x, latex = FALSE, ...) {
 #' @return object of type \code{margins.mrf}
 #'
 #' @export
-margins.mrf <- function(forest, eval = "atmean", newdata = NULL) {
+margins.mrf <- function(forest, eval = "atmean", window = NULL, newdata = NULL) {
 
   # needed inputs for the function: forest - trained forest object of class orf/mrf/brf
   #                                 eval - string defining evaluation point for marginal effects (default is atmean)
@@ -437,14 +458,14 @@ margins.mrf <- function(forest, eval = "atmean", newdata = NULL) {
     if (forest$forestInfo$inputs$honesty == FALSE) {
 
       data <- forest$forestInfo$trainData # take in-sample data
+      X_eval <- as.matrix(data[, -1])
 
     } else if (forest$forestInfo$inputs$honesty == TRUE) {
 
-      data <- forest$forestInfo$honestData
+      data <- forest$forestInfo$honestData # take honest data
+      X_eval <- as.matrix(data[, -1])
 
     }
-
-
 
   } else {
 
@@ -455,7 +476,19 @@ margins.mrf <- function(forest, eval = "atmean", newdata = NULL) {
 
     } else {
 
-      data = newdata
+      # newdata which will be used for evaluating marginal effects
+      X_eval <- as.matrix(newdata[, -1])
+
+      # get data which will be used for predicting the marginal effect
+      if (forest$forestInfo$inputs$honesty == FALSE) {
+
+        data <- forest$forestInfo$trainData # take in-sample data
+
+      } else if (forest$forestInfo$inputs$honesty == TRUE) {
+
+        data <- forest$forestInfo$honestData # take honest data
+
+      }
 
     }
 
@@ -465,6 +498,8 @@ margins.mrf <- function(forest, eval = "atmean", newdata = NULL) {
   # ----------------------------------------------------------------------------------- #
 
   ### data preparation and checks
+  # check the window size
+  window <- check_window(window)
   # get number of observations
   n_data <- as.numeric(nrow(data))
   # get categories
@@ -482,7 +517,7 @@ margins.mrf <- function(forest, eval = "atmean", newdata = NULL) {
 
   ### marginal effects preparation
   # share of SD to be used
-  h_std <- 0.1
+  h_std <- window
   # check if X is continuous or dummy or categorical
   X_type <- apply(X, 2, function(x) length(unique(x)))
   # now determine the type of X
@@ -499,13 +534,13 @@ margins.mrf <- function(forest, eval = "atmean", newdata = NULL) {
   ### check the evaluation point
   if (eval == "atmean") {
     # variable of interest: X_1 to X_last, ME at mean
-    X_mean <- lapply(1:ncol(X), function(x) t(as.matrix(colMeans(X)))) # set all Xs to their mean values (so many times as we have Xs)
+    X_mean <- lapply(1:ncol(X_eval), function(x) t(as.matrix(colMeans(X_eval)))) # set all Xs to their mean values (so many times as we have Xs)
   } else if (eval == "atmedian") {
     # variable of interest: X_1 to X_last, ME at median
-    X_mean <- lapply(1:ncol(X), function(x) t(as.matrix(apply(X, 2, median)))) # set all Xs to their median values (so many times as we have Xs)
+    X_mean <- lapply(1:ncol(X_eval), function(x) t(as.matrix(apply(X_eval, 2, median)))) # set all Xs to their median values (so many times as we have Xs)
   } else if (eval == "mean") {
     # # variable of interest: X_1 to X_last, mean ME
-    X_mean <- lapply(1:ncol(X), function(x) X) # set all Xs to their exact values (so many times as we have Xs)
+    X_mean <- lapply(1:ncol(X_eval), function(x) X_eval) # set all Xs to their exact values (so many times as we have Xs)
   } else {
     stop("Incorrect evaluation point. This must be one of be one of mean, atmean, or atmedian. Programme terminated.")
   }
@@ -560,10 +595,13 @@ margins.mrf <- function(forest, eval = "atmean", newdata = NULL) {
     X_mean_down[[i]][, i] <- X_down[, i]
   }
 
-  # adjust for categorical X (works also for zero categorical)
+  # adjust for categorical X (works also for zero categorical) (adjustment such that the difference is always 1)
   for (i in X_categorical) {
-    X_mean_up[[i]][, i] <- ceiling(mean(X[, i]))
-    X_mean_down[[i]][, i] <- floor(mean(X[, i]))
+    X_mean_up[[i]][, i] <- ceiling(X_mean_up[[i]][, i])
+    X_mean_down[[i]][, i] <- ifelse(ceiling(X_mean_down[[i]][, i]) == ceiling(X_mean_up[[i]][, i]),
+                                    floor(X_mean_down[[i]][, i]),
+                                    ceiling(X_mean_down[[i]][, i])
+    )
   }
 
   # adjust for dummies (works also for zero dummies)

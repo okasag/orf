@@ -41,14 +41,15 @@ orf <- function(X, Y,
 
   ## standard checks for input data
   check_X(X)
-  Y <- check_Y(Y, X)
-  Y <- check_discrete_Y(Y)
-  mtry <- check_mtry(mtry, X)
-  min.node.size <- check_min_node_size(min.node.size, X)
-  replace <- check_replace(replace)
+  Y               <- check_Y(Y, X)
+  Y               <- check_discrete_Y(Y)
+  num.trees       <- check_num_trees(num.trees)
+  mtry            <- check_mtry(mtry, X)
+  min.node.size   <- check_min_node_size(min.node.size, X)
+  replace         <- check_replace(replace)
   sample.fraction <- check_sample_fraction(sample.fraction)
-  honesty <- check_honesty(honesty)
-  inference <- check_inference(inference)
+  honesty         <- check_honesty(honesty)
+  inference       <- check_inference(inference)
 
   # -------------------------------------------------------------------------------- #
 

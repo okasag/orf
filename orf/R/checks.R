@@ -91,6 +91,29 @@ check_discrete_Y <- function(Y) {
 
 }
 
+#' check num.trees
+#'
+#' Checks the input data of num.trees
+#'
+#' @param num.trees scalar, number of trees to be estimated
+#'
+#' @return num.trees
+#'
+check_num_trees <- function(num.trees) {
+
+  if (is.null(num.trees)) {
+
+    num.trees <- 1000
+
+  } else if (!is.numeric(num.trees) | num.trees <= 0 ) {
+
+    stop("Error: Invalid value for num.trees. num.trees must be a positive number.")
+  }
+
+  num.trees
+
+}
+
 #' check mtry
 #'
 #' Checks the input data of mtry

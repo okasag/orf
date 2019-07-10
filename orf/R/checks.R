@@ -115,27 +115,27 @@ check_mtry <- function(mtry, X) {
 
 }
 
-#' check nmin
+#' check min.node.size
 #'
-#' Checks the input data of nmin
+#' Checks the input data of min.node.size
 #'
-#' @param nmin scalar, minimum node size
+#' @param min.node.size scalar, minimum node size
 #' @param X matrix of input features X
 #'
-#' @return nmin
+#' @return min.node.size
 #'
-check_nmin <- function(nmin, X) {
+check_min_node_size <- function(min.node.size, X) {
 
-if (is.null(nmin)) {
+if (is.null(min.node.size)) {
 
-  nmin <- 5
+  min.node.size <- 5
 
-} else if (!is.numeric(nmin) | nmin <= 0 | nmin > nrow(X)) {
+} else if (!is.numeric(min.node.size) | min.node.size <= 0 | min.node.size > nrow(X)) {
 
-  stop("Error: Invalid value for nmin. nmin must be a positive number, lower than number of observations.")
+  stop("Error: Invalid value for min.node.size. min.node.size must be a positive number, lower than number of observations.")
 }
 
-nmin
+  min.node.size
 
 }
 

@@ -31,7 +31,7 @@ rrf <- function(X, Y, ntree, mtry, nmin, honesty, inference) {
   check_X(X)
   Y <- check_Y(Y, X)
   mtry <- check_mtry(mtry, X)
-  nmin <- check_nmin(nmin, X)
+  nmin <- check_min_node_size(nmin, X)
   honesty <- check_honesty(honesty)
   inference <- check_inference(inference)
 

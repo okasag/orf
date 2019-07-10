@@ -35,7 +35,7 @@ mrf <- function(X, Y, ntree, mtry, nmin, honesty, inference, margins){
   Y <- check_Y(Y, X)
   Y <- check_discrete_Y(Y)
   mtry <- check_mtry(mtry, X)
-  nmin <- check_nmin(nmin, X)
+  nmin <- check_min_node_size(nmin, X)
   honesty <- check_honesty(honesty)
   inference <- check_inference(inference)
 

@@ -5,9 +5,9 @@
 #'
 #' @param X matrix of features
 #' @param Y vector of outcomes (as.matrix acceptable too)
-#' @param ntree scalar, number of trees in a forest, i.e. bootstrap replications (default is 1000 trees)
+#' @param num.trees scalar, number of trees in a forest, i.e. bootstrap replications (default is 1000 trees)
 #' @param mtry scalar, number of randomly selected features (default is the squared root of number of features, rounded up to the nearest integer)
-#' @param nmin scalar, minimum node size (default is 5 observations)
+#' @param min.node.size scalar, minimum node size (default is 5 observations)
 #' @param replace logical, if TRUE sampling with replacement, i.e. bootstrap is used to grow the trees, otherwise subsampling without replacement is used (default is set to FALSE)
 #' @param sample.fraction scalar, subsampling rate (default is 1 for bootstrap and 0.5 for subsampling)
 #' @param honesty logical, if TRUE honest forest is built using 50:50 data split (default is set to TRUE)
@@ -19,9 +19,9 @@
 #'
 #' @export
 orf <- function(X, Y,
-                ntree = 1000,
+                num.trees = 1000,
                 mtry = NULL,
-                nmin = NULL,
+                min.node.size = NULL,
                 replace = FALSE,
                 sample.fraction = NULL,
                 honesty = TRUE,
@@ -29,9 +29,9 @@ orf <- function(X, Y,
 
   # needed inputs for the function: X - matrix of features
   #                                 Y - vector of outcomes (as.matrix acceptable too)
-  #                                 ntree - number of trees in a forest
+  #                                 num.trees - number of trees in a forest
   #                                 mtry - number of randomly selected features
-  #                                 nmin - minimum node size
+  #                                 min.node.size - minimum node size
   #                                 replace - sampling with or without replacement
   #                                 sample.fraction - subsampling rate
   #                                 honesty - logical, if TRUE honest forest is built using 50:50 data split
@@ -44,7 +44,7 @@ orf <- function(X, Y,
   Y <- check_Y(Y, X)
   Y <- check_discrete_Y(Y)
   mtry <- check_mtry(mtry, X)
-  nmin <- check_nmin(nmin, X)
+  min.node.size <- check_min_node_size(min.node.size, X)
   replace <- check_replace(replace)
   sample.fraction <- check_sample_fraction(sample.fraction)
   honesty <- check_honesty(honesty)
@@ -72,8 +72,8 @@ orf <- function(X, Y,
   # --------------------------------------------------------------------------------------- #
 
   ## save the inputs:
-  inputs <- list(ntree, mtry, nmin, replace, sample.fraction, honesty, inference)
-  names(inputs) <- c("ntree", "mtry", "nmin", "replace", "sample.fraction", "honesty", "inference")
+  inputs <- list(num.trees, mtry, min.node.size, replace, sample.fraction, honesty, inference)
+  names(inputs) <- c("num.trees", "mtry", "min.node.size", "replace", "sample.fraction", "honesty", "inference")
 
   ## save colnames
   # Y - numeric response as only regression is supported (so far)
@@ -118,7 +118,7 @@ orf <- function(X, Y,
 
     # estimate ncat-1 forests (everything on the same data: placing splits and effect estimation), no subsampling
     forest <- lapply(data_ind, function(x) ranger(dependent.variable.name = paste(Y_name), data = x,
-                                                  num.trees = ntree, mtry = mtry, min.node.size = nmin,
+                                                  num.trees = num.trees, mtry = mtry, min.node.size = min.node.size,
                                                   replace = replace, sample.fraction = sample.fraction,
                                                   importance = "none"))
 
@@ -209,7 +209,7 @@ orf <- function(X, Y,
 
     # estimate ncat-1 forests (everything on the same data: placing splits and effect estimation), no subsampling
     forest <- lapply(data_ind_train, function(x) ranger(dependent.variable.name = paste(Y_name), data = x,
-                                                        num.trees = ntree, mtry = mtry, min.node.size = nmin,
+                                                        num.trees = num.trees, mtry = mtry, min.node.size = min.node.size,
                                                         replace = replace, sample.fraction = sample.fraction,
                                                         importance = "none"))
 
@@ -300,7 +300,7 @@ orf <- function(X, Y,
 
     # estimate ncat-1 forests (everything on the same data: placing splits and effect estimation), no subsampling
     forest <- lapply(data_ind_train, function(x) ranger(dependent.variable.name = paste(Y_name), data = x,
-                                                        num.trees = ntree, mtry = mtry, min.node.size = nmin,
+                                                        num.trees = num.trees, mtry = mtry, min.node.size = min.node.size,
                                                         replace = replace, sample.fraction = sample.fraction,
                                                         importance = "none"))
 
@@ -763,8 +763,8 @@ summary.orf <- function(object, latex = FALSE, ...) {
   honesty <- inputs$honesty
   inference <- inputs$inference
   mtry <- inputs$mtry
-  ntree <- inputs$ntree
-  nmin <- inputs$nmin
+  num.trees <- inputs$num.trees
+  min.node.size <- inputs$min.node.size
   replace <- inputs$replace
   sample.fraction <- inputs$sample.fraction
   honest_data <- forest$forestInfo$honestData
@@ -791,8 +791,8 @@ summary.orf <- function(object, latex = FALSE, ...) {
     # -------------------------------------------------------------------------------- #
 
     # structure summary into a list
-    output <- list(type, categories, build, ntree, mtry, nmin, replace, sample.fraction, honesty, inference, trainsize, honestsize, features, mse, rps)
-    names(output) <- c("type", "categories", "build", "ntree", "mtry", "nmin", "replace", "sample.fraction", "honesty", "inference", "trainsize", "honestsize", "features", "mse", "rps")
+    output <- list(type, categories, build, num.trees, mtry, min.node.size, replace, sample.fraction, honesty, inference, trainsize, honestsize, features, mse, rps)
+    names(output) <- c("type", "categories", "build", "num.trees", "mtry", "min.node.size", "replace", "sample.fraction", "honesty", "inference", "trainsize", "honestsize", "features", "mse", "rps")
 
     # output matrix
     output_matrix <- matrix(NA, ncol = 1, nrow = length(output))
@@ -828,8 +828,8 @@ summary.orf <- function(object, latex = FALSE, ...) {
     # -------------------------------------------------------------------------------- #
 
     # structure summary into a list
-    output <- list(type, categories, build, ntree, mtry, nmin, replace, sample.fraction, honesty, inference, trainsize, honestsize, features, mse, rps)
-    names(output) <- c("type", "categories", "build", "ntree", "mtry", "nmin", "replace", "sample.fraction", "honesty", "inference", "trainsize", "honestsize", "features", "mse", "rps")
+    output <- list(type, categories, build, num.trees, mtry, min.node.size, replace, sample.fraction, honesty, inference, trainsize, honestsize, features, mse, rps)
+    names(output) <- c("type", "categories", "build", "num.trees", "mtry", "min.node.size", "replace", "sample.fraction", "honesty", "inference", "trainsize", "honestsize", "features", "mse", "rps")
 
     # output matrix
     output_matrix <- matrix(NA, ncol = 1, nrow = length(output))
@@ -865,8 +865,8 @@ summary.orf <- function(object, latex = FALSE, ...) {
     # -------------------------------------------------------------------------------- #
 
     # structure summary into a list
-    output <- list(type, categories, build, ntree, mtry, nmin, replace, sample.fraction, honesty, inference, trainsize, honestsize, features, mse, rps)
-    names(output) <- c("type", "categories", "build", "ntree", "mtry", "nmin", "replace", "sample.fraction", "honesty", "inference", "trainsize", "honestsize", "features", "mse", "rps")
+    output <- list(type, categories, build, num.trees, mtry, min.node.size, replace, sample.fraction, honesty, inference, trainsize, honestsize, features, mse, rps)
+    names(output) <- c("type", "categories", "build", "num.trees", "mtry", "min.node.size", "replace", "sample.fraction", "honesty", "inference", "trainsize", "honestsize", "features", "mse", "rps")
 
     # output matrix
     output_matrix <- matrix(NA, ncol = 1, nrow = length(output))

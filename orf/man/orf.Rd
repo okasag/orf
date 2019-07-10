@@ -6,19 +6,20 @@
 \alias{orf-package}
 \title{orf: An Implementation of the Ordered Random Forest Algorithm}
 \usage{
-orf(X, Y, ntree = 1000, mtry = NULL, nmin = NULL, replace = FALSE,
-  sample.fraction = NULL, honesty = TRUE, inference = FALSE)
+orf(X, Y, num.trees = 1000, mtry = NULL, min.node.size = NULL,
+  replace = FALSE, sample.fraction = NULL, honesty = TRUE,
+  inference = FALSE)
 }
 \arguments{
 \item{X}{matrix of features}
 
 \item{Y}{vector of outcomes (as.matrix acceptable too)}
 
-\item{ntree}{scalar, number of trees in a forest, i.e. bootstrap replications (default is 1000 trees)}
+\item{num.trees}{scalar, number of trees in a forest, i.e. bootstrap replications (default is 1000 trees)}
 
 \item{mtry}{scalar, number of randomly selected features (default is the squared root of number of features, rounded up to the nearest integer)}
 
-\item{nmin}{scalar, minimum node size (default is 5 observations)}
+\item{min.node.size}{scalar, minimum node size (default is 5 observations)}
 
 \item{replace}{logical, if TRUE sampling with replacement, i.e. bootstrap is used to grow the trees, otherwise subsampling without replacement is used (default is set to FALSE)}
 

@@ -139,13 +139,33 @@ nmin
 
 }
 
+#' check replace
+#'
+#' Checks the input for replace
+#'
+#' @param replace logical, if TRUE bootstrapping, if FALSE subsampling
+#'
+#' @return replace
+check_replace <- function(replace) {
+
+  if (!(is.logical(replace))) {
+
+    replace <- FALSE
+    warning("replace must be logical. replace has been set to FALSE as a default.")
+
+  }
+
+  replace
+
+}
+
 #' check sample.fraction
 #'
 #' Checks the input data of sample.fraction
 #'
 #' @param sample.fraction scalar, fraction of data used for subsampling
 #'
-#' @return nmin
+#' @return sample.fraction
 #'
 check_sample_fraction <- function(sample.fraction) {
 

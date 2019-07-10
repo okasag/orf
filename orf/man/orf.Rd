@@ -6,8 +6,8 @@
 \alias{orf-package}
 \title{orf: An Implementation of the Ordered Random Forest Algorithm}
 \usage{
-orf(X, Y, ntree = 1000, mtry = NULL, nmin = NULL,
-  sample.fraction = NULL, honesty = FALSE, inference = FALSE)
+orf(X, Y, ntree = 1000, mtry = NULL, nmin = NULL, replace = FALSE,
+  sample.fraction = NULL, honesty = TRUE, inference = FALSE)
 }
 \arguments{
 \item{X}{matrix of features}
@@ -20,9 +20,11 @@ orf(X, Y, ntree = 1000, mtry = NULL, nmin = NULL,
 
 \item{nmin}{scalar, minimum node size (default is 5 observations)}
 
+\item{replace}{logical, if TRUE sampling with replacement, i.e. bootstrap is used to grow the trees, otherwise subsampling without replacement is used (default is set to FALSE)}
+
 \item{sample.fraction}{scalar, subsampling rate (default is 1 for bootstrap and 0.5 for subsampling)}
 
-\item{honesty}{logical, if TRUE honest forest is built using 50:50 data split (default is set to FALSE)}
+\item{honesty}{logical, if TRUE honest forest is built using 50:50 data split (default is set to TRUE)}
 
 \item{inference}{logical, if TRUE the weight based inference is conducted (default is set to FALSE)}
 }

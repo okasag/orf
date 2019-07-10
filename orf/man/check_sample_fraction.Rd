@@ -10,7 +10,7 @@ check_sample_fraction(sample.fraction)
 \item{sample.fraction}{scalar, fraction of data used for subsampling}
 }
 \value{
-nmin
+sample.fraction
 }
 \description{
 Checks the input data of sample.fraction

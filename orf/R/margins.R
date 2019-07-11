@@ -7,7 +7,7 @@
 #' @param forest estimated forest object of class \code{orf} or \code{mrf}
 #' @param eval string defining evaluation point for marginal effects. These can be one of "mean", "atmean", or "atmedian"
 #' @param window numeric, share of standard deviation of X to be used for evaluation of the marginal effect (default is 0.1)
-#' @param newdata matrix of new Xs (currently not supported)
+#' @param newdata matrix of new Xs for which marginal effects will be computed
 #'
 #' @export
 margins <- function(forest, eval = "atmean", window = NULL, newdata = NULL) UseMethod("margins")
@@ -21,7 +21,7 @@ margins <- function(forest, eval = "atmean", window = NULL, newdata = NULL) UseM
 #' @param forest estimated forest object of class \code{orf} or \code{mrf}
 #' @param eval string defining evaluation point for marginal effects. These can be one of "mean", "atmean", or "atmedian"
 #' @param window numeric, share of standard deviation of X to be used for evaluation of the marginal effect (default is 0.1)
-#' @param newdata matrix of new Xs (currently not supported)
+#' @param newdata matrix of new Xs for which marginal effects will be computed
 #'
 #' @export
 margins.default <- function(forest, eval = "atmean", window = NULL, newdata = NULL) {
@@ -40,7 +40,7 @@ margins.default <- function(forest, eval = "atmean", window = NULL, newdata = NU
 #' @param forest trained ordered random forest object of class \code{orf}
 #' @param eval string defining evaluation point for marginal effects. These can be one of "mean", "atmean", or "atmedian"
 #' @param window numeric, share of standard deviation of X to be used for evaluation of the marginal effect (default is 0.1)
-#' @param newdata matrix of new Xs (currently not supported)
+#' @param newdata matrix of new Xs for which marginal effects will be computed
 #'
 #' @importFrom stats predict median pnorm sd
 #' @import ranger
@@ -73,15 +73,20 @@ margins.orf <- function(forest, eval = "atmean", window = NULL, newdata = NULL) 
 
   } else {
 
+    # check if X has name
+    if (is.null(colnames(newdata))) { colnames(newdata) <- paste0("X", rep(1:ncol(newdata))) }
+
     # check if newdata is compatible with train data
-    if (ncol(newdata) != ncol(forest$forestInfo$trainData)) {
+    if (all(colnames(forest$forestInfo$trainData)[-1] != colnames(newdata)) | ncol(newdata) != (ncol(forest$forestInfo$trainData) - 1)) {
 
       stop("newdata is not compatible with training data. Programme terminated.")
 
     } else {
 
+      # check X data
+      check_X(newdata)
       # newdata which will be used for evaluating marginal effects
-      X_eval <- as.matrix(newdata[, -1])
+      X_eval <- as.matrix(newdata)
 
       # get data which will be used for predicting the marginal effect
       if (forest$forestInfo$inputs$honesty == FALSE) {
@@ -436,7 +441,7 @@ print.margins.orf <- function(x, latex = FALSE, ...) {
 #' @param forest trained multinomial random forest object of class \code{mrf}
 #' @param eval string defining evaluation point for marginal effects. These can be one of "mean", "atmean", or "atmedian". Default is "atmean".
 #' @param window numeric, share of standard deviation of X to be used for evaluation of the marginal effect (default is 0.1)
-#' @param newdata matrix of new Xs (currently not supported)
+#' @param newdata matrix of new Xs for which marginal effects will be computed
 #'
 #' @importFrom stats predict median pnorm sd
 #' @import ranger
@@ -470,14 +475,16 @@ margins.mrf <- function(forest, eval = "atmean", window = NULL, newdata = NULL) 
   } else {
 
     # check if newdata is compatible with train data
-    if (ncol(newdata) != ncol(forest$forestInfo$trainData)) {
+    if (ncol(newdata) != (ncol(forest$forestInfo$trainData) - 1)) {
 
       stop("newdata is not compatible with training data. Programme terminated.")
 
     } else {
 
+      # check X data
+      check_X(newdata)
       # newdata which will be used for evaluating marginal effects
-      X_eval <- as.matrix(newdata[, -1])
+      X_eval <- as.matrix(newdata)
 
       # get data which will be used for predicting the marginal effect
       if (forest$forestInfo$inputs$honesty == FALSE) {

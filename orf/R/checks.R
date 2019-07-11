@@ -190,15 +190,20 @@ check_replace <- function(replace) {
 #'
 #' @return sample.fraction
 #'
-check_sample_fraction <- function(sample.fraction) {
+check_sample_fraction <- function(sample.fraction, replace) {
 
-  if (is.null(sample.fraction)) {
+  if (replace = TRUE & (is.null(sample.fraction))) {
+
+    sample.fraction <- 1
+
+  } else if (replace = FALSE & (is.null(sample.fraction))) {
 
     sample.fraction <- 0.5
 
   } else if (!is.numeric(sample.fraction) | sample.fraction <= 0 | sample.fraction > 1) {
 
     stop("Error: Invalid input value for sample.fraction. The number must be within the interval of [0,1).")
+
   }
 
   sample.fraction
@@ -225,6 +230,35 @@ check_honesty <- function(honesty) {
 
 }
 
+#' check honesty fraction
+#'
+#' Checks the input data of honesty.fraction in orf
+#'
+#' @param honesty.fraction scalar, share of the data set aside to estimate the effects (default is 0.5)
+#'
+#' @return honesty.fraction
+#'
+check_honesty_fraction <- function(honesty.fraction, honesty) {
+
+  if (honesty == TRUE & is.null(honesty.fraction)) {
+
+    honesty.fraction <- 0.5
+
+  } else if (honesty == FALSE & (!is.null(honesty.fraction) | honesty.fraction != 0)) {
+
+    warning("For honesty = FALSE honesty.fraction will be ignored.")
+    honesty.fraction <- 0
+
+  } else if (!is.numeric(honesty.fraction) | honesty.fraction <= 0 | honesty.fraction >= 1) {
+
+    stop("Error: Invalid value for honesty.fraction. honesty.fraction must be within [0,1] interval.")
+
+  }
+
+  honesty.fraction
+
+}
+
 #' check inference
 #'
 #' Checks the input for inference
@@ -234,7 +268,7 @@ check_honesty <- function(honesty) {
 #' @return inference
 check_inference <- function(inference) {
 
-  if (!(is.logical(inference))) {
+  if (!(is.logical(inference)) | is.null(inference)) {
 
     inference <- FALSE
     warning("inference must be logical. inference has been set to FALSE as a default.")
@@ -312,3 +346,5 @@ check_window <- function(window) {
   window
 
 }
+
+

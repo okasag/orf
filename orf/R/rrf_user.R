@@ -71,7 +71,7 @@ rrf <- function(X, Y, ntree, mtry, nmin, honesty, inference) {
 
     ## do honest forest estimation here using 50:50 data split as in Lechner (2018)
     # devide into 50:50 honesty sets
-    split_data <- honest_split(dat)
+    split_data <- honest_split(dat, honesty.fraction, orf = FALSE)
     train_data <- split_data$trainData # take out training data
     honest_data <- split_data$honestData # take out honest data
     rows_train_data <- as.numeric(rownames(train_data)) # take rownames of train data as numeric
@@ -137,7 +137,7 @@ rrf <- function(X, Y, ntree, mtry, nmin, honesty, inference) {
 
     ## do honest forest estimation here using 50:50 data split as in Lechner (2018)
     # devide into 50:50 honesty sets
-    split_data <- honest_split(dat)
+    split_data <- honest_split(dat, honesty.fraction, orf = FALSE)
     train_data <- split_data$trainData # take out training data
     honest_data <- split_data$honestData # take out honest data
 

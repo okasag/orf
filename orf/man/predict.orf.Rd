@@ -4,12 +4,14 @@
 \alias{predict.orf}
 \title{predict.orf}
 \usage{
-\method{predict}{orf}(object, new_data, ...)
+\method{predict}{orf}(object, newdata = NULL, inference = NULL, ...)
 }
 \arguments{
 \item{object}{estimated forest object of type \code{orf}}
 
-\item{new_data}{matrix X containing the observations to predict}
+\item{newdata}{matrix X containing the observations to predict}
+
+\item{inference}{logical, if TRUE variances for the predictions will be estimated}
 
 \item{...}{further arguments (currently ignored)}
 }

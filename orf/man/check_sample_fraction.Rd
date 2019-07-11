@@ -4,10 +4,12 @@
 \alias{check_sample_fraction}
 \title{check sample.fraction}
 \usage{
-check_sample_fraction(sample.fraction)
+check_sample_fraction(sample.fraction, replace)
 }
 \arguments{
 \item{sample.fraction}{scalar, fraction of data used for subsampling}
+
+\item{replace}{logical, if bootstrap or subsampling should be used}
 }
 \value{
 sample.fraction

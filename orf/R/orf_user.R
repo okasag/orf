@@ -436,12 +436,6 @@ predict.orf <- function(object, newdata = NULL, inference = NULL, ...) {
   train_data <- forest$forestInfo$trainData
   honest_ind_data <- forest$forestInfo$indicatorData # indicator data needed for indicator predictions
 
-  # take out list of ranger objects (be careful, its Forests with S at the end!)
-  forest <- forest$trainForests
-
-  ## get train data names (only X)
-  train_data_name <- colnames(train_data)[2:ncol(train_data)]
-
   # -------------------------------------------------------------------------------- #
 
   ## get fitted values if newdata = NULL
@@ -460,6 +454,12 @@ predict.orf <- function(object, newdata = NULL, inference = NULL, ...) {
     }
 
   } else {
+
+    # take out list of ranger objects (be careful, its Forests with S at the end!)
+    forest <- forest$trainForests
+
+    ## get train data names (only X)
+    train_data_name <- colnames(train_data)[2:ncol(train_data)]
 
     ## get X matrix newdata as dataframe and check colnames
     # X

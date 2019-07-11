@@ -187,16 +187,17 @@ check_replace <- function(replace) {
 #' Checks the input data of sample.fraction
 #'
 #' @param sample.fraction scalar, fraction of data used for subsampling
+#' @param replace logical, if bootstrap or subsampling should be used
 #'
 #' @return sample.fraction
 #'
 check_sample_fraction <- function(sample.fraction, replace) {
 
-  if (replace = TRUE & (is.null(sample.fraction))) {
+  if (replace == TRUE & (is.null(sample.fraction))) {
 
     sample.fraction <- 1
 
-  } else if (replace = FALSE & (is.null(sample.fraction))) {
+  } else if (replace == FALSE & (is.null(sample.fraction))) {
 
     sample.fraction <- 0.5
 
@@ -235,6 +236,7 @@ check_honesty <- function(honesty) {
 #' Checks the input data of honesty.fraction in orf
 #'
 #' @param honesty.fraction scalar, share of the data set aside to estimate the effects (default is 0.5)
+#' @param honesty logical, if data should be split into train and honest sample
 #'
 #' @return honesty.fraction
 #'

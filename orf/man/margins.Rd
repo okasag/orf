@@ -13,7 +13,7 @@ margins(forest, eval = "atmean", window = NULL, newdata = NULL)
 
 \item{window}{numeric, share of standard deviation of X to be used for evaluation of the marginal effect (default is 0.1)}
 
-\item{newdata}{matrix of new Xs (currently not supported)}
+\item{newdata}{matrix of new Xs for which marginal effects will be computed}
 }
 \description{
 margins is an S3 generic with methods to estimate marginal effects

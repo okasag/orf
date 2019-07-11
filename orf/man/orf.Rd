@@ -8,7 +8,7 @@
 \usage{
 orf(X, Y, num.trees = 1000, mtry = NULL, min.node.size = NULL,
   replace = FALSE, sample.fraction = NULL, honesty = TRUE,
-  inference = FALSE)
+  honesty.fraction = NULL, inference = FALSE)
 }
 \arguments{
 \item{X}{matrix of features}
@@ -26,6 +26,8 @@ orf(X, Y, num.trees = 1000, mtry = NULL, min.node.size = NULL,
 \item{sample.fraction}{scalar, subsampling rate (default is 1 for bootstrap and 0.5 for subsampling)}
 
 \item{honesty}{logical, if TRUE honest forest is built using 50:50 data split (default is set to TRUE)}
+
+\item{honesty.fraction}{scalar, share of observations belonging to honest sample not used for growing the forest (default is 0.5)}
 
 \item{inference}{logical, if TRUE the weight based inference is conducted (default is set to FALSE)}
 }
@@ -45,8 +47,7 @@ estimating forest weights as well as marginal effects and thus
 provides similar output as in standard econometric models for
 ordered choice.
 
-Ordered Random Forests for semi-parametric estimation of ordered choice model
-as proposed in Lechner & Okasa (2019)
+Ordered Forest for flexible estimation of the ordered choice model as developed in Lechner & Okasa (2019)
 }
 \author{
 Gabriel Okasa \email{gabriel.okasa@unisg.ch}

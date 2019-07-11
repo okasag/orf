@@ -149,7 +149,7 @@ mrf <- function(X, Y, ntree, mtry, nmin, honesty, inference, margins){
 
     ## do honest forest estimation here using 50:50 data split as in Lechner (2018)
     # devide into 50:50 honesty sets
-    split_data <- honest_split(dat, honesty.fraction, orf = TRUE)
+    split_data <- honest_split(dat, honesty.fraction = 0.5, orf = TRUE)
     # take care of train data
     train_data <- split_data$trainData # take out training data
     rows_train_data <- as.numeric(rownames(train_data)) # take rownames of train data as numeric
@@ -232,7 +232,7 @@ mrf <- function(X, Y, ntree, mtry, nmin, honesty, inference, margins){
 
     ## do honest forest estimation here using 50:50 data split as in Lechner (2018)
     # devide into 50:50 honesty sets
-    split_data <- honest_split(dat, honesty.fraction, orf = TRUE)
+    split_data <- honest_split(dat, honesty.fraction = 0.5, orf = TRUE)
     # take care of train data
     train_data <- split_data$trainData # take out training data
     rows_train_data <- as.numeric(rownames(train_data)) # take rownames of train data as numeric
@@ -416,7 +416,7 @@ mrf <- function(X, Y, ntree, mtry, nmin, honesty, inference, margins){
 
     ## do honest forest estimation here using 50:50 data split as in Lechner (2018)
     # devide into 50:50 honesty sets
-    split_data <- honest_split(dat, honesty.fraction, orf = TRUE)
+    split_data <- honest_split(dat, honesty.fraction = 0.5, orf = TRUE)
     # take care of train data
     train_data <- split_data$trainData # take out training data
     rows_train_data <- as.numeric(rownames(train_data)) # take rownames of train data as numeric
@@ -507,7 +507,7 @@ mrf <- function(X, Y, ntree, mtry, nmin, honesty, inference, margins){
 
     ## do honest forest estimation here using 50:50 data split as in Lechner (2018)
     # devide into 50:50 honesty sets
-    split_data <- honest_split(dat, honesty.fraction, orf = TRUE)
+    split_data <- honest_split(dat, honesty.fraction = 0.5, orf = TRUE)
     # take care of train data
     train_data <- split_data$trainData # take out training data
     rows_train_data <- as.numeric(rownames(train_data)) # take rownames of train data as numeric

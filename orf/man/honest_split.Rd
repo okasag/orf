@@ -2,17 +2,21 @@
 % Please edit documentation in R/utils.R
 \name{honest_split}
 \alias{honest_split}
-\title{honest 50/50 sample split}
+\title{honest sample split}
 \usage{
-honest_split(data)
+honest_split(data, honesty.fraction, orf)
 }
 \arguments{
 \item{data}{dataframe or matrix of features and outcomes to be split honestly}
+
+\item{honesty.fraction}{share of sample to belong to honesty sample}
+
+\item{orf}{logical, if honest split should be done for orf or not}
 }
 \value{
 named list of honest and training sample
 }
 \description{
-Creates honest sample split by randomly selecting 50 percent of observations
-to belong to honest sample and 50 percent to training sample
+Creates honest sample split by randomly selecting prespecified share of observations
+to belong to honest sample and to training sample
 }

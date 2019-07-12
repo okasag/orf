@@ -246,7 +246,11 @@ check_honesty_fraction <- function(honesty.fraction, honesty) {
 
     honesty.fraction <- 0.5
 
-  } else if (honesty == FALSE & (!is.null(honesty.fraction) | honesty.fraction != 0)) {
+  } else if (honesty == FALSE & (is.null(honesty.fraction))) {
+
+    honesty.fraction <- 0
+
+  } else if (honesty == FALSE & honesty.fraction != 0) {
 
     warning("For honesty = FALSE honesty.fraction will be ignored.")
     honesty.fraction <- 0

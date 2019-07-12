@@ -795,139 +795,119 @@ summary.orf <- function(object, latex = FALSE, ...) {
 
   ## get forest as object
   forest <- object
-  ## save forest inputs
-  inputs <- forest$forestInfo$inputs
-  honesty <- inputs$honesty
-  honesty.fraction <- inputs$honesty.fraction
-  inference <- inputs$inference
-  mtry <- inputs$mtry
-  num.trees <- inputs$num.trees
-  min.node.size <- inputs$min.node.size
-  replace <- inputs$replace
-  sample.fraction <- inputs$sample.fraction
-  honest_data <- forest$forestInfo$honestData
-  train_data <- forest$forestInfo$trainData
-  categories <- length(forest$forestInfo$categories)
-  type <- "Ordered Random Forest"
 
   # -------------------------------------------------------------------------------- #
 
-  if (honesty == TRUE & inference == TRUE) {
+  ## save forest inputs
+  main_class        <- class(forest)[1]
+  inputs            <- forest$forestInfo$inputs
 
-    # -------------------------------------------------------------------------------- #
+  honesty           <- inputs$honesty
+  honesty.fraction  <- inputs$honesty.fraction
+  inference         <- inputs$inference
+  mtry              <- inputs$mtry
+  num.trees         <- inputs$num.trees
+  min.node.size     <- inputs$min.node.size
+  replace           <- inputs$replace
+  sample.fraction   <- inputs$sample.fraction
+  honest_data       <- forest$forestInfo$honestData
+  train_data        <- forest$forestInfo$trainData
+  categories        <- length(forest$forestInfo$categories)
+  type              <- "Ordered Forest"
 
-    ## honest splitting, i.e. use honest data
-    # take out summary statistics
-    mse <- round(forest$honestMSE, 5)
-    rps <- round(forest$honestRPS, 5)
-    trainsize <- nrow(train_data)
-    honestsize <- nrow(honest_data)
-    features <- ncol(train_data)-1 # take out the response
-    # check if subsampling or bootstrapping was used
-    if (forest$trainForests[[1]]$replace == TRUE) { build <- "Bootstrap" } else { build <- "Subsampling" }
+  # -------------------------------------------------------------------------------- #
 
-    # -------------------------------------------------------------------------------- #
+  ## honest splitting, i.e. use honest data
+  # take out summary statistics
+  mse         <- round(forest$MSE, 5)
+  rps         <- round(forest$RPS, 5)
+  trainsize   <- nrow(train_data)
+  honestsize  <- ifelse(is.null(honest_data), 0, nrow(honest_data))
+  features    <- ncol(train_data) - 1   # take out the response
 
-    # structure summary into a list
-    output <- list(type, categories, build, num.trees, mtry, min.node.size, replace, sample.fraction, honesty, honesty.fraction, inference, trainsize, honestsize, features, mse, rps)
-    names(output) <- c("type", "categories", "build", "num.trees", "mtry", "min.node.size", "replace", "sample.fraction", "honesty", "honesty.fraction", "inference", "trainsize", "honestsize", "features", "mse", "rps")
+  # check if subsampling or bootstrapping was used
+  if (forest$trainForests[[1]]$replace == TRUE) { build <- "Bootstrap" } else { build <- "Subsampling" }
 
-    # output matrix
-    output_matrix <- matrix(NA, ncol = 1, nrow = length(output))
-    # populate output matrix
-    rownames(output_matrix) <- names(output) # rownames are names
-    colnames(output_matrix) <- "" # no colname
-    output_matrix[, 1] <- unlist(output) # column 2 are values
+  # -------------------------------------------------------------------------------- #
 
-    # generate latex output if selected
-    if (latex == TRUE) { colnames(output_matrix) <- "Attributes"
-    output_matrix <- xtable(output_matrix, caption = "Ordered Random Forest Summary")
-    }
+  # structure summary into a list
+  output        <- list(type, categories, build, num.trees, mtry, min.node.size, replace, sample.fraction, honesty, honesty.fraction, inference, trainsize, honestsize, features, mse, rps)
+  names(output) <- c("type", "categories", "build", "num.trees", "mtry", "min.node.size", "replace", "sample.fraction", "honesty", "honesty.fraction", "inference", "trainsize", "honestsize", "features", "mse", "rps")
 
-    # pack it into output
-    output <- output_matrix
+  # output matrix
+  output_matrix <- matrix(NA, ncol = 1, nrow = length(output))
+  # populate output matrix
+  rownames(output_matrix) <- names(output) # rownames are names
+  colnames(output_matrix) <- "" # no visible colname
+  output_matrix[, 1]      <- unlist(output) # column 1 are values
 
-    # -------------------------------------------------------------------------------- #
-
-  } else if (honesty == FALSE & inference == FALSE) {
-
-    # -------------------------------------------------------------------------------- #
-
-    ## no honest splitting, i.e. use all data
-    # take out summary statistics
-    mse <- round(forest$oobMSE, 5)
-    rps <- round(forest$oobRPS, 5)
-    trainsize <- nrow(train_data)
-    honestsize <- 0
-    features <- ncol(train_data)-1 # take out the response
-    # check if subsampling or bootstrapping was used
-    if (forest$trainForests[[1]]$replace == TRUE) { build <- "Bootstrap" } else { build <- "Subsampling" }
-
-    # -------------------------------------------------------------------------------- #
-
-    # structure summary into a list
-    output <- list(type, categories, build, num.trees, mtry, min.node.size, replace, sample.fraction, honesty, honesty.fraction, inference, trainsize, honestsize, features, mse, rps)
-    names(output) <- c("type", "categories", "build", "num.trees", "mtry", "min.node.size", "replace", "sample.fraction", "honesty", "honesty.fraction", "inference", "trainsize", "honestsize", "features", "mse", "rps")
-
-    # output matrix
-    output_matrix <- matrix(NA, ncol = 1, nrow = length(output))
-    # populate output matrix
-    rownames(output_matrix) <- names(output) # rownames are names
-    colnames(output_matrix) <- "" # no colname
-    output_matrix[, 1] <- unlist(output) # column 2 are values
-
-    # generate latex output if selected
-    if (latex == TRUE) { colnames(output_matrix) <- "Attributes"
-    output_matrix <- xtable(output_matrix, caption = "Ordered Random Forest Summary")
-    }
-
-    # put it into output
-    output <- output_matrix
-
-    # -------------------------------------------------------------------------------- #
-
-  } else if (honesty == TRUE & inference == FALSE) {
-
-    # -------------------------------------------------------------------------------- #
-
-    ## honest splitting, i.e. use honest data
-    # take out summary statistics
-    mse <- round(forest$honestMSE, 5)
-    rps <- round(forest$honestRPS, 5)
-    trainsize <- nrow(train_data)
-    honestsize <- nrow(honest_data)
-    features <- ncol(train_data)-1 # take out the response
-    # check if subsampling or bootstrapping was used
-    if (forest$trainForests[[1]]$replace == TRUE) { build <- "Bootstrap" } else { build <- "Subsampling" }
-
-    # -------------------------------------------------------------------------------- #
-
-    # structure summary into a list
-    output <- list(type, categories, build, num.trees, mtry, min.node.size, replace, sample.fraction, honesty, honesty.fraction, inference, trainsize, honestsize, features, mse, rps)
-    names(output) <- c("type", "categories", "build", "num.trees", "mtry", "min.node.size", "replace", "sample.fraction", "honesty", "honesty.fraction", "inference", "trainsize", "honestsize", "features", "mse", "rps")
-
-    # output matrix
-    output_matrix <- matrix(NA, ncol = 1, nrow = length(output))
-    # populate output matrix
-    rownames(output_matrix) <- names(output) # rownames are names
-    colnames(output_matrix) <- "" # no colname
-    output_matrix[, 1] <- unlist(output) # column 2 are values
-
-    # generate latex output if selected
-    if (latex == TRUE) { colnames(output_matrix) <- "Attributes"
-    output_matrix <- xtable(output_matrix, caption = "Ordered Random Forest Summary")
-    }
-
-    # -------------------------------------------------------------------------------- #
-
-    # pack it into output
-    output <- output_matrix
-
-    # -------------------------------------------------------------------------------- #
-
+  # generate latex output if selected
+  if (latex == TRUE) { colnames(output_matrix) <- "Ordered Forest Summary"
+  output_matrix <- xtable(output_matrix, caption = "Summary of the Ordered Forest Estimation", align = "ll")
   }
 
+  # pack it into output
+  output <- output_matrix
+
+  # -------------------------------------------------------------------------------- #
+
+  cat("Summary of the", type, "Estimation \n\n")
+
   # return output
-  return(output)
+  print(noquote(output), comment = FALSE)
+
+  # -------------------------------------------------------------------------------- #
+
+}
+
+
+#' print.orf
+#'
+#' print of an ordered forest object of class \code{orf}
+#'
+#' @param x object of type \code{margins.orf}
+#' @param ... further arguments (currently ignored)
+#'
+#' @export
+print.orf <- function(x, ...) {
+
+  # needed inputs for the function: forest - forest object coming from orf function
+  #                                        - ... additional arguments (currently ignored)
+
+  # -------------------------------------------------------------------------------- #
+
+  ## get forest as x
+  forest <- x
+
+  # -------------------------------------------------------------------------------- #
+
+  ## save forest inputs
+  main_class        <- class(forest)[1]
+  inputs            <- forest$forestInfo$inputs
+
+  honesty           <- inputs$honesty
+  mtry              <- inputs$mtry
+  num.trees         <- inputs$num.trees
+  min.node.size     <- inputs$min.node.size
+  replace           <- inputs$replace
+  honest_data       <- forest$forestInfo$honestData
+  train_data        <- forest$forestInfo$trainData
+  categories        <- length(forest$forestInfo$categories)
+  build             <- ifelse(replace == TRUE, "Bootstrap", "Subsampling")
+  type              <- "Ordered Forest"
+
+  # -------------------------------------------------------------------------------- #
+
+  cat(type, "object of class", main_class, "\n\n")
+
+  cat("Number of Categories:            ", categories, "\n")
+  cat("Sample Size:                     ", sum(nrow(train_data), nrow(honest_data)), "\n")
+  cat("Number of Trees:                 ", num.trees, "\n")
+  cat("Build:                           ", build, "\n")
+  cat("Mtry:                            ", mtry, "\n")
+  cat("Minimum Node Size:               ", min.node.size, "\n")
+  cat("Honest Forest:                   ", honesty, "\n")
+
+  # -------------------------------------------------------------------------------- #
 
 }

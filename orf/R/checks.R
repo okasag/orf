@@ -83,8 +83,8 @@ check_discrete_Y <- function(Y) {
 
   if (!all(sort(unique(Y)) == seq_along(unique(Y)))) {
     warning(paste(c("The input matrix Y has been recoded to: ", seq_along(unique(Y))), sep = " ", collapse = " "))
-    # recode Y
-    for(i in seq_along(unique(Y))) {Y <- replace(Y, Y == sort(unique(Y))[i], seq_along(unique(Y))[i]) }
+    # recode Y (sort values ascending)
+    Y <- match(Y, sort(unique(Y)))
   }
 
   Y

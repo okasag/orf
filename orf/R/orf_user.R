@@ -699,22 +699,13 @@ plot.orf <- function(x, ...) {
   honest_data <- forest$forestInfo$honestData
   train_data <- forest$forestInfo$trainData
 
-  # chekc if honesty was used or not and modify objects accordingly
-  if (honesty == FALSE) {
+  # -------------------------------------------------------------------------------- #
 
-    probabilities <- forest$oobPredictions # take out probabilities
-    outcomes <- train_data[, 1] # take the observed outcomes
-
-
-  } else {
-
-    probabilities <- forest$honestPredictions # take out honest predictions
-    all_data <- rbind(honest_data, train_data) # put data together
-    all_data <- all_data[order(as.numeric(row.names(all_data))), ] # sort data as original
-    outcomes <- all_data[, 1] # take the observed outcomes
-
-
-  }
+  # get predictions and estimation data
+  probabilities <- forest$forestPredictions # take out honest predictions
+  all_data <- rbind(honest_data, train_data) # put data together
+  all_data <- all_data[order(as.numeric(row.names(all_data))), ] # sort data as original
+  outcomes <- all_data[, 1] # take the observed outcomes
 
   # -------------------------------------------------------------------------------- #
 

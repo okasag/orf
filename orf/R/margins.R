@@ -6,11 +6,12 @@
 #'
 #' @param forest estimated forest object of class \code{orf} or \code{mrf}
 #' @param eval string defining evaluation point for marginal effects. These can be one of "mean", "atmean", or "atmedian"
+#' @param inference logical, if TRUE inference on marginal effects will be conducted (default is inherited from the orf object)
 #' @param window numeric, share of standard deviation of X to be used for evaluation of the marginal effect (default is 0.1)
 #' @param newdata matrix of new Xs for which marginal effects will be computed
 #'
 #' @export
-margins <- function(forest, eval = "atmean", window = NULL, newdata = NULL) UseMethod("margins")
+margins <- function(forest, eval = "atmean", inference = NULL, window = NULL, newdata = NULL) UseMethod("margins")
 
 
 #' margins.default
@@ -20,11 +21,12 @@ margins <- function(forest, eval = "atmean", window = NULL, newdata = NULL) UseM
 #' Applicable classes are \code{orf} or \code{mrf} .#'
 #' @param forest estimated forest object of class \code{orf} or \code{mrf}
 #' @param eval string defining evaluation point for marginal effects. These can be one of "mean", "atmean", or "atmedian"
+#' @param inference logical, if TRUE inference on marginal effects will be conducted (default is inherited from the orf object)
 #' @param window numeric, share of standard deviation of X to be used for evaluation of the marginal effect (default is 0.1)
 #' @param newdata matrix of new Xs for which marginal effects will be computed
 #'
 #' @export
-margins.default <- function(forest, eval = "atmean", window = NULL, newdata = NULL) {
+margins.default <- function(forest, eval = "atmean", inference = NULL, window = NULL, newdata = NULL) {
 
   warning(paste("margins does not know how to handle object of class ",
                 class(forest),
@@ -39,6 +41,7 @@ margins.default <- function(forest, eval = "atmean", window = NULL, newdata = NU
 #'
 #' @param forest trained ordered random forest object of class \code{orf}
 #' @param eval string defining evaluation point for marginal effects. These can be one of "mean", "atmean", or "atmedian"
+#' @param inference logical, if TRUE inference on marginal effects will be conducted (default is inherited from the orf object)
 #' @param window numeric, share of standard deviation of X to be used for evaluation of the marginal effect (default is 0.1)
 #' @param newdata matrix of new Xs for which marginal effects will be computed
 #'
@@ -48,23 +51,53 @@ margins.default <- function(forest, eval = "atmean", window = NULL, newdata = NU
 #' @return object of type \code{margins.orf}
 #'
 #' @export
-margins.orf <- function(forest, eval = "atmean", window = NULL, newdata = NULL) {
+margins.orf <- function(forest, eval = "atmean", inference = NULL, window = NULL, newdata = NULL) {
 
   # needed inputs for the function: forest - trained forest object of class orf/mrf/brf
   #                                 eval - string defining evaluation point for marginal effects
   #                                 newdata - matrix of new Xs for which the marginal effects should be computed
   # ----------------------------------------------------------------------------------- #
 
-  ### decide if prediction or in sample marginal effects should be evaluated
+  ## save forest inputs
+  inputs            <- forest$forestInfo$inputs
+  forest_replace    <- inputs$replace
+  forest_honesty    <- inputs$honesty
+  forest_inference  <- inputs$inference
+
+  # ----------------------------------------------------------------------------------- #
+
+  ## check inference possibilities according to previous estimation
+  # if inference not specified, take inference argument as it was in the estimation
+  if (is.null(inference)) {
+
+    inference <- forest_inference
+
+  }
+
+  # check if inference is logical
+  inference <- check_inference(inference)
+
+  # if inference TRUE, but orf was NOT estimated with subsampling AND honesty, no inference possible
+  if (inference == TRUE & (forest_replace != FALSE | forest_honesty != TRUE)) {
+
+    warning("Inference is not possible if the orf object was not estimated with both subsampling and honesty.
+            For marginal effects with inference, reestimate orf setting replace = FALSE and honesty = TRUE.")
+    inference <- FALSE
+
+  }
+
+  # -------------------------------------------------------------------------------- #
+
+  # decide if prediction or in sample marginal effects should be evaluated
   if (is.null(newdata)) {
 
     # if no newdata supplied, estimate in sample marginal effects
-    if (forest$forestInfo$inputs$honesty == FALSE) {
+    if (forest_honesty == FALSE) {
 
       data <- forest$forestInfo$trainData # take in-sample data
       X_eval <- as.matrix(data[, -1])
 
-    } else if (forest$forestInfo$inputs$honesty == TRUE) {
+    } else if (forest_honesty == TRUE) {
 
       data <- forest$forestInfo$honestData # take honest data
       X_eval <- as.matrix(data[, -1])
@@ -89,11 +122,11 @@ margins.orf <- function(forest, eval = "atmean", window = NULL, newdata = NULL) 
       X_eval <- as.matrix(newdata)
 
       # get data which will be used for predicting the marginal effect
-      if (forest$forestInfo$inputs$honesty == FALSE) {
+      if (forest_honesty == FALSE) {
 
         data <- forest$forestInfo$trainData # take in-sample data
 
-      } else if (forest$forestInfo$inputs$honesty == TRUE) {
+      } else if (forest_honesty == TRUE) {
 
         data <- forest$forestInfo$honestData # take honest data
 
@@ -222,7 +255,7 @@ margins.orf <- function(forest, eval = "atmean", window = NULL, newdata = NULL) 
   # ----------------------------------------------------------------------------------- #
 
   ### check honesty and inference
-  if (forest$forestInfo$inputs$honesty == FALSE & forest$forestInfo$inputs$inference == FALSE) {
+  if (forest_honesty == FALSE & inference == FALSE) {
 
     #### now we do not need weights if we do not need inference (based on out of bag predictions)
     # forest prediction for X_mean_up (mean doesnt matter for atmean or atmedian)
@@ -230,7 +263,7 @@ margins.orf <- function(forest, eval = "atmean", window = NULL, newdata = NULL) 
     # forest prediction for X_mean_down (mean doesnt matter for atmean or atmedian)
     forest_pred_down <- lapply(forest$trainForests, function(x) lapply(X_mean_down, function(y) mean(predict(x, data = y)$predictions)))
 
-  } else if (forest$forestInfo$inputs$honesty == TRUE & forest$forestInfo$inputs$inference == FALSE) {
+  } else if (forest_honesty == TRUE & inference == FALSE) {
 
     # do honest predictions
     # forest prediction for X_mean_up (use new faster function particularly for ME)
@@ -238,7 +271,7 @@ margins.orf <- function(forest, eval = "atmean", window = NULL, newdata = NULL) 
     # forest prediction for X_mean_down
     forest_pred_down <- predict_forest_preds_for_ME(forest$trainForests, data_ind, X_mean_down)
 
-  } else if (forest$forestInfo$inputs$honesty == TRUE & forest$forestInfo$inputs$inference == TRUE) {
+  } else if (forest_honesty == TRUE & inference == TRUE) {
 
     # do honest predictions with weight based inference
     # extract weights for desired Xs up: get weights from honest sample and predict weights for evaluation points from HONEST sample
@@ -302,13 +335,7 @@ margins.orf <- function(forest, eval = "atmean", window = NULL, newdata = NULL) 
 
   # ----------------------------------------------------------------------------------- #
 
-  # put marginal effects into results
-  results <- list(marginal_effects)
-  names(results) <- c("MarginalEffects")
-
-  # ----------------------------------------------------------------------------------- #
-
-  if (forest$forestInfo$inputs$inference == TRUE) {
+  if (inference == TRUE) {
 
     ### variance for the marginal effects
     ## compute prerequisities for variance of honest marginal effects
@@ -385,6 +412,18 @@ margins.orf <- function(forest, eval = "atmean", window = NULL, newdata = NULL) 
 
     # ----------------------------------------------------------------------------------- #
 
+  } else {
+
+    # no values for the other parameters if inference is not desired
+    variance_me <- NULL
+    sd_me       <- NULL
+    t_value     <- NULL
+    p_values    <- NULL
+
+    # put everything into a list of results
+    results <- list(marginal_effects, variance_me, sd_me, t_value, p_values)
+    names(results) <- c("MarginalEffects", "Variances", "StandardErrors", "tValues", "pValues")
+
   }
 
   # ----------------------------------------------------------------------------------- #
@@ -412,12 +451,12 @@ margins.orf <- function(forest, eval = "atmean", window = NULL, newdata = NULL) 
 print.margins.orf <- function(x, latex = FALSE, ...) {
 
   # chekc if inference has been done
-  if (length(x) > 1 & latex == FALSE) {
+  if (!is.null(x$Variances) & latex == FALSE) {
 
     # print inference output table
     margins_output(x)
 
-   } else if (length(x) > 1 & latex == TRUE) {
+   } else if (!is.null(x$Variances) & latex == TRUE) {
 
     # print inference output table latex
     margins_output_latex(x)
@@ -440,6 +479,7 @@ print.margins.orf <- function(x, latex = FALSE, ...) {
 #'
 #' @param forest trained multinomial random forest object of class \code{mrf}
 #' @param eval string defining evaluation point for marginal effects. These can be one of "mean", "atmean", or "atmedian". Default is "atmean".
+#' @param inference logical, if TRUE inference on marginal effects will be conducted (default is inherited from the mrf object)
 #' @param window numeric, share of standard deviation of X to be used for evaluation of the marginal effect (default is 0.1)
 #' @param newdata matrix of new Xs for which marginal effects will be computed
 #'
@@ -449,23 +489,53 @@ print.margins.orf <- function(x, latex = FALSE, ...) {
 #' @return object of type \code{margins.mrf}
 #'
 #' @export
-margins.mrf <- function(forest, eval = "atmean", window = NULL, newdata = NULL) {
+margins.mrf <- function(forest, eval = "atmean", inference = NULL, window = NULL, newdata = NULL) {
 
   # needed inputs for the function: forest - trained forest object of class orf/mrf/brf
   #                                 eval - string defining evaluation point for marginal effects (default is atmean)
   #                                 newdata - matrix of new Xs
   # ----------------------------------------------------------------------------------- #
 
+  ## save forest inputs
+  inputs            <- forest$forestInfo$inputs
+  forest_replace    <- inputs$replace
+  forest_honesty    <- inputs$honesty
+  forest_inference  <- inputs$inference
+
+  # ----------------------------------------------------------------------------------- #
+
+  ## check inference possibilities according to previous estimation
+  # if inference not specified, take inference argument as it was in the estimation
+  if (is.null(inference)) {
+
+    inference <- forest_inference
+
+  }
+
+  # check if inference is logical
+  inference <- check_inference(inference)
+
+  # if inference TRUE, but orf was NOT estimated with subsampling AND honesty, no inference possible
+  if (inference == TRUE & (forest_replace != FALSE | forest_honesty != TRUE)) {
+
+    warning("Inference is not possible if the orf object was not estimated with both subsampling and honesty.
+            For marginal effects with inference, reestimate orf setting replace = FALSE and honesty = TRUE.")
+    inference <- FALSE
+
+  }
+
+  # -------------------------------------------------------------------------------- #
+
   ### decide if prediction or in sample marginal effects should be evaluated
   if (is.null(newdata)) {
 
     # if no newdata supplied, estimate in sample marginal effects
-    if (forest$forestInfo$inputs$honesty == FALSE) {
+    if (forest_honesty == FALSE) {
 
       data <- forest$forestInfo$trainData # take in-sample data
       X_eval <- as.matrix(data[, -1])
 
-    } else if (forest$forestInfo$inputs$honesty == TRUE) {
+    } else if (forest_honesty == TRUE) {
 
       data <- forest$forestInfo$honestData # take honest data
       X_eval <- as.matrix(data[, -1])
@@ -487,11 +557,11 @@ margins.mrf <- function(forest, eval = "atmean", window = NULL, newdata = NULL) 
       X_eval <- as.matrix(newdata)
 
       # get data which will be used for predicting the marginal effect
-      if (forest$forestInfo$inputs$honesty == FALSE) {
+      if (forest_honesty == FALSE) {
 
         data <- forest$forestInfo$trainData # take in-sample data
 
-      } else if (forest$forestInfo$inputs$honesty == TRUE) {
+      } else if (forest_honesty == TRUE) {
 
         data <- forest$forestInfo$honestData # take honest data
 
@@ -620,7 +690,7 @@ margins.mrf <- function(forest, eval = "atmean", window = NULL, newdata = NULL) 
   # ----------------------------------------------------------------------------------- #
 
   ### check honesty and inference
-  if (forest$forestInfo$inputs$honesty == FALSE & forest$forestInfo$inputs$inference == FALSE) {
+  if (forest_honesty == FALSE & inference == FALSE) {
 
     #### now we do not need weights if we do not need inference (based on out of bag predictions)
     # forest prediction for X_mean_up (mean doesnt matter for atmean or atmedian)
@@ -628,7 +698,7 @@ margins.mrf <- function(forest, eval = "atmean", window = NULL, newdata = NULL) 
     # forest prediction for X_mean_down (mean doesnt matter for atmean or atmedian)
     forest_pred_down <- lapply(forest$trainForests, function(x) lapply(X_mean_down, function(y) mean(predict(x, data = y)$predictions)))
 
-  } else if (forest$forestInfo$inputs$honesty == TRUE & forest$forestInfo$inputs$inference == FALSE) {
+  } else if (forest_honesty == TRUE & inference == FALSE) {
 
     # do honest predictions
     # forest prediction for X_mean_up (use new faster function particularly for ME)
@@ -636,7 +706,7 @@ margins.mrf <- function(forest, eval = "atmean", window = NULL, newdata = NULL) 
     # forest prediction for X_mean_down
     forest_pred_down <- predict_forest_preds_for_ME(forest$trainForests, data_ind, X_mean_down)
 
-  } else if (forest$forestInfo$inputs$honesty == TRUE & forest$forestInfo$inputs$inference == TRUE) {
+  } else if (forest_honesty == TRUE & inference == TRUE) {
 
     # do honest predictions with weight based inference
     # extract weights for desired Xs up: get weights from honest sample and predict weights for evaluation points from HONEST sample
@@ -691,13 +761,7 @@ margins.mrf <- function(forest, eval = "atmean", window = NULL, newdata = NULL) 
 
   # ----------------------------------------------------------------------------------- #
 
-  # put marginal effects into results
-  results <- list(marginal_effects)
-  names(results) <- c("MarginalEffects")
-
-  # ----------------------------------------------------------------------------------- #
-
-  if (forest$forestInfo$inputs$inference == TRUE) {
+  if (inference == TRUE) {
 
     ### variance for the marginal effects
     ## compute prerequisities for variance of honest marginal effects
@@ -759,6 +823,18 @@ margins.mrf <- function(forest, eval = "atmean", window = NULL, newdata = NULL) 
 
     # ----------------------------------------------------------------------------------- #
 
+  } else {
+
+    # no values for the other parameters if inference is not desired
+    variance_me <- NULL
+    sd_me       <- NULL
+    t_value     <- NULL
+    p_values    <- NULL
+
+    # put everything into a list of results
+    results <- list(marginal_effects, variance_me, sd_me, t_value, p_values)
+    names(results) <- c("MarginalEffects", "Variances", "StandardErrors", "tValues", "pValues")
+
   }
 
   # ----------------------------------------------------------------------------------- #
@@ -786,12 +862,12 @@ margins.mrf <- function(forest, eval = "atmean", window = NULL, newdata = NULL) 
 print.margins.mrf <- function(x, latex = FALSE, ...) {
 
   # chekc if inference has been done
-  if (length(x) > 1 & latex == FALSE) {
+  if (!is.null(x$Variances) & latex == FALSE) {
 
     # print inference output table
     margins_output(x)
 
-  } else if (length(x) > 1 & latex == TRUE) {
+  } else if (!is.null(x$Variances) & latex == TRUE) {
 
     # print inference output table latex
     margins_output_latex(x)

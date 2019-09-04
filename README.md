@@ -23,7 +23,12 @@ random forest algorithm from the ranger package
 
 ## to do:
 
-- include all the functions as a part of the package
-- define S3 classes and methods for the generic functions
-- add margins functions
-- 
+- add inference estimation for predict.orf in case of newdata = NULL
+
+- add inference argument for margins.orf
+
+- add example data and examples for all functions
+
+- write new vignette
+
+- add tests using test_that

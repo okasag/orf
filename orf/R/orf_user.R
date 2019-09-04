@@ -494,7 +494,7 @@ predict.orf <- function(object, newdata = NULL, inference = NULL, ...) {
     # if inference TRUE, but orf was NOT estimated with subsampling AND honesty, no inference possible
     if (inference == TRUE & (replace != FALSE | honesty != TRUE)) {
 
-      warning("Inference is not possible if the object orf was not estimated with both subsampling and honesty.
+      warning("Inference is not possible if the orf object was not estimated with both subsampling and honesty.
             For predictions with inference, reestimate orf setting replace = FALSE and honesty = TRUE.")
       inference <- FALSE
 

@@ -1002,7 +1002,6 @@ predict.mrf <- function(object, new_data, ...) {
 #' @param ... further arguments (currently ignored)
 #'
 #' @import ggplot2
-#' @importFrom gridExtra grid.arrange
 #' @importFrom utils stack
 #'
 #' @export
@@ -1047,7 +1046,7 @@ plot.mrf <- function(x, ...) {
   colnames(probabilities) <- sapply(seq_along(categories), function(i) paste0("P(Y=", i, ")"))
 
   # cbind together
-  df_plot <- cbind(outcomes, probabilities)
+  df_plot <- as.data.frame(cbind(outcomes, probabilities))
 
   # subset according to categories
   df_plot_cat <- lapply(seq_along(categories), function(i) as.data.frame(subset(df_plot, outcomes == i)))
@@ -1060,32 +1059,44 @@ plot.mrf <- function(x, ...) {
   df_plot_prob <- lapply(df_plot_cat, function(x) stack(x[seq_along(categories)+1]))
   df_plot_mean <- lapply(df_plot_cat, function(x) stack(x[seq_along(categories)+1+length(categories)]))
 
-  # add colnames
-  df_plot_prob <- lapply(df_plot_prob, function(x) { colnames(x) <- c("Probability", "Category")
-  return(x)}
-  )
-  # add colnames
-  df_plot_mean <- lapply(df_plot_mean, function(x) { colnames(x) <- c("Probability", "Category")
-  return(x)}
-  )
+  # add colnames and column indicating the outcome category
+  df_plot_prob <- lapply(seq_along(df_plot_prob), function(i) {
+    # add column of outcome category to eahc list entry
+    df_plot_prob[[i]]$Outcome <- paste("Class", i, sep = " ")
+    # add colnames
+    colnames(df_plot_prob[[i]]) <- c("Probability", "Density", "Outcome")
+    # return the list
+    return(df_plot_prob[[i]])  })
+
+  # stack the dataframes under each other
+  df_plot_prob <- as.data.frame(do.call(rbind, df_plot_prob))
+
+  # add colnames and column indicating the outcome category
+  df_plot_mean <- lapply(seq_along(df_plot_mean), function(i) {
+    # add column of outcome category to eahc list entry
+    df_plot_mean[[i]]$Outcome <- paste("Class", i, sep = " ")
+    # add colnames
+    colnames(df_plot_mean[[i]]) <- c("Probability", "Density", "Outcome")
+    # return the list
+    return(df_plot_mean[[i]])  })
+
+  # stack the dataframes under each other
+  df_plot_mean <- as.data.frame(do.call(rbind, df_plot_mean))
 
   # -------------------------------------------------------------------------------- #
 
-  ## generate plot objects
-  # Use semi-transparent fill
-  plots <- lapply(seq_along(df_plot_prob), function(i) {
-    ggplot(df_plot_prob[[i]], aes_string(x="Probability", fill="Category")) +
-      geom_density(alpha=0.4) +
-      geom_vline(data=df_plot_mean[[i]], aes_string(xintercept="Probability", color="Category"), linetype="dashed") +
-      ggtitle(paste("Category", i, sep = " ")) +
-      xlab("Predicted Probability") +
-      ylab("Probability Mass") +
-      theme_bw() +
-      theme(plot.title = element_text(hjust = 0.5))
-  })
-
-  # print plots
-  do.call("grid.arrange", c(plots, ncol=1))
+  # generate ggplot
+  ggplot(data = df_plot_prob, aes_string(x = "Probability", fill = "Density"))+
+    geom_density(alpha = 0.4, aes_string(y = "..scaled..")) +
+    facet_wrap("Outcome", ncol = 1)+
+    geom_vline(data = df_plot_mean, aes_string(xintercept = "Probability", color = "Density"), linetype="dashed") +
+    ggtitle("Distribution of Multinomial Forest Probability Predictions") +
+    xlab("Predicted Probability") +
+    ylab("Probability Mass") +
+    theme_bw() +
+    theme(strip.background = element_rect(fill = "gray92")) +
+    theme(legend.position = "top") +
+    theme(plot.title = element_text(hjust = 0.5))
 
   # no output to return for plot
 

@@ -680,7 +680,6 @@ predict.orf <- function(object, newdata = NULL, inference = NULL, ...) {
 #' @param ... further arguments (currently ignored)
 #'
 #' @import ggplot2
-#' @importFrom gridExtra grid.arrange
 #' @importFrom utils stack
 #'
 #' @export
@@ -765,7 +764,7 @@ plot.orf <- function(x, ...) {
     ylab("Probability Mass") +
     theme_bw() +
     theme(strip.background = element_rect(fill = "gray92")) +
-    theme(legend.position = "bottom") +
+    theme(legend.position = "top") +
     theme(plot.title = element_text(hjust = 0.5))
 
   # no output to return for plot

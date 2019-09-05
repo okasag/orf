@@ -305,7 +305,7 @@ orf <- function(X, Y,
     # get honest weights
     forest_weights <- mapply(function(x,y,z) get_forest_weights(x, y, z), forest, data_ind_honest, data_ind_train, SIMPLIFY = F)
     honest_weights <- lapply(forest_weights, function(x) x[rows_honest_data, ]) # take out honest sample honest weights
-    train_weights <- lapply(forest_weights, function(x) x[rows_train_data, ]) # take out train sample honest weights
+    train_weights  <- lapply(forest_weights, function(x) x[rows_train_data, ]) # take out train sample honest weights
 
     # --------------------------------------------------------------------------------------- #
 
@@ -438,20 +438,30 @@ predict.orf <- function(object, newdata = NULL, inference = NULL, ...) {
 
   # -------------------------------------------------------------------------------- #
 
-  ## get fitted values if newdata = NULL
-  if (is.null(newdata)) {
+  # if inference not specified, take inference argument as it was in the estimation
+  if (is.null(inference)) {
+
+    inference <- inputs$inference
+
+  }
+
+  # check if inference is logical
+  inference <- check_inference(inference)
+
+  ## get fitted values if newdata = NULL and inference arguments coincide
+  if (is.null(newdata) & (inference == inputs$inference)) {
 
     # take in sample predictions
     pred_final <- forest$forestPredictions
     var_final  <- forest$forestVariances
     pred_class <- forest$predictedCategories
 
-    # if inference specified here, its not taken into cosnideration
-    if (!is.null(inference)) {
+  } else if (is.null(newdata) & (inference == FALSE) & (inputs$inference == TRUE)) {
 
-      warning("Inference argument is ignored if no newdata supplied.")
-
-    }
+    # then take the estimated values but dont supply the inference results
+    pred_final <- forest$forestPredictions
+    var_final  <- NULL
+    pred_class <- forest$predictedCategories
 
   } else {
 
@@ -461,36 +471,42 @@ predict.orf <- function(object, newdata = NULL, inference = NULL, ...) {
     ## get train data names (only X)
     train_data_name <- colnames(train_data)[2:ncol(train_data)]
 
-    ## get X matrix newdata as dataframe and check colnames
-    # X
-    if (is.null(colnames(newdata))) { colnames(newdata) <- paste0("X", rep(1:ncol(newdata))) } # check if X has name
-    newdata_name <- colnames(newdata) # save the name of X
-    newdata <- as.data.frame(newdata) # as dataframe
-    n_newdata <- nrow(newdata) # rows of new data
-    n_cat <- as.numeric(length(categories))
+    if (is.null(newdata) & (inference == TRUE) & (inputs$inference == FALSE)) {
 
-    # -------------------------------------------------------------------------------- #
+      # note that the newdata is the estimation data and inference should reflect that
+      flag_newdata <- 1
+      # take traindata as newdata and estimate the weights needed for inference
+      newdata <- as.data.frame(rbind(train_data, honest_data))
+      # sort according to rownames
+      newdata <- as.data.frame(newdata[order(as.numeric(row.names(newdata))), ])
+      # get further values
+      n_newdata <- nrow(newdata) # rows of new data
+      n_cat <- as.numeric(length(categories))
 
-    # check if its compatible with the data used for training
-    if (all(train_data_name != newdata_name) | (ncol(newdata) != ncol(train_data)-1)) {
+    } else if (!is.null(newdata)) {
 
-      stop("Newdata are not compatible with the training data. Check supplied data. Programme terminated.")
+      ## get X matrix newdata as dataframe and check colnames
+      # X
+      if (is.null(colnames(newdata))) { colnames(newdata) <- paste0("X", rep(1:ncol(newdata))) } # check if X has name
+      newdata_name <- colnames(newdata) # save the name of X
+      newdata <- as.data.frame(newdata) # as dataframe
+      n_newdata <- nrow(newdata) # rows of new data
+      n_cat <- as.numeric(length(categories))
+
+      # -------------------------------------------------------------------------------- #
+
+      # check if its compatible with the data used for training
+      if (all(train_data_name != newdata_name) | (ncol(newdata) != ncol(train_data)-1)) {
+
+        stop("Newdata are not compatible with the training data. Check supplied data. Programme terminated.")
+
+      }
 
     }
 
     # -------------------------------------------------------------------------------- #
 
     ## check inference possibilities according to previous estimation
-    # if inference not specified, take inference argument as it was in the estimation
-    if (is.null(inference)) {
-
-      inference <- inputs$inference
-
-    }
-
-    # check if inference is logical
-    inference <- check_inference(inference)
-
     # if inference TRUE, but orf was NOT estimated with subsampling AND honesty, no inference possible
     if (inference == TRUE & (replace != FALSE | honesty != TRUE)) {
 
@@ -635,11 +651,43 @@ predict.orf <- function(object, newdata = NULL, inference = NULL, ...) {
 
       # --------------------------------------------------------------------------------------- #
 
-      # get indicator outcomes out of honest indicator data
-      Y_ind_honest <- lapply(honest_ind_data, function(x) x[, 1])
+      # adapt variance computations according to newdata
+      if (flag_newdata == 1) {
 
-      # compute the variances for the categorical predictions
-      var_final <- pred_orf_variance(forest_pred, forest_weights_pred, Y_ind_honest)
+        # use get_orf_variance
+        # compute variances as in within estimation (smaller normalization parameter due to sample size)
+        # divide forest_pred and forest_weights into 2 pieces for honest and train (ordering doesnt matter)
+        n_halfdata <- floor(length(forest_pred[[1]])/2)
+        n_fulldata <- length(forest_pred[[1]])
+        # transform to matrix vector
+        forest_pred <- lapply(forest_pred, function(x) matrix(x, ncol = 1))
+        # take care of rownames
+        forest_pred <- lapply(forest_pred, function(x) { rownames(x) <- (1:n_fulldata); return(x) })
+        forest_weights_pred <- lapply(forest_weights_pred, function(x) { rownames(x) <- (1:n_fulldata); return(x) })
+        # predictions (vectors as matrices)
+        honest_pred <- lapply(forest_pred, function(x) as.matrix(x[(1:n_halfdata), ]))
+        train_pred  <- lapply(forest_pred, function(x) as.matrix(x[((n_halfdata + 1):n_fulldata), ]))
+        # weights (matrices)
+        honest_weights_pred <- lapply(forest_weights_pred, function(x) x[(1:n_halfdata), ])
+        train_weights_pred  <- lapply(forest_weights_pred, function(x) x[((n_halfdata + 1):n_fulldata), ])
+
+        # get indicator outcomes out of honest indicator data
+        Y_ind_honest <- lapply(honest_ind_data, function(x) matrix(x[, 1], ncol = 1))
+
+        # compute the in sample variance
+        var_final <- get_orf_variance(honest_pred, honest_weights_pred, train_pred, train_weights_pred, Y_ind_honest)
+
+      } else {
+
+        # use standard pred_orf_variance
+        # get indicator outcomes out of honest indicator data
+        Y_ind_honest <- lapply(honest_ind_data, function(x) x[, 1])
+
+        # compute the variances for the categorical predictions
+        var_final <- pred_orf_variance(forest_pred, forest_weights_pred, Y_ind_honest)
+
+      }
+
 
       # -------------------------------------------------------------------------------- #
 

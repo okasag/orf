@@ -23,9 +23,7 @@ random forest algorithm from the ranger package
 
 ## to do:
 
-- add inference estimation for predict.orf in case of newdata = NULL
-
-- add inference argument for margins.orf
+- add type argument into predict.orf
 
 - add example data and examples for all functions
 

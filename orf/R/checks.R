@@ -285,6 +285,26 @@ check_inference <- function(inference) {
 
 }
 
+#' check importance
+#'
+#' Checks the input for importance
+#'
+#' @param importance ogical, if TRUE variable importance is conducted
+#'
+#' @return importance
+check_importance <- function(importance) {
+
+  if (!(is.logical(importance)) | is.null(importance)) {
+
+    importance <- FALSE
+    warning("importance must be logical. importance has been set to FALSE as a default.")
+
+  }
+
+  importance
+
+}
+
 #' check newdata
 #'
 #' Checks the input for newdata for predict.orf/predict.mrf

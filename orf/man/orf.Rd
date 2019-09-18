@@ -8,7 +8,7 @@
 \usage{
 orf(X, Y, num.trees = 1000, mtry = NULL, min.node.size = NULL,
   replace = FALSE, sample.fraction = NULL, honesty = TRUE,
-  honesty.fraction = NULL, inference = FALSE)
+  honesty.fraction = NULL, inference = FALSE, importance = FALSE)
 }
 \arguments{
 \item{X}{matrix of features}
@@ -30,6 +30,8 @@ orf(X, Y, num.trees = 1000, mtry = NULL, min.node.size = NULL,
 \item{honesty.fraction}{scalar, share of observations belonging to honest sample not used for growing the forest (default is 0.5)}
 
 \item{inference}{logical, if TRUE the weight based inference is conducted (default is set to FALSE)}
+
+\item{importance}{logical, if TRUE variable importance measure based on permutation is conducted (default is set to FALSE)}
 }
 \value{
 object of type orf

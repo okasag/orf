@@ -13,6 +13,7 @@
 #' @param honesty logical, if TRUE honest forest is built using 50:50 data split (default is set to TRUE)
 #' @param honesty.fraction scalar, share of observations belonging to honest sample not used for growing the forest (default is 0.5)
 #' @param inference logical, if TRUE the weight based inference is conducted (default is set to FALSE)
+#' @param importance logical, if TRUE variable importance measure based on permutation is conducted (default is set to FALSE)
 #'
 #' @import ranger
 #'
@@ -27,7 +28,8 @@ orf <- function(X, Y,
                 sample.fraction = NULL,
                 honesty = TRUE,
                 honesty.fraction = NULL,
-                inference = FALSE) {
+                inference = FALSE,
+                importance = FALSE) {
 
   # needed inputs for the function: X - matrix of features
   #                                 Y - vector of outcomes (as.matrix acceptable too)
@@ -38,7 +40,7 @@ orf <- function(X, Y,
   #                                 sample.fraction - subsampling rate
   #                                 honesty - logical, if TRUE honest forest is built using 50:50 data split
   #                                 inference - logical, if TRUE the weight based inference is conducted (honesty has to be TRUE)
-
+  #                                 importance - logical, if TRUE variable importance measure based on permutation is conducted
   # -------------------------------------------------------------------------------- #
 
   ## standard checks for input data
@@ -53,6 +55,7 @@ orf <- function(X, Y,
   honesty          <- check_honesty(honesty)
   honesty.fraction <- check_honesty_fraction(honesty.fraction, honesty)
   inference        <- check_inference(inference)
+  importance       <- check_importance(importance)
 
   # -------------------------------------------------------------------------------- #
 
@@ -76,8 +79,8 @@ orf <- function(X, Y,
   # --------------------------------------------------------------------------------------- #
 
   ## save the inputs:
-  inputs <- list(num.trees, mtry, min.node.size, replace, sample.fraction, honesty, honesty.fraction, inference)
-  names(inputs) <- c("num.trees", "mtry", "min.node.size", "replace", "sample.fraction", "honesty", "honesty.fraction", "inference")
+  inputs <- list(num.trees, mtry, min.node.size, replace, sample.fraction, honesty, honesty.fraction, inference, importance)
+  names(inputs) <- c("num.trees", "mtry", "min.node.size", "replace", "sample.fraction", "honesty", "honesty.fraction", "inference", "importance")
 
   ## save colnames
   # Y - numeric response as only regression is supported (so far)
@@ -98,6 +101,17 @@ orf <- function(X, Y,
   categories <- as.numeric(sort(unique(Y))) # sequence of categories
   ncat <- as.numeric(length(categories)) # number of categories
   cat <- categories[1:(ncat-1)] # cat to esitmate / without the last category (not needed cuz P(Y_ind<=last_cat)=1)
+
+  # variable importance definition
+  if (importance == TRUE) {
+
+    varimportance <- "permutation"
+
+  } else {
+
+    varimportance <- "none"
+
+  }
 
   # --------------------------------------------------------------------------------------- #
 
@@ -124,7 +138,7 @@ orf <- function(X, Y,
     forest <- lapply(data_ind, function(x) ranger(dependent.variable.name = paste(Y_name), data = x,
                                                   num.trees = num.trees, mtry = mtry, min.node.size = min.node.size,
                                                   replace = replace, sample.fraction = sample.fraction,
-                                                  importance = "none"))
+                                                  importance = varimportance))
 
     # --------------------------------------------------------------------------------------- #
 
@@ -210,7 +224,7 @@ orf <- function(X, Y,
     forest <- lapply(data_ind_train, function(x) ranger(dependent.variable.name = paste(Y_name), data = x,
                                                         num.trees = num.trees, mtry = mtry, min.node.size = min.node.size,
                                                         replace = replace, sample.fraction = sample.fraction,
-                                                        importance = "none"))
+                                                        importance = varimportance))
 
     # --------------------------------------------------------------------------------------- #
 
@@ -298,7 +312,7 @@ orf <- function(X, Y,
     forest <- lapply(data_ind_train, function(x) ranger(dependent.variable.name = paste(Y_name), data = x,
                                                         num.trees = num.trees, mtry = mtry, min.node.size = min.node.size,
                                                         replace = replace, sample.fraction = sample.fraction,
-                                                        importance = "none"))
+                                                        importance = varimportance))
 
     # --------------------------------------------------------------------------------------- #
 
@@ -371,13 +385,37 @@ orf <- function(X, Y,
 
   # -------------------------------------------------------------------------------- #
 
+  # compute simple variable importance if it is desired
+  if (importance == TRUE) {
+
+    # pre-requesities for variable importance computation
+    var_imp_shares      <- matrix(unlist(lapply(Y_ind_train, function(x) mean(x))), nrow = 1) # matrix of proportions for each but last class
+    var_imp_shares_0    <- matrix(c(0, var_imp_shares[1, 1:(ncol(var_imp_shares)-1)]), nrow = 1) # shifted matrix for ease of computation
+    var_imp_shares_last <- var_imp_shares[1, ncol(var_imp_shares)] # get the last share of classes
+    var_imp_forests     <- matrix(unlist(lapply(forest, function(x) x$variable.importance)), nrow = ncol(var_imp_shares), byrow = T) # get the variable importances for eahc of binary forests
+
+    # compute scaling factor using shares
+    var_imp_scaling     <- matrix(rep(t((var_imp_shares - var_imp_shares_0)/var_imp_shares_last), ncol(X_train)), ncol = ncol(X_train))
+
+    # compute var_imp using scaling factor and importance from binary forests
+    var_imp             <- as.numeric(round(colSums(var_imp_scaling * var_imp_forests), 4))
+    names(var_imp)      <- X_name
+
+  } else {
+
+    var_imp <- NULL
+
+  }
+
+  # -------------------------------------------------------------------------------- #
+
   # save forest information
   forest_info <- list(inputs, train_data, honest_data, categories, data_ind)
   names(forest_info) <- c("inputs", "trainData", "honestData", "categories", "indicatorData")
 
   # define output of the function
-  output <- list(forest, forest_info, pred_final, var_final, pred_class, pred_mse, pred_rps)
-  names(output) <- c("trainForests",  "forestInfo", "forestPredictions", "forestVariances", "predictedCategories", "MSE", "RPS")
+  output <- list(forest, forest_info, pred_final, var_final, pred_class, var_imp, pred_mse, pred_rps)
+  names(output) <- c("trainForests",  "forestInfo", "forestPredictions", "forestVariances", "predictedCategories", "variableImportance", "MSE", "RPS")
 
   # --------------------------------------------------------------------------------------- #
 
@@ -855,6 +893,7 @@ summary.orf <- function(object, latex = FALSE, ...) {
   honesty           <- inputs$honesty
   honesty.fraction  <- inputs$honesty.fraction
   inference         <- inputs$inference
+  importance        <- inputs$importance
   mtry              <- inputs$mtry
   num.trees         <- inputs$num.trees
   min.node.size     <- inputs$min.node.size
@@ -881,8 +920,8 @@ summary.orf <- function(object, latex = FALSE, ...) {
   # -------------------------------------------------------------------------------- #
 
   # structure summary into a list
-  output        <- list(type, categories, build, num.trees, mtry, min.node.size, replace, sample.fraction, honesty, honesty.fraction, inference, trainsize, honestsize, features, mse, rps)
-  names(output) <- c("type", "categories", "build", "num.trees", "mtry", "min.node.size", "replace", "sample.fraction", "honesty", "honesty.fraction", "inference", "trainsize", "honestsize", "features", "mse", "rps")
+  output        <- list(type, categories, build, num.trees, mtry, min.node.size, replace, sample.fraction, honesty, honesty.fraction, inference, importance, trainsize, honestsize, features, mse, rps)
+  names(output) <- c("type", "categories", "build", "num.trees", "mtry", "min.node.size", "replace", "sample.fraction", "honesty", "honesty.fraction", "inference", "importance", "trainsize", "honestsize", "features", "mse", "rps")
 
   # output matrix
   output_matrix <- matrix(NA, ncol = 1, nrow = length(output))
@@ -940,6 +979,7 @@ print.orf <- function(x, ...) {
   num.trees         <- inputs$num.trees
   min.node.size     <- inputs$min.node.size
   replace           <- inputs$replace
+  inference         <- inputs$inference
   honest_data       <- forest$forestInfo$honestData
   train_data        <- forest$forestInfo$trainData
   categories        <- length(forest$forestInfo$categories)
@@ -957,6 +997,7 @@ print.orf <- function(x, ...) {
   cat("Mtry:                            ", mtry, "\n")
   cat("Minimum Node Size:               ", min.node.size, "\n")
   cat("Honest Forest:                   ", honesty, "\n")
+  cat("Weight-Based Inference:          ", inference, "\n")
 
   # -------------------------------------------------------------------------------- #
 

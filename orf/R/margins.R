@@ -5,13 +5,13 @@
 #' Applicable classes are \code{orf} and \code{mrf}.
 #'
 #' @param forest estimated forest object of class \code{orf} or \code{mrf}
-#' @param eval string defining evaluation point for marginal effects. These can be one of "mean", "atmean", or "atmedian"
+#' @param eval string defining evaluation point for marginal effects. These can be one of "mean", "atmean", or "atmedian". (Default is "mean")
 #' @param inference logical, if TRUE inference on marginal effects will be conducted (default is inherited from the orf object)
 #' @param window numeric, share of standard deviation of X to be used for evaluation of the marginal effect (default is 0.1)
 #' @param newdata matrix of new Xs for which marginal effects will be computed
 #'
 #' @export
-margins <- function(forest, eval = "atmean", inference = NULL, window = NULL, newdata = NULL) UseMethod("margins")
+margins <- function(forest, eval = NULL, inference = NULL, window = NULL, newdata = NULL) UseMethod("margins")
 
 
 #' margins.default
@@ -20,13 +20,13 @@ margins <- function(forest, eval = "atmean", inference = NULL, window = NULL, ne
 #' of various discrete choice models based on the random forests algorithm.
 #' Applicable classes are \code{orf} or \code{mrf} .#'
 #' @param forest estimated forest object of class \code{orf} or \code{mrf}
-#' @param eval string defining evaluation point for marginal effects. These can be one of "mean", "atmean", or "atmedian"
+#' @param eval string defining evaluation point for marginal effects. These can be one of "mean", "atmean", or "atmedian". (Default is "mean")
 #' @param inference logical, if TRUE inference on marginal effects will be conducted (default is inherited from the orf object)
 #' @param window numeric, share of standard deviation of X to be used for evaluation of the marginal effect (default is 0.1)
 #' @param newdata matrix of new Xs for which marginal effects will be computed
 #'
 #' @export
-margins.default <- function(forest, eval = "atmean", inference = NULL, window = NULL, newdata = NULL) {
+margins.default <- function(forest, eval = NULL, inference = NULL, window = NULL, newdata = NULL) {
 
   warning(paste("margins does not know how to handle object of class ",
                 class(forest),
@@ -40,7 +40,7 @@ margins.default <- function(forest, eval = "atmean", inference = NULL, window = 
 #' estimate marginal effects of the ordered random forest
 #'
 #' @param forest trained ordered random forest object of class \code{orf}
-#' @param eval string defining evaluation point for marginal effects. These can be one of "mean", "atmean", or "atmedian"
+#' @param eval string defining evaluation point for marginal effects. These can be one of "mean", "atmean", or "atmedian" (default is "mean")
 #' @param inference logical, if TRUE inference on marginal effects will be conducted (default is inherited from the orf object)
 #' @param window numeric, share of standard deviation of X to be used for evaluation of the marginal effect (default is 0.1)
 #' @param newdata matrix of new Xs for which marginal effects will be computed
@@ -51,7 +51,7 @@ margins.default <- function(forest, eval = "atmean", inference = NULL, window = 
 #' @return object of type \code{margins.orf}
 #'
 #' @export
-margins.orf <- function(forest, eval = "atmean", inference = NULL, window = NULL, newdata = NULL) {
+margins.orf <- function(forest, eval = NULL, inference = NULL, window = NULL, newdata = NULL) {
 
   # needed inputs for the function: forest - trained forest object of class orf/mrf/brf
   #                                 eval - string defining evaluation point for marginal effects
@@ -63,6 +63,11 @@ margins.orf <- function(forest, eval = "atmean", inference = NULL, window = NULL
   forest_replace    <- inputs$replace
   forest_honesty    <- inputs$honesty
   forest_inference  <- inputs$inference
+
+  # ----------------------------------------------------------------------------------- #
+
+  # check eval input
+  eval <- check_eval(eval)
 
   # ----------------------------------------------------------------------------------- #
 
@@ -478,7 +483,7 @@ print.margins.orf <- function(x, latex = FALSE, ...) {
 #' estimate marginal effects of the multinomial random forest
 #'
 #' @param forest trained multinomial random forest object of class \code{mrf}
-#' @param eval string defining evaluation point for marginal effects. These can be one of "mean", "atmean", or "atmedian". Default is "atmean".
+#' @param eval string defining evaluation point for marginal effects. These can be one of "mean", "atmean", or "atmedian". (Default is "mean")
 #' @param inference logical, if TRUE inference on marginal effects will be conducted (default is inherited from the mrf object)
 #' @param window numeric, share of standard deviation of X to be used for evaluation of the marginal effect (default is 0.1)
 #' @param newdata matrix of new Xs for which marginal effects will be computed
@@ -489,7 +494,7 @@ print.margins.orf <- function(x, latex = FALSE, ...) {
 #' @return object of type \code{margins.mrf}
 #'
 #' @export
-margins.mrf <- function(forest, eval = "atmean", inference = NULL, window = NULL, newdata = NULL) {
+margins.mrf <- function(forest, eval = NULL, inference = NULL, window = NULL, newdata = NULL) {
 
   # needed inputs for the function: forest - trained forest object of class orf/mrf/brf
   #                                 eval - string defining evaluation point for marginal effects (default is atmean)
@@ -501,6 +506,11 @@ margins.mrf <- function(forest, eval = "atmean", inference = NULL, window = NULL
   forest_replace    <- inputs$replace
   forest_honesty    <- inputs$honesty
   forest_inference  <- inputs$inference
+
+  # ----------------------------------------------------------------------------------- #
+
+  # check eval input
+  eval <- check_eval(eval)
 
   # ----------------------------------------------------------------------------------- #
 

@@ -4,13 +4,13 @@
 \alias{margins.mrf}
 \title{margins.mrf}
 \usage{
-\method{margins}{mrf}(forest, eval = "atmean", inference = NULL,
+\method{margins}{mrf}(forest, eval = NULL, inference = NULL,
   window = NULL, newdata = NULL)
 }
 \arguments{
 \item{forest}{trained multinomial random forest object of class \code{mrf}}
 
-\item{eval}{string defining evaluation point for marginal effects. These can be one of "mean", "atmean", or "atmedian". Default is "atmean".}
+\item{eval}{string defining evaluation point for marginal effects. These can be one of "mean", "atmean", or "atmedian". (Default is "mean")}
 
 \item{inference}{logical, if TRUE inference on marginal effects will be conducted (default is inherited from the mrf object)}
 

@@ -4,13 +4,13 @@
 \alias{margins.default}
 \title{margins.default}
 \usage{
-\method{margins}{default}(forest, eval = "atmean", inference = NULL,
+\method{margins}{default}(forest, eval = NULL, inference = NULL,
   window = NULL, newdata = NULL)
 }
 \arguments{
 \item{forest}{estimated forest object of class \code{orf} or \code{mrf}}
 
-\item{eval}{string defining evaluation point for marginal effects. These can be one of "mean", "atmean", or "atmedian"}
+\item{eval}{string defining evaluation point for marginal effects. These can be one of "mean", "atmean", or "atmedian". (Default is "mean")}
 
 \item{inference}{logical, if TRUE inference on marginal effects will be conducted (default is inherited from the orf object)}
 

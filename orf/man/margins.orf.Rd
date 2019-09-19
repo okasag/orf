@@ -4,13 +4,13 @@
 \alias{margins.orf}
 \title{margins.orf}
 \usage{
-\method{margins}{orf}(forest, eval = "atmean", inference = NULL,
+\method{margins}{orf}(forest, eval = NULL, inference = NULL,
   window = NULL, newdata = NULL)
 }
 \arguments{
 \item{forest}{trained ordered random forest object of class \code{orf}}
 
-\item{eval}{string defining evaluation point for marginal effects. These can be one of "mean", "atmean", or "atmedian"}
+\item{eval}{string defining evaluation point for marginal effects. These can be one of "mean", "atmean", or "atmedian" (default is "mean")}
 
 \item{inference}{logical, if TRUE inference on marginal effects will be conducted (default is inherited from the orf object)}
 

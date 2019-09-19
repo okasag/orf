@@ -373,4 +373,32 @@ check_window <- function(window) {
 
 }
 
+#' check evaluation for margins
+#'
+#' Checks the input data of eval in margins
+#'
+#' @param eval string, evaluation points for margins
+#'
+#' @return eval
+#'
+check_eval <- function(eval) {
+
+  if (is.null(eval)) {
+
+    eval <- "mean"
+
+  } else if ((eval != "mean") & (eval != "atmean") & (eval !="atmedian")) {
+
+    eval <- "mean"
+    warning("Warning: Invalid value for eval. This must be one of be one of mean, atmean, or atmedian.
+            eval was set to mean as a default.")
+  } else {
+
+    eval <- eval
+
+  }
+
+  eval
+
+}
 

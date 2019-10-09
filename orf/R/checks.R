@@ -402,3 +402,33 @@ check_eval <- function(eval) {
 
 }
 
+
+#' check prediction type for predict.orf
+#'
+#' Checks the input data of type in predict.orf
+#'
+#' @param type string, prediction type for predict.orf
+#'
+#' @return type
+#'
+check_type <- function(type) {
+
+  if (is.null(type)) {
+
+    type <- "probs"
+
+  } else if ((type != "probs") & (type != "p") & (type !="class") & (type !="c")) {
+
+    type <- "probs"
+    warning("Warning: Invalid value for type. This must be one of be one of probs, p, or class, c.
+            type was set to probs as a default.")
+  } else {
+
+    type <- type
+
+  }
+
+  type
+
+}
+

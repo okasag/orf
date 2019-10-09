@@ -4,14 +4,17 @@
 \alias{predict.orf}
 \title{predict.orf}
 \usage{
-\method{predict}{orf}(object, newdata = NULL, inference = NULL, ...)
+\method{predict}{orf}(object, newdata = NULL, type = NULL,
+  inference = NULL, ...)
 }
 \arguments{
 \item{object}{estimated forest object of type \code{orf}}
 
 \item{newdata}{matrix X containing the observations to predict}
 
-\item{inference}{logical, if TRUE variances for the predictions will be estimated}
+\item{type}{string specifying the type of the prediction, These can be either "probs" or  "p" for probabilities and "class" or "c" for classes. (Default is "probs").}
+
+\item{inference}{logical, if TRUE variances for the predictions will be estimated (only feasible for probability predictions).}
 
 \item{...}{further arguments (currently ignored)}
 }
@@ -21,8 +24,7 @@ object of class \code{orf.prediction} with elements
       \code{trainForests}  \tab saved forests trained for ORF estimations (inherited from \code{ranger}) \cr
       \code{forestInfo}    \tab info containing forest inputs and data used \cr
       \code{forestPredictions} \tab predicted values \cr
-      \code{forestVariances} \tab variances of predicted values (only if \code{inference=TRUE} in the passed \code{orf object}) \cr
-      \code{predictedCategories} \tab categories predicted with ORF based on maximum probability \cr
+      \code{forestVariances} \tab variances of predicted values (only if \code{honesty=TRUE} and \code{replace=FALSE} in the passed \code{orf object}) \cr
   }
 }
 \description{

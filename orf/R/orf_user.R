@@ -175,8 +175,8 @@ orf <- function(X, Y,
     # --------------------------------------------------------------------------------------- #
 
     ## convert probabilities into class predictions ("classification")
-    pred_class <- as.matrix(apply(pred_final, 1, which.max))
-    colnames(pred_class) <- "Category"
+    #pred_class <- as.matrix(apply(pred_final, 1, which.max))
+    #colnames(pred_class) <- "Category"
 
     # --------------------------------------------------------------------------------------- #
 
@@ -261,8 +261,8 @@ orf <- function(X, Y,
     # --------------------------------------------------------------------------------------- #
 
     ## convert probabilities into class predictions ("classification")
-    pred_class <- as.matrix(apply(pred_final, 1, which.max))
-    colnames(pred_class) <- "Category"
+    #pred_class <- as.matrix(apply(pred_final, 1, which.max))
+    #colnames(pred_class) <- "Category"
 
     # --------------------------------------------------------------------------------------- #
 
@@ -364,8 +364,8 @@ orf <- function(X, Y,
     # --------------------------------------------------------------------------------------- #
 
     ## convert probabilities into class predictions ("classification")
-    pred_class <- as.matrix(apply(pred_final, 1, which.max))
-    colnames(pred_class) <- "Category"
+    #pred_class <- as.matrix(apply(pred_final, 1, which.max))
+    #colnames(pred_class) <- "Category"
 
     # --------------------------------------------------------------------------------------- #
 
@@ -414,8 +414,8 @@ orf <- function(X, Y,
   names(forest_info) <- c("inputs", "trainData", "honestData", "categories", "indicatorData")
 
   # define output of the function
-  output <- list(forest, forest_info, pred_final, var_final, pred_class, var_imp, pred_mse, pred_rps)
-  names(output) <- c("trainForests",  "forestInfo", "forestPredictions", "forestVariances", "predictedCategories", "variableImportance", "MSE", "RPS")
+  output <- list(forest, forest_info, pred_final, var_final, var_imp, pred_mse, pred_rps)
+  names(output) <- c("trainForests",  "forestInfo", "forestPredictions", "forestVariances", "variableImportance", "MSE", "RPS")
 
   # --------------------------------------------------------------------------------------- #
 
@@ -437,7 +437,8 @@ orf <- function(X, Y,
 #'
 #' @param object estimated forest object of type \code{orf}
 #' @param newdata matrix X containing the observations to predict
-#' @param inference logical, if TRUE variances for the predictions will be estimated
+#' @param type string specifying the type of the prediction, These can be either "probs" or  "p" for probabilities and "class" or "c" for classes. (Default is "probs").
+#' @param inference logical, if TRUE variances for the predictions will be estimated (only feasible for probability predictions).
 #' @param ... further arguments (currently ignored)
 #'
 #' @import ranger
@@ -447,12 +448,11 @@ orf <- function(X, Y,
 ##'       \code{trainForests}  \tab saved forests trained for ORF estimations (inherited from \code{ranger}) \cr
 ##'       \code{forestInfo}    \tab info containing forest inputs and data used \cr
 ##'       \code{forestPredictions} \tab predicted values \cr
-##'       \code{forestVariances} \tab variances of predicted values (only if \code{inference=TRUE} in the passed \code{orf object}) \cr
-##'       \code{predictedCategories} \tab categories predicted with ORF based on maximum probability \cr
+##'       \code{forestVariances} \tab variances of predicted values (only if \code{honesty=TRUE} and \code{replace=FALSE} in the passed \code{orf object}) \cr
 ##'   }
 #'
 #' @export
-predict.orf <- function(object, newdata = NULL, inference = NULL, ...) {
+predict.orf <- function(object, newdata = NULL, type = NULL, inference = NULL, ...) {
   # needed inputs for the function: forest - orf object coming from orf function
   #                                 newdata - matrix X containing the observations to predict
 
@@ -486,20 +486,45 @@ predict.orf <- function(object, newdata = NULL, inference = NULL, ...) {
   # check if inference is logical
   inference <- check_inference(inference)
 
+  # check if type is admissible
+  type <- check_type(type)
+
+  # check if inference is possible according to prediction type
+  if (type == "class" | type == "c") {
+
+   inference <- FALSE
+
+  }
+
   ## get fitted values if newdata = NULL and inference arguments coincide
   if (is.null(newdata) & (inference == inputs$inference)) {
 
     # take in sample predictions
     pred_final <- forest$forestPredictions
     var_final  <- forest$forestVariances
-    pred_class <- forest$predictedCategories
+
+    # check the desired type of predictions
+    if (type == "class" | type == "c") {
+
+      # convert probabilities into class predictions ("ordered classification")
+      pred_final <- as.matrix(apply(pred_final, 1, which.max))
+      var_final  <- NULL
+
+    }
 
   } else if (is.null(newdata) & (inference == FALSE) & (inputs$inference == TRUE)) {
 
     # then take the estimated values but dont supply the inference results
     pred_final <- forest$forestPredictions
     var_final  <- NULL
-    pred_class <- forest$predictedCategories
+
+    # check the desired type of predictions
+    if (type == "class" | type == "c") {
+
+      # convert probabilities into class predictions ("ordered classification")
+      pred_final <- as.matrix(apply(pred_final, 1, which.max))
+
+    }
 
   } else {
 
@@ -590,9 +615,13 @@ predict.orf <- function(object, newdata = NULL, inference = NULL, ...) {
 
       # --------------------------------------------------------------------------------------- #
 
-      ## convert probabilities into class predictions ("classification")
-      pred_class <- as.matrix(apply(pred_final, 1, which.max))
-      colnames(pred_class) <- "Category"
+      # check the desired type of predictions
+      if (type == "class" | type == "c") {
+
+        # convert probabilities into class predictions ("ordered classification")
+        pred_final <- as.matrix(apply(pred_final, 1, which.max))
+
+      }
 
       # --------------------------------------------------------------------------------------- #
 
@@ -636,9 +665,13 @@ predict.orf <- function(object, newdata = NULL, inference = NULL, ...) {
 
       # --------------------------------------------------------------------------------------- #
 
-      ## convert probabilities into class predictions ("classification")
-      pred_class <- as.matrix(apply(pred_final, 1, which.max))
-      colnames(pred_class) <- "Category"
+      # check the desired type of predictions
+      if (type == "class" | type == "c") {
+
+        # convert probabilities into class predictions ("ordered classification")
+        pred_final <- as.matrix(apply(pred_final, 1, which.max))
+
+      }
 
       # --------------------------------------------------------------------------------------- #
 
@@ -649,85 +682,78 @@ predict.orf <- function(object, newdata = NULL, inference = NULL, ...) {
 
     } else if (honesty == TRUE & inference == TRUE) {
 
-      # -------------------------------------------------------------------------------- #
+        # -------------------------------------------------------------------------------- #
 
-      # predict weights by using forest train, honest data and newdata (for each category except one)
-      forest_weights_pred <- lapply(forest, function(x) predict_forest_weights(x, honest_data, newdata))
+        # predict weights by using forest train, honest data and newdata (for each category except one)
+        forest_weights_pred <- lapply(forest, function(x) predict_forest_weights(x, honest_data, newdata))
 
-      # get predictions by matrix multiplication of weights with honest responses
-      forest_pred <- mapply(function(x,y) as.numeric(x%*%y[, 1]), forest_weights_pred, honest_ind_data, SIMPLIFY = FALSE)
+        # get predictions by matrix multiplication of weights with honest responses
+        forest_pred <- mapply(function(x,y) as.numeric(x%*%y[, 1]), forest_weights_pred, honest_ind_data, SIMPLIFY = FALSE)
 
-      # -------------------------------------------------------------------------------- #
+        # -------------------------------------------------------------------------------- #
 
-      # add the probability for the last outcome (always 1)
-      pred_1 <- append(forest_pred, list(rep(1, n_newdata)))
-      # prepend zero vector to predictions for later differencing
-      pred_0 <- append(list(rep(0, n_newdata)), forest_pred) # append a first 0 elemnt for the list
+        # add the probability for the last outcome (always 1)
+        pred_1 <- append(forest_pred, list(rep(1, n_newdata)))
+        # prepend zero vector to predictions for later differencing
+        pred_0 <- append(list(rep(0, n_newdata)), forest_pred) # append a first 0 elemnt for the list
 
-      # --------------------------------------------------------------------------------------- #
+        # --------------------------------------------------------------------------------------- #
 
-      # total predictions (make sure it returns a list)
-      pred_total <- as.list(mapply(function(x,y) x-y, pred_1, pred_0, SIMPLIFY = F))
+        # total predictions (make sure it returns a list)
+        pred_total <- as.list(mapply(function(x,y) x-y, pred_1, pred_0, SIMPLIFY = F))
 
-      # avoid negative predictions
-      pred_total <- lapply(pred_total, function(x) ifelse((x < 0), 0, x))
+        # avoid negative predictions
+        pred_total <- lapply(pred_total, function(x) ifelse((x < 0), 0, x))
 
-      # coerce to final matrix
-      pred_total <- sapply(pred_total, function(x) as.matrix(x))
+        # coerce to final matrix
+        pred_total <- sapply(pred_total, function(x) as.matrix(x))
 
-      # normalize predictions
-      pred_final <- matrix(apply(pred_total, 1, function(x) (x)/(sum(x))), ncol = n_cat, byrow = T)
+        # normalize predictions
+        pred_final <- matrix(apply(pred_total, 1, function(x) (x)/(sum(x))), ncol = n_cat, byrow = T)
 
-      # add names
-      colnames(pred_final) <- sapply(categories, function(x) paste("Category", x, sep = " "))
+        # add names
+        colnames(pred_final) <- sapply(categories, function(x) paste("Category", x, sep = " "))
 
-      # --------------------------------------------------------------------------------------- #
+        # --------------------------------------------------------------------------------------- #
 
-      ## convert probabilities into class predictions ("classification")
-      pred_class <- as.matrix(apply(pred_final, 1, which.max))
-      colnames(pred_class) <- "Category"
+        # adapt variance computations according to newdata
+        if (flag_newdata == 1) {
 
-      # --------------------------------------------------------------------------------------- #
+          # use get_orf_variance
+          # compute variances as in within estimation (smaller normalization parameter due to sample size)
+          # divide forest_pred and forest_weights into 2 pieces for honest and train (ordering doesnt matter)
+          n_halfdata <- floor(length(forest_pred[[1]])/2)
+          n_fulldata <- length(forest_pred[[1]])
+          # transform to matrix vector
+          forest_pred <- lapply(forest_pred, function(x) matrix(x, ncol = 1))
+          # take care of rownames
+          forest_pred <- lapply(forest_pred, function(x) { rownames(x) <- (1:n_fulldata); return(x) })
+          forest_weights_pred <- lapply(forest_weights_pred, function(x) { rownames(x) <- (1:n_fulldata); return(x) })
+          # predictions (vectors as matrices)
+          honest_pred <- lapply(forest_pred, function(x) as.matrix(x[(1:n_halfdata), ]))
+          train_pred  <- lapply(forest_pred, function(x) as.matrix(x[((n_halfdata + 1):n_fulldata), ]))
+          # weights (matrices)
+          honest_weights_pred <- lapply(forest_weights_pred, function(x) x[(1:n_halfdata), ])
+          train_weights_pred  <- lapply(forest_weights_pred, function(x) x[((n_halfdata + 1):n_fulldata), ])
 
-      # adapt variance computations according to newdata
-      if (flag_newdata == 1) {
+          # get indicator outcomes out of honest indicator data
+          Y_ind_honest <- lapply(honest_ind_data, function(x) matrix(x[, 1], ncol = 1))
 
-        # use get_orf_variance
-        # compute variances as in within estimation (smaller normalization parameter due to sample size)
-        # divide forest_pred and forest_weights into 2 pieces for honest and train (ordering doesnt matter)
-        n_halfdata <- floor(length(forest_pred[[1]])/2)
-        n_fulldata <- length(forest_pred[[1]])
-        # transform to matrix vector
-        forest_pred <- lapply(forest_pred, function(x) matrix(x, ncol = 1))
-        # take care of rownames
-        forest_pred <- lapply(forest_pred, function(x) { rownames(x) <- (1:n_fulldata); return(x) })
-        forest_weights_pred <- lapply(forest_weights_pred, function(x) { rownames(x) <- (1:n_fulldata); return(x) })
-        # predictions (vectors as matrices)
-        honest_pred <- lapply(forest_pred, function(x) as.matrix(x[(1:n_halfdata), ]))
-        train_pred  <- lapply(forest_pred, function(x) as.matrix(x[((n_halfdata + 1):n_fulldata), ]))
-        # weights (matrices)
-        honest_weights_pred <- lapply(forest_weights_pred, function(x) x[(1:n_halfdata), ])
-        train_weights_pred  <- lapply(forest_weights_pred, function(x) x[((n_halfdata + 1):n_fulldata), ])
+          # compute the in sample variance
+          var_final <- get_orf_variance(honest_pred, honest_weights_pred, train_pred, train_weights_pred, Y_ind_honest)
 
-        # get indicator outcomes out of honest indicator data
-        Y_ind_honest <- lapply(honest_ind_data, function(x) matrix(x[, 1], ncol = 1))
+        } else {
 
-        # compute the in sample variance
-        var_final <- get_orf_variance(honest_pred, honest_weights_pred, train_pred, train_weights_pred, Y_ind_honest)
+          # use standard pred_orf_variance
+          # get indicator outcomes out of honest indicator data
+          Y_ind_honest <- lapply(honest_ind_data, function(x) x[, 1])
 
-      } else {
+          # compute the variances for the categorical predictions
+          var_final <- pred_orf_variance(forest_pred, forest_weights_pred, Y_ind_honest)
 
-        # use standard pred_orf_variance
-        # get indicator outcomes out of honest indicator data
-        Y_ind_honest <- lapply(honest_ind_data, function(x) x[, 1])
+        }
 
-        # compute the variances for the categorical predictions
-        var_final <- pred_orf_variance(forest_pred, forest_weights_pred, Y_ind_honest)
-
-      }
-
-
-      # -------------------------------------------------------------------------------- #
+        # --------------------------------------------------------------------------------------- #
 
     }
 
@@ -738,12 +764,12 @@ predict.orf <- function(object, newdata = NULL, inference = NULL, ...) {
   # -------------------------------------------------------------------------------- #
 
   # save forest information
-  forest_info <- list(inputs, categories, newdata)
-  names(forest_info) <- c("inputs", "categories", "newData")
+  forest_info <- list(inputs, categories, newdata, type, inference)
+  names(forest_info) <- c("inputs", "categories", "newData", "predType", "predInference")
 
   # define output of the function
-  output <- list(forest_info, pred_final, var_final, pred_class)
-  names(output) <- c("forestInfo", "forestPredictions", "forestVariances", "predictedCategories")
+  output <- list(forest_info, pred_final, var_final)
+  names(output) <- c("forestInfo", "forestPredictions", "forestVariances")
 
   # -------------------------------------------------------------------------------- #
 

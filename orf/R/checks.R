@@ -255,9 +255,9 @@ check_honesty_fraction <- function(honesty.fraction, honesty) {
     warning("For honesty = FALSE honesty.fraction will be ignored.")
     honesty.fraction <- 0
 
-  } else if (!is.numeric(honesty.fraction) | honesty.fraction <= 0 | honesty.fraction >= 1) {
+  } else if (!is.numeric(honesty.fraction) | honesty.fraction < 0 | honesty.fraction >= 1) {
 
-    stop("Error: Invalid value for honesty.fraction. honesty.fraction must be within [0,1] interval.")
+    stop("Error: Invalid value for honesty.fraction. honesty.fraction must be within (0,1] interval.")
 
   }
 

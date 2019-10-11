@@ -61,7 +61,7 @@ Ordered Forest for flexible estimation of the ordered choice model as developed 
 \examples{
 \dontrun{
 
-# Ordered Forest with default settings
+## 1) Ordered Forest with default settings
 require(orf)
 
 # load example data
@@ -90,6 +90,23 @@ predict(orf)
 # estimate marginal effects of the orf
 margins(orf)
 
+
+require(orf)
+
+# load example data
+data(odata)
+
+# specify response and covariates
+Y <- odata[, 1]
+X <- odata[, -1]
+
+# estimate Ordered Forest
+set.seed(123)
+orf <- orf(X, Y, num.trees = 2000, mtry = 3, min.node.size = 10,
+ replace = TRUE, sample.fraction = 1, honesty = FALSE,
+ honesty.fraction = 0, inference = FALSE, importance = FALSE)
+
+ summary(orf)
 }
 
 }

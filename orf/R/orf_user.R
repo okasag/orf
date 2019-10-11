@@ -2,7 +2,6 @@
 #'
 #' Ordered Forest for flexible estimation of the ordered choice model as developed in Lechner & Okasa (2019)
 #'
-#'
 #' @param X matrix of features
 #' @param Y vector of outcomes (as.matrix acceptable too)
 #' @param num.trees scalar, number of trees in a forest, i.e. bootstrap replications (default is 1000 trees)
@@ -17,7 +16,48 @@
 #'
 #' @import ranger
 #'
-#' @return object of type orf
+#' @return object of type \code{orf} with following elements
+#'       \item{trainForests}{saved forests trained for ORF estimations (inherited from \code{ranger})}
+#'       \item{forestInfo}{info containing forest inputs and data used}
+#'       \item{forestPredictions}{predicted values}
+#'       \item{forestVariances}{variances of predicted values}
+#'       \item{variableImportance}{weighted measure of permutation based variable importance}
+#'       \item{MSE}{in-sample mean squared error}
+#'       \item{RPS}{in-sample ranked probability score}
+#'
+#' @examples
+#' \dontrun{
+#'
+#' # Ordered Forest with default settings
+#' require(orf)
+#'
+#' # load example data
+#' data(odata)
+#'
+#' # specify response and covariates
+#' Y <- odata[, 1]
+#' X <- odata[, -1]
+#'
+#' # estimate Ordered Forest
+#' set.seed(123)
+#' orf <- orf(X, Y)
+#'
+#' # print output of the orf estimation
+#' print(orf)
+#'
+#' # show summary of the orf estimation
+#' summary(orf)
+#'
+#' # plot the estimated probability distributions
+#' plot(orf)
+#'
+#' # predict with the estimated orf
+#' predict(orf)
+#'
+#' # estimate marginal effects of the orf
+#' margins(orf)
+#'
+#' }
 #'
 #' @export
 orf <- function(X, Y,
@@ -443,13 +483,10 @@ orf <- function(X, Y,
 #'
 #' @import ranger
 #'
-#' @return object of class \code{orf.prediction} with elements
-##'   \tabular{ll}{
-##'       \code{trainForests}  \tab saved forests trained for ORF estimations (inherited from \code{ranger}) \cr
-##'       \code{forestInfo}    \tab info containing forest inputs and data used \cr
-##'       \code{forestPredictions} \tab predicted values \cr
-##'       \code{forestVariances} \tab variances of predicted values (only if \code{honesty=TRUE} and \code{replace=FALSE} in the passed \code{orf object}) \cr
-##'   }
+#' @return object of class \code{orf.prediction} with following elements
+#'       \item{forestInfo}{info containing forest inputs and data used}
+#'       \item{forestPredictions}{predicted values}
+#'       \item{forestVariances}{variances of predicted values}
 #'
 #' @export
 predict.orf <- function(object, newdata = NULL, type = NULL, inference = NULL, ...) {

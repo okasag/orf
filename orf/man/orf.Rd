@@ -34,7 +34,14 @@ orf(X, Y, num.trees = 1000, mtry = NULL, min.node.size = NULL,
 \item{importance}{logical, if TRUE variable importance measure based on permutation is conducted (default is set to FALSE)}
 }
 \value{
-object of type orf
+object of type \code{orf} with following elements
+      \item{trainForests}{saved forests trained for ORF estimations (inherited from \code{ranger})}
+      \item{forestInfo}{info containing forest inputs and data used}
+      \item{forestPredictions}{predicted values}
+      \item{forestVariances}{variances of predicted values}
+      \item{variableImportance}{weighted measure of permutation based variable importance}
+      \item{MSE}{in-sample mean squared error}
+      \item{RPS}{in-sample ranked probability score}
 }
 \description{
 An Implementation of the Ordered Random Forest Algorithm
@@ -50,6 +57,41 @@ provides similar output as in standard econometric models for
 ordered choice.
 
 Ordered Forest for flexible estimation of the ordered choice model as developed in Lechner & Okasa (2019)
+}
+\examples{
+\dontrun{
+
+# Ordered Forest with default settings
+require(orf)
+
+# load example data
+data(odata)
+
+# specify response and covariates
+Y <- odata[, 1]
+X <- odata[, -1]
+
+# estimate Ordered Forest
+set.seed(123)
+orf <- orf(X, Y)
+
+# print output of the orf estimation
+print(orf)
+
+# show summary of the orf estimation
+summary(orf)
+
+# plot the estimated probability distributions
+plot(orf)
+
+# predict with the estimated orf
+predict(orf)
+
+# estimate marginal effects of the orf
+margins(orf)
+
+}
+
 }
 \author{
 Gabriel Okasa \email{gabriel.okasa@unisg.ch}

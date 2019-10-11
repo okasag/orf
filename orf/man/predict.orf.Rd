@@ -19,13 +19,10 @@
 \item{...}{further arguments (currently ignored)}
 }
 \value{
-object of class \code{orf.prediction} with elements
-  \tabular{ll}{
-      \code{trainForests}  \tab saved forests trained for ORF estimations (inherited from \code{ranger}) \cr
-      \code{forestInfo}    \tab info containing forest inputs and data used \cr
-      \code{forestPredictions} \tab predicted values \cr
-      \code{forestVariances} \tab variances of predicted values (only if \code{honesty=TRUE} and \code{replace=FALSE} in the passed \code{orf object}) \cr
-  }
+object of class \code{orf.prediction} with following elements
+      \item{forestInfo}{info containing forest inputs and data used}
+      \item{forestPredictions}{predicted values}
+      \item{forestVariances}{variances of predicted values}
 }
 \description{
 Prediction for new observations based on estimated ordered random forest

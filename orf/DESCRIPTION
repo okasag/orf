@@ -17,6 +17,7 @@ Description: An implementation of the Ordered Forest estimator
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
+Depends: R (>= 2.10)
 Imports: 
     ggplot2, 
     ranger,

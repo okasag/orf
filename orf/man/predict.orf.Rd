@@ -10,7 +10,7 @@
 \arguments{
 \item{object}{estimated forest object of type \code{orf}}
 
-\item{newdata}{matrix X containing the observations to predict}
+\item{newdata}{matrix X containing the observations for which the outcomes should be predicted}
 
 \item{type}{string specifying the type of the prediction, These can be either "probs" or  "p" for probabilities and "class" or "c" for classes. (Default is "probs").}
 
@@ -27,4 +27,40 @@ object of class \code{orf.prediction} with following elements
 \description{
 Prediction for new observations based on estimated ordered random forest
 of type \code{orf}
+}
+\examples{
+#\dontrun{
+
+# Ordered Forest
+require(orf)
+
+# load example data
+data(odata)
+
+# specify response and covariates for train and test
+idx <- sample(seq(1, nrow(odata), 1), 0.8*nrow(odata))
+
+# train set
+Y_train <- odata[idx, 1]
+X_train <- odata[idx, -1]
+
+# test set
+Y_test <- odata[-idx, 1]
+X_test <- odata[-idx, -1]
+
+# estimate Ordered Forest
+set.seed(123)
+orf <- orf(X_train, Y_train)
+
+# predict the probabilities with the estimated orf
+orf_pred <- predict(orf, newdata = X_test)
+
+# predict the probabilities with estimated orf together with variances
+orf_pred <- predict(orf, newdata = X_test, inference = TRUE)
+
+# predict the classes with estimated orf
+orf_pred <- predict(orf, newdata = X_test, type = "class")
+
+#}
+
 }

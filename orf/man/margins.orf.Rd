@@ -24,3 +24,42 @@ object of type \code{margins.orf}
 \description{
 estimate marginal effects of the ordered random forest
 }
+\examples{
+#\dontrun{
+
+## Ordered Forest
+require(orf)
+
+# load example data
+data(odata)
+
+# specify response and covariates
+Y <- odata[, 1]
+X <- odata[, -1]
+
+# estimate Ordered Forest
+set.seed(123)
+orf <- orf(X, Y)
+
+# estimate marginal effects of the orf (default)
+margins(orf)
+
+# estimate marginal effects evaluated at the mean
+margins(orf, eval = "atmean")
+
+# estimate marginal effects with inference
+# (orf object has to be estimated with honesty and subsampling)
+margins(orf, inference = TRUE)
+
+# estimate marginal effects with custom window size
+margins(orf, window = 0.5)
+
+# estimate marginal effects for some new data (within support of X)
+margins(orf, newdata = X[1:10, ])
+
+# estimate marginal effects with all custom settings
+margins(orf, eval = "atmedian", inference = TRUE, window = 0.5, newdata = X[1:10, ])
+
+#}
+
+}

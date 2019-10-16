@@ -16,3 +16,29 @@
 \description{
 summary of an ordered random forest object of class \code{orf}
 }
+\examples{
+#\dontrun{
+
+# Ordered Forest
+require(orf)
+
+# load example data
+data(odata)
+
+# specify response and covariates
+Y <- odata[, 1]
+X <- odata[, -1]
+
+# estimate Ordered Forest
+set.seed(123)
+orf <- orf(X, Y)
+
+# show summary of the orf estimation
+summary(orf)
+
+# show summary of the orf estimation coded in LaTeX
+summary(orf, latex = TRUE)
+
+#}
+
+}

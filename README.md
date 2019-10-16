@@ -23,9 +23,7 @@ random forest algorithm from the ranger package
 
 ## to do:
 
-- add type argument into predict.orf
-
-- add example data and examples for all functions
+- add examples for all functions
 
 - write new vignette
 

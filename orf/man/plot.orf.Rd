@@ -14,3 +14,26 @@
 \description{
 plot ordered random forest object of class \code{orf}
 }
+\examples{
+#\dontrun{
+
+# Ordered Forest
+require(orf)
+
+# load example data
+data(odata)
+
+# specify response and covariates
+Y <- odata[, 1]
+X <- odata[, -1]
+
+# estimate Ordered Forest
+set.seed(123)
+orf <- orf(X, Y)
+
+# plot the estimated probability distributions
+plot(orf)
+
+#}
+
+}

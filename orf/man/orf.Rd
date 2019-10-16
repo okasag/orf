@@ -59,9 +59,9 @@ ordered choice.
 Ordered Forest for flexible estimation of the ordered choice model as developed in Lechner & Okasa (2019)
 }
 \examples{
-\dontrun{
+#\dontrun{
 
-## 1) Ordered Forest with default settings
+## Ordered Forest
 require(orf)
 
 # load example data
@@ -71,7 +71,8 @@ data(odata)
 Y <- odata[, 1]
 X <- odata[, -1]
 
-# estimate Ordered Forest
+## Main Example with all orf related functions
+# estimate Ordered Forest with default settings
 set.seed(123)
 orf <- orf(X, Y)
 
@@ -90,24 +91,40 @@ predict(orf)
 # estimate marginal effects of the orf
 margins(orf)
 
+## Further Examples of orf
+# estimate Ordered Forest with own tuning parameters
+set.seed(123)
+orf <- orf(X, Y, num.trees = 2000, mtry = 3, min.node.size = 10)
 
-require(orf)
+# estimate Ordered Forest with bootstrapping and without honesty
+set.seed(123)
+orf <- orf(X, Y, replace = TRUE, honesty = FALSE)
 
-# load example data
-data(odata)
+# estimate Ordered Forest with subsampling and with honesty
+set.seed(123)
+orf <- orf(X, Y, replace = FALSE, honesty = TRUE)
 
-# specify response and covariates
-Y <- odata[, 1]
-X <- odata[, -1]
+# estimate Ordered Forest with subsampling and with honesty
+# with own tuning for subsample fraction and honesty fraction
+set.seed(123)
+orf <- orf(X, Y, replace = FALSE, sample.fraction = 0.5, honesty = TRUE, honesty.fraction = 0.5)
 
-# estimate Ordered Forest
+# estimate Ordered Forest with subsampling and with honesty and with inference
+# (for inference, subsampling and honesty are required)
+set.seed(123)
+orf <- orf(X, Y, replace = FALSE, honesty = TRUE, inference = TRUE)
+
+# estimate Ordered Forest with simple variable importance measure
+set.seed(123)
+orf <- orf(X, Y, importance = TRUE)
+
+# estimate Ordered Forest with all custom settings
 set.seed(123)
 orf <- orf(X, Y, num.trees = 2000, mtry = 3, min.node.size = 10,
  replace = TRUE, sample.fraction = 1, honesty = FALSE,
  honesty.fraction = 0, inference = FALSE, importance = FALSE)
 
- summary(orf)
-}
+#}
 
 }
 \author{

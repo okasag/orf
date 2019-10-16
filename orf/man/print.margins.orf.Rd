@@ -16,3 +16,32 @@
 \description{
 print estimated marginal effects from ordered random forest of class \code{margins.orf}
 }
+\examples{
+#\dontrun{
+
+## Ordered Forest
+require(orf)
+
+# load example data
+data(odata)
+
+# specify response and covariates
+Y <- odata[, 1]
+X <- odata[, -1]
+
+# estimate Ordered Forest
+set.seed(123)
+orf <- orf(X, Y)
+
+# estimate marginal effects of the orf
+orf_margins <- margins(orf)
+
+# print marginal effects
+print(orf_margins)
+
+# print marginal effects coded in LaTeX
+print(orf_margins, latex = TRUE)
+
+#}
+
+}

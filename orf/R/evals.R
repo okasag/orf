@@ -37,10 +37,10 @@ rps <- function(predictions, observed){
     cumulative <- 0
     for (i in 1:ncat){
 
-      cumulative <- cumulative + (sum(predictions[rr,1:i]) - sum(observed_dist[rr,1:i]))^2
+      cumulative <- cumulative + (sum(predictions[rr, 1:i]) - sum(observed_dist[rr, 1:i]))^2
 
     }
-    rps[rr] <- (1/(ncat-1))*cumulative
+    rps[rr] <- (1/(ncat - 1))*cumulative
   }
 
   # take mean of rps
@@ -83,7 +83,7 @@ mse <- function(predictions, observed){
   }
 
   # use apply to calculate mse (multi brier)
-  mse <- mean(rowSums(apply((observed_dist-predictions), 2, function(x) {x^2} )))
+  mse <- mean(rowSums(apply((observed_dist - predictions), 2, function(x) {x^2} )))
 
   # ------------------------------------------------------------------------------------ #
 

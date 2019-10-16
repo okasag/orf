@@ -50,6 +50,44 @@ margins.default <- function(forest, eval = NULL, inference = NULL, window = NULL
 #'
 #' @return object of type \code{margins.orf}
 #'
+#' @examples
+#' #\dontrun{
+#'
+#' ## Ordered Forest
+#' require(orf)
+#'
+#' # load example data
+#' data(odata)
+#'
+#' # specify response and covariates
+#' Y <- odata[, 1]
+#' X <- odata[, -1]
+#'
+#' # estimate Ordered Forest
+#' set.seed(123)
+#' orf <- orf(X, Y)
+#'
+#' # estimate marginal effects of the orf (default)
+#' margins(orf)
+#'
+#' # estimate marginal effects evaluated at the mean
+#' margins(orf, eval = "atmean")
+#'
+#' # estimate marginal effects with inference
+#' # (orf object has to be estimated with honesty and subsampling)
+#' margins(orf, inference = TRUE)
+#'
+#' # estimate marginal effects with custom window size
+#' margins(orf, window = 0.5)
+#'
+#' # estimate marginal effects for some new data (within support of X)
+#' margins(orf, newdata = X[1:10, ])
+#'
+#' # estimate marginal effects with all custom settings
+#' margins(orf, eval = "atmedian", inference = TRUE, window = 0.5, newdata = X[1:10, ])
+#'
+#' #}
+#'
 #' @export
 margins.orf <- function(forest, eval = NULL, inference = NULL, window = NULL, newdata = NULL) {
 
@@ -443,7 +481,6 @@ margins.orf <- function(forest, eval = NULL, inference = NULL, window = NULL, ne
 }
 
 
-
 #' print.margins.orf
 #'
 #' print estimated marginal effects from ordered random forest of class \code{margins.orf}
@@ -451,6 +488,34 @@ margins.orf <- function(forest, eval = NULL, inference = NULL, window = NULL, ne
 #' @param x object of type \code{margins.orf}
 #' @param latex logical, if latex output should be generated (\code{default = FALSE})
 #' @param ... further arguments (currently ignored)
+#'
+#' @examples
+#' #\dontrun{
+#'
+#' ## Ordered Forest
+#' require(orf)
+#'
+#' # load example data
+#' data(odata)
+#'
+#' # specify response and covariates
+#' Y <- odata[, 1]
+#' X <- odata[, -1]
+#'
+#' # estimate Ordered Forest
+#' set.seed(123)
+#' orf <- orf(X, Y)
+#'
+#' # estimate marginal effects of the orf
+#' orf_margins <- margins(orf)
+#'
+#' # print marginal effects
+#' print(orf_margins)
+#'
+#' # print marginal effects coded in LaTeX
+#' print(orf_margins, latex = TRUE)
+#'
+#' #}
 #'
 #' @export
 print.margins.orf <- function(x, latex = FALSE, ...) {
@@ -475,7 +540,6 @@ print.margins.orf <- function(x, latex = FALSE, ...) {
 
 
 }
-
 
 
 #' margins.mrf
@@ -882,12 +946,18 @@ print.margins.mrf <- function(x, latex = FALSE, ...) {
     # print inference output table latex
     margins_output_latex(x)
 
-  } else {
+  } else if (is.null(x$Variances) & latex == FALSE){
 
     # print just the marginal effects
     print(x$MarginalEffects)
 
-  }
+  } else {
 
+    # put caption an latex environment
+    xoutput <- xtable(x$MarginalEffects, digits = 4, caption = "ORF Marginal Effects")
+    # print xtable
+    print.xtable(xoutput, type = "latex", include.rownames = TRUE, comment = FALSE)
+
+  }
 
 }

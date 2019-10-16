@@ -248,10 +248,6 @@ margins_output_latex <- function(x) {
   # put hline after each variable
   print.xtable(xoutput, hline.after = c(0, seq(ncat, ncat*nvar, ncat)), type = "latex", include.rownames = FALSE, comment = FALSE)
 
-  #kable(output_matrix, "latex", booktabs = T, caption = "ORF Marginal Effects", linesep = "") %>%
-  #  row_spec(seq(ncat, ncat*nvar, ncat), hline_after = TRUE) %>%
-  #  kable_styling(latex_options =c("scale_down"))
-  #output_matrix
 }
 
 

@@ -7,10 +7,34 @@
 \method{print}{orf}(x, ...)
 }
 \arguments{
-\item{x}{object of type \code{margins.orf}}
+\item{x}{object of type \code{orf}}
 
 \item{...}{further arguments (currently ignored)}
 }
 \description{
 print of an ordered forest object of class \code{orf}
+}
+\examples{
+#\dontrun{
+
+# Ordered Forest
+require(orf)
+
+# load example data
+data(odata)
+
+# specify response and covariates
+Y <- odata[, 1]
+X <- odata[, -1]
+
+# estimate Ordered Forest
+set.seed(123)
+orf <- orf(X, Y)
+
+# print output of the orf estimation
+print(orf)
+
+#}
+
+
 }

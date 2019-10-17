@@ -57,7 +57,7 @@ test_that("fitted values are equal to predicted values in training set", {
 test_that("predicted classes reflect actual classes", {
   orf <- orf(X, Y)
   orf_classes <- predict(orf, type = "class")$forestPredictions
-  expect_equal(unique(as.numeric(orf_classes)), unique(Y))
+  expect_equal(sort(unique(as.numeric(orf_classes))), sort(unique(Y)))
 })
 
 # variance

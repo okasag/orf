@@ -1,6 +1,30 @@
-#' orf
+#' orf: An Implementation of the Ordered Forest Estimator
 #'
-#' Ordered Forest for flexible estimation of the ordered choice model as developed in Lechner & Okasa (2019)
+#' @description
+#' An implementation of the Ordered Forest estimator
+#' as in Lechner & Okasa (2019). The Ordered Forest flexibly
+#' estimates the conditional probabilities of models with ordered
+#' categorical outcomes (so-called ordered choice models).
+#' Additionally to common machine learning algorithms the orf
+#' package provides functions for estimating marginal effects as well
+#' as statistical inference thereof and thus provides similar output
+#' as in standard econometric models for ordered choice. The core
+#' forest algorithm relies on the fast C++ forest implementation
+#' from the ranger package.
+#'
+#' @details
+#' The Ordered Forest (\code{orf}) estimates the conditional ordered choice
+#' probabilities, i.e. P[Y=m|X=x]. Furthermore, estimation of marginal effects
+#' is also supported for \code{orf}. Additionally, weight-based inference can be
+#' conducted as well. If inference is desired, the Ordered Forest must be estimated
+#' with honesty and subsampling. If prediction only is desired, estimation without
+#' honesty and with bootstrapping is recommended for optimal prediction performance.
+#' \code{orf} is compatible with standard \code{R} commands such as \code{predict},
+#' \code{margins}, \code{plot}, \code{summary} and \code{print}.
+#' For further details, see examples below.
+#'
+#' @seealso \code{\link{summary.orf}}, \code{\link{plot.orf}}
+#' \code{\link{predict.orf}}, \code{\link{margins.orf}}
 #'
 #' @param X matrix of features
 #' @param Y vector of outcomes (as.matrix acceptable too)
@@ -9,12 +33,14 @@
 #' @param min.node.size scalar, minimum node size (default is 5 observations)
 #' @param replace logical, if TRUE sampling with replacement, i.e. bootstrap is used to grow the trees, otherwise subsampling without replacement is used (default is set to FALSE)
 #' @param sample.fraction scalar, subsampling rate (default is 1 for bootstrap and 0.5 for subsampling)
-#' @param honesty logical, if TRUE honest forest is built using 50:50 data split (default is set to TRUE)
+#' @param honesty logical, if TRUE honest forest is built using sample splitting (default is set to TRUE)
 #' @param honesty.fraction scalar, share of observations belonging to honest sample not used for growing the forest (default is 0.5)
 #' @param inference logical, if TRUE the weight based inference is conducted (default is set to FALSE)
 #' @param importance logical, if TRUE variable importance measure based on permutation is conducted (default is set to FALSE)
 #'
 #' @import ranger
+#' @importFrom Rcpp sourceCpp
+#' @useDynLib orf, .registration = TRUE
 #'
 #' @return object of type \code{orf} with following elements
 #'       \item{trainForests}{saved forests trained for ORF estimations (inherited from \code{ranger})}
@@ -24,6 +50,15 @@
 #'       \item{variableImportance}{weighted measure of permutation based variable importance}
 #'       \item{MSE}{in-sample mean squared error}
 #'       \item{RPS}{in-sample ranked probability score}
+#'
+#' @author Gabriel Okasa \email{gabriel.okasa@@unisg.ch}
+#'
+#' @references
+#' \itemize{
+#'   \item Lechner, M. & Okasa, G. (2019). Random Forest Estimation of the Ordered Choice Model. Lechner, M., & Okasa, G. (2019). Random Forest Estimation of the Ordered Choice Model. arXiv preprint arXiv:1907.02436. \url{https://arxiv.org/abs/1907.02436}
+#'   \item Goller, D., Knaus, M. C., Lechner, M., & Okasa, G. (2018). Predicting Match Outcomes in Football by an Ordered Forest Estimator (No. 1811). University of St. Gallen, School of Economics and Political Science. \url{http://ux-tauri.unisg.ch/RePEc/usg/econwp/EWP-1811.pdf}
+#'   \item Wright, M. N. & Ziegler, A. (2017). ranger: A fast implementation of random forests for high dimensional data in C++ and R. J Stat Softw 77:1-17. \url{https://doi.org/10.18637/jss.v077.i01}.
+#' }
 #'
 #' @examples
 #' #\dontrun{

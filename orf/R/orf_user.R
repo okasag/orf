@@ -93,6 +93,13 @@
 #'
 #' #}
 #'
+#' @references
+#' \itemize{
+#' \item Lechner, M. & Okasa, G. (2019). Random Forest Estimation of the Ordered Choice Model. Lechner, M., & Okasa, G. (2019). Random Forest Estimation of the Ordered Choice Model. arXiv preprint arXiv:1907.02436. \url{https://arxiv.org/abs/1907.02436}
+#' \item Goller, D., Knaus, M. C., Lechner, M., & Okasa, G. (2018). Predicting Match Outcomes in Football by an Ordered Forest Estimator (No. 1811). University of St. Gallen, School of Economics and Political Science. \url{http://ux-tauri.unisg.ch/RePEc/usg/econwp/EWP-1811.pdf}
+#' \item Wright, M. N. & Ziegler, A. (2017). ranger: A fast implementation of random forests for high dimensional data in C++ and R. J Stat Softw 77:1-17. \url{https://doi.org/10.18637/jss.v077.i01}.
+#' }
+#'
 #' @export
 orf <- function(X, Y,
                 num.trees = 1000,
@@ -136,17 +143,21 @@ orf <- function(X, Y,
   ## check for plausibility of options first:
   if (honesty == FALSE & inference == TRUE) {
 
-    warning("For conducting inference honesty is required. Honesty has been set to TRUE.")
+    message("For conducting inference honesty is required. Honesty has been set to TRUE.")
     # set honesty to TRUE
     honesty <- TRUE
+    # set honesty.fraction to 0.5
+    honesty.fraction <- 0.5
 
   }
 
   if (replace == TRUE & inference == TRUE) {
 
-    warning("For conducting inference subsampling is required. Replace has been set to FALSE.")
+    message("For conducting inference subsampling is required. Replace has been set to FALSE.")
     # set replace to FALSE
     replace <- FALSE
+    # set sample.fraction to 0.5
+    sample.fraction <- 0.5
 
   }
 

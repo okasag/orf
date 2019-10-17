@@ -4,7 +4,7 @@
 \name{orf}
 \alias{orf}
 \alias{orf-package}
-\title{orf: An Implementation of the Ordered Random Forest Algorithm}
+\title{orf: An Implementation of the Ordered Forest Estimator}
 \usage{
 orf(X, Y, num.trees = 1000, mtry = NULL, min.node.size = NULL,
   replace = FALSE, sample.fraction = NULL, honesty = TRUE,
@@ -44,17 +44,16 @@ object of type \code{orf} with following elements
       \item{RPS}{in-sample ranked probability score}
 }
 \description{
-An Implementation of the Ordered Random Forest Algorithm
-as in Lechner & Okasa (2019) and other related estimators for
-discrete choice models based on the random forest algorithm.
-These include models with ordered, multinomial as well as binary
-response. Standard random forest estimator for continuous response
-is implemented, too. All the forest based algorithms rely on the
-fast C++ forest implementation from the ranger package. Additionally
-to common implementations the orf package provides functions for
-estimating forest weights as well as marginal effects and thus
-provides similar output as in standard econometric models for
-ordered choice.
+An implementation of the Ordered Forest estimator
+as in Lechner & Okasa (2019). The Ordered Forest flexibly
+estimates the conditional probabilities of models with ordered
+categorical outcomes (so-called ordered choice models).
+Additionally to common machine learning algorithms the orf
+package provides functions for estimating marginal effects as well
+as statistical inference thereof and thus provides similar output
+as in standard econometric models for ordered choice. The core
+forest algorithm relies on the fast C++ forest implementation
+from the ranger package.
 
 Ordered Forest for flexible estimation of the ordered choice model as developed in Lechner & Okasa (2019)
 }
@@ -126,6 +125,19 @@ orf <- orf(X, Y, num.trees = 2000, mtry = 3, min.node.size = 10,
 
 #}
 
+}
+\references{
+\itemize{
+  \item Lechner, M. & Okasa, G. (2019). Random Forest Estimation of the Ordered Choice Model. Lechner, M., & Okasa, G. (2019). Random Forest Estimation of the Ordered Choice Model. arXiv preprint arXiv:1907.02436. \url{https://arxiv.org/abs/1907.02436}
+  \item Goller, D., Knaus, M. C., Lechner, M., & Okasa, G. (2018). Predicting Match Outcomes in Football by an Ordered Forest Estimator (No. 1811). University of St. Gallen, School of Economics and Political Science. \url{http://ux-tauri.unisg.ch/RePEc/usg/econwp/EWP-1811.pdf}
+  \item Wright, M. N. & Ziegler, A. (2017). ranger: A fast implementation of random forests for high dimensional data in C++ and R. J Stat Softw 77:1-17. \url{https://doi.org/10.18637/jss.v077.i01}.
+}
+
+\itemize{
+\item Lechner, M. & Okasa, G. (2019). Random Forest Estimation of the Ordered Choice Model. Lechner, M., & Okasa, G. (2019). Random Forest Estimation of the Ordered Choice Model. arXiv preprint arXiv:1907.02436. \url{https://arxiv.org/abs/1907.02436}
+\item Goller, D., Knaus, M. C., Lechner, M., & Okasa, G. (2018). Predicting Match Outcomes in Football by an Ordered Forest Estimator (No. 1811). University of St. Gallen, School of Economics and Political Science. \url{http://ux-tauri.unisg.ch/RePEc/usg/econwp/EWP-1811.pdf}
+\item Wright, M. N. & Ziegler, A. (2017). ranger: A fast implementation of random forests for high dimensional data in C++ and R. J Stat Softw 77:1-17. \url{https://doi.org/10.18637/jss.v077.i01}.
+}
 }
 \author{
 Gabriel Okasa \email{gabriel.okasa@unisg.ch}

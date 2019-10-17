@@ -1,4 +1,4 @@
-#' orf: An Implementation of the Ordered Forest Estimator
+#' orf: ordered random forests
 #'
 #' @description
 #' An implementation of the Ordered Forest estimator

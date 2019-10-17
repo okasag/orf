@@ -2,7 +2,7 @@
 % Please edit documentation in R/orf_user.R
 \name{orf}
 \alias{orf}
-\title{orf: An Implementation of the Ordered Forest Estimator}
+\title{orf: ordered random forests}
 \usage{
 orf(X, Y, num.trees = 1000, mtry = NULL, min.node.size = NULL,
   replace = FALSE, sample.fraction = NULL, honesty = TRUE,

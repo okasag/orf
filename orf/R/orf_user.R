@@ -15,12 +15,14 @@
 #' @details
 #' The Ordered Forest (\code{orf}) estimates the conditional ordered choice
 #' probabilities, i.e. P[Y=m|X=x]. Furthermore, estimation of marginal effects
-#' is also supported for \code{orf}. Additionally, weight-based inference can be
-#' conducted as well. If inference is desired, the Ordered Forest must be estimated
-#' with honesty and subsampling. If prediction only is desired, estimation without
-#' honesty and with bootstrapping is recommended for optimal prediction performance.
-#' \code{orf} is compatible with standard \code{R} commands such as \code{predict},
-#' \code{margins}, \code{plot}, \code{summary} and \code{print}.
+#' is also supported for \code{orf}. Additionally, weight-based inference for
+#' the probability predictions can be conducted as well. If inference is desired,
+#' the Ordered Forest must be estimated with honesty and subsampling.
+#' If prediction only is desired, estimation without honesty and with bootstrapping
+#' is recommended for optimal prediction performance.
+#'
+#' \code{orf} is compatible with standard \code{R} commands such as
+#' \code{predict}, \code{margins}, \code{plot}, \code{summary} and \code{print}.
 #' For further details, see examples below.
 #'
 #' @seealso \code{\link{summary.orf}}, \code{\link{plot.orf}}
@@ -543,12 +545,24 @@ orf <- function(X, Y,
 }
 
 
-#' predict.orf
+#' orf prediction
 #'
-#' Prediction for new observations based on estimated ordered random forest
-#' of type \code{orf}
+#' @description
+#' Prediction for new observations based on estimated Ordered Forest of class \code{orf}
 #'
-#' @param object estimated forest object of type \code{orf}
+#' @details
+#' \code{predict.orf} estimates the conditional ordered choice probabilities,
+#' i.e. P[Y=m|X=x] for new data points (matrix X containing new observations
+#' of covariates) based on the estimated Ordered Forest object of class \code{orf}.
+#' Furthermore, weight-based inference for the probability predictions can be
+#' conducted as well. If inference is desired, the supplied Ordered Forest must be
+#' estimated with honesty and subsampling. If prediction only is desired, estimation
+#' without honesty and with bootstrapping is recommended for optimal prediction
+#' performance. Additionally to the probability predictions, class predictions can
+#' be estimated as well using the \code{type} argument. In this case, the predicted
+#' classes are obtained as classes with the highest predicted probability.
+#'
+#' @param object estimated cforest objet of class \code{orf}
 #' @param newdata matrix X containing the observations for which the outcomes should be predicted
 #' @param type string specifying the type of the prediction, These can be either "probs" or  "p" for probabilities and "class" or "c" for classes. (Default is "probs").
 #' @param inference logical, if TRUE variances for the predictions will be estimated (only feasible for probability predictions).
@@ -932,11 +946,106 @@ predict.orf <- function(object, newdata = NULL, type = NULL, inference = NULL, .
 }
 
 
-#' plot.orf
+#' orf prediction print
 #'
-#' plot ordered random forest object of class \code{orf}
+#' @description
+#' print of Ordered Forest predictions of class \code{orf.prediction}
 #'
-#' @param x estimated ordered random forest object of type \code{orf}
+#' @details
+#' \code{print.orf} provides a first glimpse of the Ordered Forest estimation,
+#' printed directly to the \code{R} console. The printed information contains
+#' the main inputs of the \code{orf} function.
+#'
+#' @param x estimated Ordered Forest object of class \code{orf}
+#' @param ... further arguments (currently ignored)
+#'
+#' @examples
+#' #\dontrun{
+#'
+#' # Ordered Forest
+#' require(orf)
+#'
+#' # load example data
+#' data(odata)
+#'
+#' # specify response and covariates
+#' Y <- odata[, 1]
+#' X <- odata[, -1]
+#'
+#' # estimate Ordered Forest
+#' set.seed(123)
+#' orf <- orf(X, Y)
+#'
+#' # print output of the orf estimation
+#' print(orf)
+#'
+#' #}
+#'
+#'
+#' @export
+print.orf.prediction <- function(x, ...) {
+
+  # needed inputs for the function: forest - forest object coming from orf function
+  #                                        - ... additional arguments (currently ignored)
+
+  # -------------------------------------------------------------------------------- #
+
+  ## get forest predictions as x
+  forest_pred <- x
+
+  # -------------------------------------------------------------------------------- #
+
+  ## save forest prediction inputs
+  main_class        <- class(forest_pred )[1]
+  inputs            <- forest_pred$forestInfo$inputs
+
+  honesty           <- inputs$honesty
+  mtry              <- inputs$mtry
+  num.trees         <- inputs$num.trees
+  min.node.size     <- inputs$min.node.size
+  replace           <- inputs$replace
+  inference         <- inputs$inference
+
+  pred_data         <- forest_pred$forestInfo$newData
+  pred_type         <- forest_pred$forestInfo$predType
+  pred_inference    <- forest_pred$forestInfo$predInference
+  categories        <- length(forest_pred$forestInfo$categories)
+  build             <- ifelse(replace == TRUE, "Bootstrap", "Subsampling")
+  type              <- "Ordered Forest Prediction"
+
+  # -------------------------------------------------------------------------------- #
+
+  cat(type, "object of class", main_class, "\n\n")
+
+  cat("Prediction Type:                 ", pred_type, "\n")
+  cat("Number of Categories:            ", categories, "\n")
+  cat("Sample Size:                     ", nrow(forest_pred$forestPredictions), "\n")
+  cat("Number of Trees:                 ", num.trees, "\n")
+  cat("Build:                           ", build, "\n")
+  cat("Mtry:                            ", mtry, "\n")
+  cat("Minimum Node Size:               ", min.node.size, "\n")
+  cat("Honest Forest:                   ", honesty, "\n")
+  cat("Weight-Based Inference:          ", pred_inference, "\n")
+
+  # -------------------------------------------------------------------------------- #
+
+}
+
+
+#' orf plot
+#'
+#' @description
+#' plot the probability distributions estimated by the Ordered Forest object of class \code{orf}
+#'
+#' @details
+#' \code{plot.orf} generates probability distributions, i.e. density plots of estimated
+#' ordered probabilities by the Ordered Forest for each outcome class considered.
+#' The plots effectively visualize the estimated probability density in contrast to
+#' a real observed ordered outcome class and as such provide a visual inspection of
+#' the overall in-sample estimation accuracy. The dashed lines locate the means of
+#' the respective probability distributions.
+#'
+#' @param x estimated Ordered Forest object of class \code{orf}
 #' @param ... further arguments (currently ignored)
 #'
 #' @import ggplot2
@@ -1056,11 +1165,17 @@ plot.orf <- function(x, ...) {
 }
 
 
-#' summary.orf
+#' orf summary
 #'
-#' summary of an ordered random forest object of class \code{orf}
+#' @description
+#' summary of an estimated Ordered Forest object of class \code{orf}
 #'
-#' @param object estimated ordered random forest object of type \code{orf}
+#' @details
+#' \code{summary.orf} provides a short summary of the Ordered Forest estimation,
+#' including the input information regarding the values of hyperparameters as
+#' well as the output information regarding the prediction accuracy.
+#'
+#' @param object estimated Ordered Forest object of class \code{orf}
 #' @param latex logical, TRUE if latex summary should be generated
 #' @param ... further arguments (currently ignored)
 #'
@@ -1161,7 +1276,7 @@ summary.orf <- function(object, latex = FALSE, ...) {
 
   # -------------------------------------------------------------------------------- #
 
-  cat("Summary of the", type, "Estimation \n\n")
+  cat("Summary of the", type, "Estimation \n")
 
   # return output
   print(noquote(output), comment = FALSE)
@@ -1171,11 +1286,17 @@ summary.orf <- function(object, latex = FALSE, ...) {
 }
 
 
-#' print.orf
+#' orf print
 #'
-#' print of an ordered forest object of class \code{orf}
+#' @description
+#' print of an estimated Ordered Forest object of class \code{orf}
 #'
-#' @param x object of type \code{orf}
+#' @details
+#' \code{print.orf} provides a first glimpse of the Ordered Forest estimation,
+#' printed directly to the \code{R} console. The printed information contains
+#' the main inputs of the \code{orf} function.
+#'
+#' @param x estimated Ordered Forest object of class \code{orf}
 #' @param ... further arguments (currently ignored)
 #'
 #' @examples

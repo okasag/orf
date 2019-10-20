@@ -14,7 +14,12 @@
 \item{...}{further arguments (currently ignored)}
 }
 \description{
-print estimated marginal effects from ordered random forest of class \code{margins.orf}
+print of estimated marginal effects of the Ordered Forest of class \code{margins.orf}
+}
+\details{
+\code{print.margins.orf} provides a first glimpse of the Ordered Forest
+marginal effects, printed directly to the \code{R} console. The printed information
+contains the results for the marginal effects for each covariate and each outcome class.
 }
 \examples{
 #\dontrun{

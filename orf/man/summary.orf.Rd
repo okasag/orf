@@ -2,19 +2,24 @@
 % Please edit documentation in R/orf_user.R
 \name{summary.orf}
 \alias{summary.orf}
-\title{summary.orf}
+\title{orf summary}
 \usage{
 \method{summary}{orf}(object, latex = FALSE, ...)
 }
 \arguments{
-\item{object}{estimated ordered random forest object of type \code{orf}}
+\item{object}{estimated Ordered Forest object of class \code{orf}}
 
 \item{latex}{logical, TRUE if latex summary should be generated}
 
 \item{...}{further arguments (currently ignored)}
 }
 \description{
-summary of an ordered random forest object of class \code{orf}
+summary of an estimated Ordered Forest object of class \code{orf}
+}
+\details{
+\code{summary.orf} provides a short summary of the Ordered Forest estimation,
+including the input information regarding the values of hyperparameters as
+well as the output information regarding the prediction accuracy.
 }
 \examples{
 #\dontrun{

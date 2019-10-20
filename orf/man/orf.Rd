@@ -56,12 +56,14 @@ from the ranger package.
 \details{
 The Ordered Forest (\code{orf}) estimates the conditional ordered choice
 probabilities, i.e. P[Y=m|X=x]. Furthermore, estimation of marginal effects
-is also supported for \code{orf}. Additionally, weight-based inference can be
-conducted as well. If inference is desired, the Ordered Forest must be estimated
-with honesty and subsampling. If prediction only is desired, estimation without
-honesty and with bootstrapping is recommended for optimal prediction performance.
-\code{orf} is compatible with standard \code{R} commands such as \code{predict},
-\code{margins}, \code{plot}, \code{summary} and \code{print}.
+is also supported for \code{orf}. Additionally, weight-based inference for
+the probability predictions can be conducted as well. If inference is desired,
+the Ordered Forest must be estimated with honesty and subsampling.
+If prediction only is desired, estimation without honesty and with bootstrapping
+is recommended for optimal prediction performance.
+
+\code{orf} is compatible with standard \code{R} commands such as
+\code{predict}, \code{margins}, \code{plot}, \code{summary} and \code{print}.
 For further details, see examples below.
 }
 \examples{

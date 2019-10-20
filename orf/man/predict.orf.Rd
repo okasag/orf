@@ -2,13 +2,13 @@
 % Please edit documentation in R/orf_user.R
 \name{predict.orf}
 \alias{predict.orf}
-\title{predict.orf}
+\title{orf prediction}
 \usage{
 \method{predict}{orf}(object, newdata = NULL, type = NULL,
   inference = NULL, ...)
 }
 \arguments{
-\item{object}{estimated forest object of type \code{orf}}
+\item{object}{estimated cforest objet of class \code{orf}}
 
 \item{newdata}{matrix X containing the observations for which the outcomes should be predicted}
 
@@ -25,8 +25,19 @@ object of class \code{orf.prediction} with following elements
       \item{forestVariances}{variances of predicted values}
 }
 \description{
-Prediction for new observations based on estimated ordered random forest
-of type \code{orf}
+Prediction for new observations based on estimated Ordered Forest of class \code{orf}
+}
+\details{
+\code{predict.orf} estimates the conditional ordered choice probabilities,
+i.e. P[Y=m|X=x] for new data points (matrix X containing new observations
+of covariates) based on the estimated Ordered Forest object of class \code{orf}.
+Furthermore, weight-based inference for the probability predictions can be
+conducted as well. If inference is desired, the supplied Ordered Forest must be
+estimated with honesty and subsampling. If prediction only is desired, estimation
+without honesty and with bootstrapping is recommended for optimal prediction
+performance. Additionally to the probability predictions, class predictions can
+be estimated as well using the \code{type} argument. In this case, the predicted
+classes are obtained as classes with the highest predicted probability.
 }
 \examples{
 #\dontrun{
@@ -38,6 +49,7 @@ require(orf)
 data(odata)
 
 # specify response and covariates for train and test
+set.seed(123)
 idx <- sample(seq(1, nrow(odata), 1), 0.8*nrow(odata))
 
 # train set

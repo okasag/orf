@@ -2,13 +2,13 @@
 % Please edit documentation in R/margins.R
 \name{margins.default}
 \alias{margins.default}
-\title{margins.default}
+\title{orf margins default}
 \usage{
 \method{margins}{default}(forest, eval = NULL, inference = NULL,
   window = NULL, newdata = NULL)
 }
 \arguments{
-\item{forest}{estimated forest object of class \code{orf} or \code{mrf}}
+\item{forest}{estimated Ordered Forest object of class \code{orf}}
 
 \item{eval}{string defining evaluation point for marginal effects. These can be one of "mean", "atmean", or "atmedian". (Default is "mean")}
 
@@ -16,10 +16,22 @@
 
 \item{window}{numeric, share of standard deviation of X to be used for evaluation of the marginal effect (default is 0.1)}
 
-\item{newdata}{matrix of new Xs for which marginal effects will be computed}
+\item{newdata}{matrix of new Xs for which marginal effects should be computed}
 }
 \description{
-margins.default is a default for S3 generic with methods to estimate marginal effects
-of various discrete choice models based on the random forests algorithm.
-Applicable classes are \code{orf} or \code{mrf} .#'
+S3 default with methods to estimate marginal effects
+of an Ordered Forest objects of class \code{orf}.
+}
+\details{
+\code{margins.default} estimates marginal effects at the mean, at the median, or
+the mean marginal effects, depending on the \code{eval} argument. It is advised
+to increase the number of subsampling replications in the supplied \code{orf}
+object as the estimation of the marginal effects is a more demanding exercise
+than a simple Ordered Forest estimation/prediction. Additionally to the estimation
+of the marginal effects, the weight-based inference for the effects is supported
+as well. Note, that the inference procedure is much more computationally exhausting
+exercise due to the computation of the forest weights. Additionally, the evaluation
+window for the marginal effects can be regulated through the \code{window} argument.
+Furthermore, new data for which marginal effects should be computed can be supplied
+as well as long as it lies within the support of X.
 }

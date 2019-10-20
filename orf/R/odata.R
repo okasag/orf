@@ -1,19 +1,23 @@
-#' Simulated Example Dataset with Ordered Categorical Outcomes
+#' Simulated Example Dataset
 #'
+#' @description
 #' A simulated example dataset with ordered categorical outcome variable
 #' containing different types of covariates for illustration purposes.
 #'
-#' @format A data frame with 1000 rows and 5 variables:
-#' \describe{
+#' @format A data frame with 1000 rows and 5 variables
+#'
+#' @return
 #'   \item{Y}{ordered outcome, classes 1, 2, and 3}
 #'   \item{X1}{continuous covariate, N(0,1)}
 #'   \item{X2}{categorical covariate, values 1, 2, and 3}
 #'   \item{X3}{binary covariate, values 0 and 1}
 #'   \item{X4}{continuous covariate, N(0,10)}
-#' }
 #'
-#' For the exact data egenrating process, see the example below.
+#' @details
+#' For the exact data generating process, see the example below.
+#'
 #' @examples
+#' \dontrun{
 #' # generate example data
 #'
 #' # set seed for replicability
@@ -44,5 +48,6 @@
 #' odata <- as.data.frame(cbind(Y, X))
 #'
 #' # end of data generating
+#' }
 #'
 "odata"

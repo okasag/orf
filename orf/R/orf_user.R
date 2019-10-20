@@ -585,6 +585,7 @@ orf <- function(X, Y,
 #' data(odata)
 #'
 #' # specify response and covariates for train and test
+#' set.seed(123)
 #' idx <- sample(seq(1, nrow(odata), 1), 0.8*nrow(odata))
 #'
 #' # train set
@@ -946,17 +947,17 @@ predict.orf <- function(object, newdata = NULL, type = NULL, inference = NULL, .
 }
 
 
-#' orf prediction print
+#' print orf prediction
 #'
 #' @description
 #' print of Ordered Forest predictions of class \code{orf.prediction}
 #'
 #' @details
-#' \code{print.orf} provides a first glimpse of the Ordered Forest estimation,
-#' printed directly to the \code{R} console. The printed information contains
-#' the main inputs of the \code{orf} function.
+#' \code{print.orf.prediction} provides a first glimpse of the Ordered Forest
+#' prediction, printed directly to the \code{R} console. The printed information
+#' contains the main inputs of the \code{predict.orf} function.
 #'
-#' @param x estimated Ordered Forest object of class \code{orf}
+#' @param x predicted Ordered Forest object of class \code{orf.prediction}
 #' @param ... further arguments (currently ignored)
 #'
 #' @examples
@@ -968,16 +969,27 @@ predict.orf <- function(object, newdata = NULL, type = NULL, inference = NULL, .
 #' # load example data
 #' data(odata)
 #'
-#' # specify response and covariates
-#' Y <- odata[, 1]
-#' X <- odata[, -1]
+#' # specify response and covariates for train and test
+#' set.seed(123)
+#' idx <- sample(seq(1, nrow(odata), 1), 0.8*nrow(odata))
+#'
+#' # train set
+#' Y_train <- odata[idx, 1]
+#' X_train <- odata[idx, -1]
+#'
+#' # test set
+#' Y_test <- odata[-idx, 1]
+#' X_test <- odata[-idx, -1]
 #'
 #' # estimate Ordered Forest
 #' set.seed(123)
-#' orf <- orf(X, Y)
+#' orf <- orf(X_train, Y_train)
 #'
-#' # print output of the orf estimation
-#' print(orf)
+#' # predict the probabilities with the estimated orf
+#' orf_pred <- predict(orf, newdata = X_test)
+#'
+#' # print the prediction object
+#' print(orf_pred)
 #'
 #' #}
 #'
@@ -985,7 +997,7 @@ predict.orf <- function(object, newdata = NULL, type = NULL, inference = NULL, .
 #' @export
 print.orf.prediction <- function(x, ...) {
 
-  # needed inputs for the function: forest - forest object coming from orf function
+  # needed inputs for the function: forest - forest object coming from predict.orf function
   #                                        - ... additional arguments (currently ignored)
 
   # -------------------------------------------------------------------------------- #
@@ -996,7 +1008,7 @@ print.orf.prediction <- function(x, ...) {
   # -------------------------------------------------------------------------------- #
 
   ## save forest prediction inputs
-  main_class        <- class(forest_pred )[1]
+  main_class        <- class(forest_pred)[1]
   inputs            <- forest_pred$forestInfo$inputs
 
   honesty           <- inputs$honesty
@@ -1012,6 +1024,19 @@ print.orf.prediction <- function(x, ...) {
   categories        <- length(forest_pred$forestInfo$categories)
   build             <- ifelse(replace == TRUE, "Bootstrap", "Subsampling")
   type              <- "Ordered Forest Prediction"
+
+  # define nice output for pred_type
+  if (pred_type == "p" | pred_type == "probs") {
+
+    # probabilities
+    pred_type <- "probability"
+
+  } else if (pred_type == "c" | pred_type == "class") {
+
+    # classes
+    pred_type <- "class"
+
+  }
 
   # -------------------------------------------------------------------------------- #
 
@@ -1286,7 +1311,7 @@ summary.orf <- function(object, latex = FALSE, ...) {
 }
 
 
-#' orf print
+#' print orf
 #'
 #' @description
 #' print of an estimated Ordered Forest object of class \code{orf}

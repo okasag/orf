@@ -3,25 +3,27 @@
 \docType{data}
 \name{odata}
 \alias{odata}
-\title{Simulated Example Dataset with Ordered Categorical Outcomes}
-\format{A data frame with 1000 rows and 5 variables:
-\describe{
-  \item{Y}{ordered outcome, classes 1, 2, and 3}
+\title{Simulated Example Dataset}
+\format{A data frame with 1000 rows and 5 variables}
+\usage{
+odata
+}
+\value{
+\item{Y}{ordered outcome, classes 1, 2, and 3}
   \item{X1}{continuous covariate, N(0,1)}
   \item{X2}{categorical covariate, values 1, 2, and 3}
   \item{X3}{binary covariate, values 0 and 1}
   \item{X4}{continuous covariate, N(0,10)}
 }
-
-For the exact data egenrating process, see the example below.}
-\usage{
-odata
-}
 \description{
 A simulated example dataset with ordered categorical outcome variable
 containing different types of covariates for illustration purposes.
 }
+\details{
+For the exact data generating process, see the example below.
+}
 \examples{
+\dontrun{
 # generate example data
 
 # set seed for replicability
@@ -52,6 +54,7 @@ Y <- as.numeric(cut(Y, breaks = cuts, include.lowest = TRUE))
 odata <- as.data.frame(cbind(Y, X))
 
 # end of data generating
+}
 
 }
 \keyword{datasets}

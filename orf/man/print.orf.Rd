@@ -2,17 +2,22 @@
 % Please edit documentation in R/orf_user.R
 \name{print.orf}
 \alias{print.orf}
-\title{print.orf}
+\title{print orf}
 \usage{
 \method{print}{orf}(x, ...)
 }
 \arguments{
-\item{x}{object of type \code{orf}}
+\item{x}{estimated Ordered Forest object of class \code{orf}}
 
 \item{...}{further arguments (currently ignored)}
 }
 \description{
-print of an ordered forest object of class \code{orf}
+print of an estimated Ordered Forest object of class \code{orf}
+}
+\details{
+\code{print.orf} provides a first glimpse of the Ordered Forest estimation,
+printed directly to the \code{R} console. The printed information contains
+the main inputs of the \code{orf} function.
 }
 \examples{
 #\dontrun{

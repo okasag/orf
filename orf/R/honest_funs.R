@@ -99,3 +99,78 @@ predict_honest <- function(forest, honest_data, test_data) {
   # ----------------------------------------------------------------------------------- #
 
 }
+
+
+#' honest sample split
+#'
+#' Creates honest sample split by randomly selecting prespecified share of observations
+#' to belong to honest sample and to training sample
+#'
+#' @param data dataframe or matrix of features and outcomes to be split honestly
+#' @param honesty.fraction share of sample to belong to honesty sample
+#' @param orf logical, if honest split should be done for orf or not
+#'
+#' @return named list of honest and training sample
+
+honest_split <- function(data, honesty.fraction, orf) {
+
+  # get number of observations in total
+  n <- nrow(data)
+
+  if (orf == TRUE) {
+
+    # initiate repeat indicator
+    rep_idx <- 1
+
+    # repeat until optimal honesty split is found (optimal in a sense that all outcome categories are represented in both samples)
+    repeat{
+
+      # randomize indices for train and honest sample (take care of uneven numbers with floor and ceiling)
+      ind <- sample(c(rep(0, ceiling((1-honesty.fraction)*n)), rep(1, floor(honesty.fraction*n))))
+      # indicator for which observations go into train and honest set
+      honesty_i <- which(ind == 1)
+      # separate training set
+      train <- data[-honesty_i, ]
+      # separate honest set
+      honest <- data[honesty_i, ]
+
+      # check if in both data sets all outcome categories are represented or if too many tries have been done
+      if(all(sort(unique(train[, 1])) == sort(unique(honest[, 1]))) | rep_idx == 10){
+        break
+      }
+
+      # repeat indicator
+      rep_idx <- rep_idx + 1
+
+    }
+
+    # check if in the above procedure was succesful
+    if (all(sort(unique(train[, 1])) != sort(unique(honest[, 1])))) {
+      stop("At least one of the categories of the input matrix Y contains too few observations.
+           This prevents an optimal honesty split. Consider recoding your outcome into less categories or set honesty = FALSE.")
+    }
+
+    } else {
+
+      # for classical regression forest the above condition is not binding
+      # randomize indices for train and honest sample (take care of uneven numbers with floor and ceiling)
+      ind <- sample(c(rep(0, ceiling((1-honesty.fraction)*n)), rep(1, floor(honesty.fraction*n))))
+      # indicator for which observations go into train and honest set
+      honesty_i <- which(ind == 1)
+      # separate training set
+      train <- data[-honesty_i, ]
+      # separate honest set
+      honest <- data[honesty_i, ]
+
+    }
+
+  # put it into output
+  output <- list(train, honest)
+  # set names
+  names(output) <- c("trainData", "honestData")
+
+  # return output
+  return(output)
+
+}
+

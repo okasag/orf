@@ -1,16 +1,15 @@
 # orf: ordered random forests
 
-An Implementation of the Ordered Random Forest Algorithm
-as in Lechner & Okasa (2019) and other related estimators for 
-discrete choice models based on the random forest algorithm.
-These include models with ordered, multinomial as well as binary
-response. Standard random forest estimator for continuous response
-is implemented, too. All the forest based algorithms rely on the
-fast C++ forest implementation from the ranger package. Additionally
-to common implementations the orf package provides functions for
-estimating forest weights as well as marginal effects and thus
-provides similar output as in standard econometric models for
-ordered choice.
+An implementation of the Ordered Forest estimator
+as in Lechner & Okasa (2019). The Ordered Forest flexibly
+estimates the conditional probabilities of models with ordered
+categorical outcomes (so-called ordered choice models).
+Additionally to common machine learning algorithms the orf
+package provides functions for estimating marginal effects as well
+as statistical inference thereof and thus provides similar output
+as in standard econometric models for ordered choice. The core
+forest algorithm relies on the fast C++ forest implementation
+from the ranger package.
 
 ## author
 
@@ -23,8 +22,5 @@ random forest algorithm from the ranger package
 
 ## to do:
 
-- add examples for all functions
-
 - write new vignette
 
-- add tests using test_that

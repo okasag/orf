@@ -491,12 +491,6 @@ margins.orf <- function(forest, eval = NULL, inference = NULL, window = NULL, ne
 
     # ----------------------------------------------------------------------------------- #
 
-    # put everything into a list of results
-    results <- list(marginal_effects, variance_me, sd_me, t_value, p_values)
-    names(results) <- c("MarginalEffects", "Variances", "StandardErrors", "tValues", "pValues")
-
-    # ----------------------------------------------------------------------------------- #
-
   } else {
 
     # no values for the other parameters if inference is not desired
@@ -505,13 +499,19 @@ margins.orf <- function(forest, eval = NULL, inference = NULL, window = NULL, ne
     t_value     <- NULL
     p_values    <- NULL
 
-    # put everything into a list of results
-    results <- list(marginal_effects, variance_me, sd_me, t_value, p_values)
-    names(results) <- c("MarginalEffects", "Variances", "StandardErrors", "tValues", "pValues")
+    # ----------------------------------------------------------------------------------- #
 
   }
 
   # ----------------------------------------------------------------------------------- #
+
+  # save forest information
+  forest_info <- list(inputs, categories, eval, window, newdata, inference)
+  names(forest_info) <- c("inputs", "categories", "eval", "window", "newData", "marginsInference")
+
+  # put everything into a list of results
+  results <- list(forest_info, marginal_effects, variance_me, sd_me, t_value, p_values)
+  names(results) <- c("forestInfo", "MarginalEffects", "Variances", "StandardErrors", "tValues", "pValues")
 
   class(results) <- "margins.orf"
 
@@ -519,6 +519,152 @@ margins.orf <- function(forest, eval = NULL, inference = NULL, window = NULL, ne
   return(results)
 
   # ----------------------------------------------------------------------------------- #
+
+}
+
+
+#' orf margins summary
+#'
+#' @description
+#' summary of estimated marginal effects of the Ordered Forest of class \code{margins.orf}
+#'
+#' @details
+#' \code{summary.margins.orf} provides estimation results of the Ordered Forest
+#' marginal effects. The summary contains the results for the marginal effects
+#' for each covariate and each outcome class, optionally with inference as well.
+#' Furthermore, summary output as a LaTeX table is supported in order to directly
+#' extract the results for the documentation.
+#'
+#' @param object object of type \code{margins.orf}
+#' @param latex logical, if latex output should be generated (\code{default = FALSE})
+#' @param ... further arguments (currently ignored)
+#'
+#' @examples
+#' #\dontrun{
+#'
+#' ## Ordered Forest
+#' require(orf)
+#'
+#' # load example data
+#' data(odata)
+#'
+#' # specify response and covariates
+#' Y <- odata[, 1]
+#' X <- odata[, -1]
+#'
+#' # estimate Ordered Forest
+#' set.seed(123)
+#' orf <- orf(X, Y)
+#'
+#' # estimate marginal effects of the orf
+#' orf_margins <- margins(orf)
+#'
+#' # summary of marginal effects
+#' summary(orf_margins)
+#'
+#' # summary of marginal effects coded in LaTeX
+#' summary(orf_margins, latex = TRUE)
+#'
+#' #}
+#'
+#' @export
+summary.margins.orf <- function(object, latex = FALSE, ...) {
+
+  # -------------------------------------------------------------------------------- #
+
+  ## check user inputs
+  latex <- check_latex(latex)
+  # get object as orf_margins
+  orf_margins <- object
+
+  ## save forest margins inputs
+  main_class        <- class(orf_margins)[1]
+  inputs            <- orf_margins$forestInfo$inputs
+
+  honesty           <- inputs$honesty
+  honesty.fraction  <- inputs$honesty.fraction
+  mtry              <- inputs$mtry
+  num.trees         <- inputs$num.trees
+  min.node.size     <- inputs$min.node.size
+  replace           <- inputs$replace
+  sample.fraction   <- inputs$sample.fraction
+  inference         <- inputs$inference
+
+  pred_data         <- ifelse(is.null(orf_margins$forestInfo$newData), FALSE, TRUE)
+  eval_type         <- orf_margins$forestInfo$eval
+  eval_window       <- orf_margins$forestInfo$window
+  margins_inference <- orf_margins$forestInfo$marginsInference
+  categories        <- length(orf_margins$forestInfo$categories)
+  build             <- ifelse(replace == TRUE, "Bootstrap", "Subsampling")
+  type              <- "Ordered Forest Margins"
+
+  # -------------------------------------------------------------------------------- #
+
+  # general output
+
+  # -------------------------------------------------------------------------------- #
+
+  # structure summary into a list
+  output        <- list(type, eval_type, eval_window, pred_data, categories, build, num.trees, mtry, min.node.size, replace, sample.fraction, honesty, honesty.fraction, margins_inference)
+  names(output) <- c("type", "evaluation.type", "evaluation.window", "new.data", "categories", "build", "num.trees", "mtry", "min.node.size", "replace", "sample.fraction", "honesty", "honesty.fraction", "inference")
+
+  # output matrix
+  output_matrix <- matrix(NA, ncol = 1, nrow = length(output))
+  # populate output matrix
+  rownames(output_matrix) <- names(output) # rownames are names
+  colnames(output_matrix) <- "" # no visible colname
+  output_matrix[, 1]      <- unlist(output) # column 1 are values
+
+  # generate latex output if selected
+  if (latex == TRUE) { colnames(output_matrix) <- "Ordered Forest Margins Summary"
+  output_matrix <- xtable(output_matrix, caption = "Summary of the Ordered Forest Margins", align = "ll")
+  }
+
+  # pack it into output
+  output <- output_matrix
+
+  # -------------------------------------------------------------------------------- #
+
+  cat("Summary of the", type, "\n\n")
+
+  # return output
+  print(noquote(output), comment = FALSE)
+  cat("\n")
+
+  # -------------------------------------------------------------------------------- #
+
+  # coefficients output
+
+  # -------------------------------------------------------------------------------- #
+
+  # chekc if inference has been done
+  if (!is.null(orf_margins$Variances) & latex == FALSE) {
+
+     # print inference output table
+     margins_output(orf_margins)
+
+   } else if (!is.null(orf_margins$Variances) & latex == TRUE) {
+
+     # print inference output table latex
+     margins_output_latex(orf_margins)
+
+   } else if (is.null(orf_margins$Variances) & latex == TRUE) {
+
+     # put caption an latex environment
+     xoutput <- xtable(orf_margins$MarginalEffects, digits = 4, caption = "ORF Marginal Effects")
+     # put hline after each variable
+     print.xtable(xoutput, type = "latex", include.rownames = TRUE, comment = FALSE)
+
+   } else {
+
+     # print marginal effects title
+     cat("ORF Marginal Effects: \n\n")
+     # print just the marginal effects
+     print(round(orf_margins$MarginalEffects, 4))
+
+  }
+
+  # -------------------------------------------------------------------------------- #
 
 }
 
@@ -534,7 +680,6 @@ margins.orf <- function(forest, eval = NULL, inference = NULL, window = NULL, ne
 #' contains the results for the marginal effects for each covariate and each outcome class.
 #'
 #' @param x object of type \code{margins.orf}
-#' @param latex logical, if latex output should be generated (\code{default = FALSE})
 #' @param ... further arguments (currently ignored)
 #'
 #' @examples
@@ -560,32 +705,58 @@ margins.orf <- function(forest, eval = NULL, inference = NULL, window = NULL, ne
 #' # print marginal effects
 #' print(orf_margins)
 #'
-#' # print marginal effects coded in LaTeX
-#' print(orf_margins, latex = TRUE)
-#'
 #' #}
 #'
 #' @export
-print.margins.orf <- function(x, latex = FALSE, ...) {
+print.margins.orf <- function(x, ...) {
 
-  # chekc if inference has been done
-  if (!is.null(x$Variances) & latex == FALSE) {
+  # -------------------------------------------------------------------------------- #
 
-    # print inference output table
-    margins_output(x)
+  # save x as orf_margins
+  orf_margins       <- x
 
-   } else if (!is.null(x$Variances) & latex == TRUE) {
+  ## save forest prediction inputs
+  main_class        <- class(orf_margins)[1]
+  inputs            <- orf_margins$forestInfo$inputs
 
-    # print inference output table latex
-    margins_output_latex(x)
+  honesty           <- inputs$honesty
+  mtry              <- inputs$mtry
+  num.trees         <- inputs$num.trees
+  min.node.size     <- inputs$min.node.size
+  replace           <- inputs$replace
+  inference         <- inputs$inference
 
-  } else {
+  pred_data         <- orf_margins$forestInfo$newData
+  eval_type         <- orf_margins$forestInfo$eval
+  eval_window       <- orf_margins$forestInfo$window
+  margins_inference <- orf_margins$forestInfo$marginsInference
+  categories        <- length(orf_margins$forestInfo$categories)
+  build             <- ifelse(replace == TRUE, "Bootstrap", "Subsampling")
+  type              <- "Ordered Forest Margins"
 
-    # print just the marginal effects
-    print(x$MarginalEffects)
+  # -------------------------------------------------------------------------------- #
 
-  }
+  cat(type, "object of class", main_class, "\n\n")
 
+  cat("Evaluation Type:                 ", eval_type, "\n")
+  cat("Evaluation Window:               ", eval_window, "\n")
+  cat("Number of Categories:            ", categories, "\n")
+  cat("New Data:                        ", ifelse(is.null(pred_data), FALSE, TRUE), "\n")
+  cat("Number of Trees:                 ", num.trees, "\n")
+  cat("Build:                           ", build, "\n")
+  cat("Mtry:                            ", mtry, "\n")
+  cat("Minimum Node Size:               ", min.node.size, "\n")
+  cat("Honest Forest:                   ", honesty, "\n")
+  cat("Weight-Based Inference:          ", margins_inference, "\n\n")
+
+  # -------------------------------------------------------------------------------- #
+
+  # print marginal effects title
+  cat("ORF Marginal Effects: \n\n")
+  # print just the marginal effects
+  print(round(x$MarginalEffects, 4))
+
+  # -------------------------------------------------------------------------------- #
 
 }
 

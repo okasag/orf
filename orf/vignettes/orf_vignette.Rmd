@@ -1,80 +1,70 @@
 ---
-title: "orf:main"
+title: "orf: ordered random forests"
 author: "Gabriel Okasa"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{orf:main}
+  %\VignetteIndexEntry{orf: ordered random forests}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
 ## orf: Description
 
-R package `orf` is an Implementation of the Ordered Random Forest Algorithm
-as in Lechner & Okasa (2019) and other related estimators for 
-discrete choice models based on the random forest algorithm.
-These include models with ordered, multinomial as well as binary
-response. Standard random forest estimator for continuous response
-is implemented, too. All the forest based algorithms rely on the
-fast C++ forest implementation from the ranger package. Additionally
-to common implementations the orf package provides functions for
-estimating forest weights as well as marginal effects and thus
-provides similar output as in standard econometric models for
-ordered choice.
+R package `orf` is an implementation of the Ordered Forest estimator
+as in Lechner & Okasa (2019). The Ordered Forest flexibly
+estimates the conditional probabilities of models with ordered
+categorical outcomes (so-called ordered choice models).
+Additionally to common machine learning algorithms the orf
+package provides functions for estimating marginal effects as well
+as statistical inference thereof and thus provides similar output
+as in standard econometric models for ordered choice. The core
+forest algorithm relies on the fast C++ forest implementation
+from the ranger package.
 
-## orf: Econometric Models
+## orf: The Algorithm
 
-R package `orf` provides several functions for estimation of econometric 
-discrete choice models with a special emphasis on the ordered choice models
-(the name itself, i.e. `orf` stands for *ordered random forest*). The package
-includes the following types of estimators:
-
-- ordered random forest (`orf`)
-- multinomial random forest (`mrf`)
-- binary random forest (`brf`)
-- regression random forest (`rrf`)
-
-### ordered random forest: `orf`
-
-The main function of the package is `orf` which implements the ordered random
-forest estimator as developed by Lechner & Okasa (2019). The main idea is to
-provide a semi-parametric alternative to standard econometric ordered choice
+The main function of the package is `orf` which implements the Ordered Forest
+estimator as developed by Lechner & Okasa (2019). The main idea is to
+provide a flexible alternative to standard econometric ordered choice
 models (categorical dependent variable *with* inherent ordering) such as ordered
 logit or ordered probit while still being able to recover
 essentially the same output as in the standard parametric models. As such the 
-ordered random forest algorithm not only provides estimates of conditional
+Ordered Forest estimator not only provides estimates of conditional
 ordered choice probabilities, i.e. $P[Y=m|X=x]$ but also estimates of marginal
 effects, i.e. how the conditional probabilities vary with changes in $X$. Further,
 the **orf** estimator provides also inference for the marginal effects as well
 as for the conditional probabilities.
 
-### multinomial random forest: `mrf`
+More formally, consider an categorical ordered outcome variable $Y_i \in \{1,...,M \}$.
+Then, the can be described as follows:
 
-The function `mrf` represents essentially a derivative of the `orf` function and
-as such implements the multinomial random forest estimator which is designed to
-provide a semi-parametric alternative to standard econometric models with 
-categorical dependent variable *without* inherent ordering such as multinomial 
-logit or multinomial probit. **mrf** just like **orf** recovers standard
-econometric output such as conditional probabilities and marginal effects together
-with corresponding inference on the estimated quantities.
+******  
+**Algorithm**: Ordered Forest
 
-### binary random forest: `brf`
+******
+* **begin** Ordered Forest  
+    + **do** Cumulative Probabilities  
+        - **for** $m=0,...,M$:  
+            - **create** binary indicator variables according to: $Y_{m,i}=\mathbf{1}(Y_i \leq m)$  
+            - **estimate** regression random forest for: $Y_{m,i}=P[Y_{m,i}=1 \mid X_i=x]$  
+            - **predict** conditional probabilities as: $\hat{Y}_{m,i}=\hat{P}[Y_{m,i}=1 \mid X_i=x] = \sum^N_{i=1}\hat{w}_{m,i}(x)Y_{m,i}$  
+        - **endfor**  
+    + **endo**  
+    + **do** Class Probabilities
+        - **for** $m=1,...,M$:  
+            - **compute** probabilities for each class as follows: $\hat{P}_{m,i}=\hat{Y}_{m,i}-\hat{Y}_{m-1,i}$  
+            - **if** $\hat{P}_{m,i}<0$  
+                - **set** $\hat{P}_{m,i}=0$ and $\hat{P}_{m,i}=\frac{\hat{P}_{m,i}}{\sum^{M}_{m=1}\hat{P}_{m,i}}$  
+            - **endif**  
+        - **endfor**  
+    + **endo**  
+* **end** Ordered Forest
 
-The function `brf` implements yet another derivative of the main `orf` function
-with dependent variable being binary only. Hence, `brf` can be viewed as a
-semi-parametric alternative to popular econometric models such as logit or probit.
-Similar to the above estimators **brf** also estimates conditional probabilities
-as well as marginal effects accompanied with statistical inference.
 
-### regression random forest: `rrf`
+******
 
-The function `rrf` implements a standard regression random forest algorithm for
-a continuous dependent variable as in Breiman (2001) and is basically a wrapper
-for the ranger function from the ranger package with some additional 
-functionalities such as extracting the forest implied weights or providing
-inference method as in Lechner (2018).
-
+## orf: User Functions
 
 For all the above estimators standard `R` functions such as `summary`, `predict`,
 or `plot` are provided as well to facilitate the classical `R` user experience.

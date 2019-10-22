@@ -773,12 +773,12 @@ margins_output <- function(x) {
   output_matrix <- matrix(NA, nrow = 1, ncol = 4)
 
   cat("ORF Marginal Effects: \n\n")
-  cat("---------------------------------------------------------------------------------", "\n")
+  cat("------------------------------------------------------------------------------", "\n")
 
   for (var_idx in 1:nrow(x$MarginalEffects)) {
 
     cat(rownames(x$MarginalEffects)[var_idx], "\n")
-    cat("                    Cat ", "     Effect", "    StdDev", "    tValue ", "   pValue", "     ", "\n")
+    cat("                   Class", "     Effect", "    StdDev", "    tValue ", "   pValue", "     ", "\n")
 
     for (cat_idx in 1:ncol(x$MarginalEffects)) {
 
@@ -806,9 +806,9 @@ margins_output <- function(x) {
 
   }
 
-  cat("---------------------------------------------------------------------------------", "\n")
+  cat("------------------------------------------------------------------------------", "\n")
   cat("Significance levels correspond to: *** .< 0.01, ** .< 0.05, * .< 0.1 \n")
-  cat("---------------------------------------------------------------------------------", "\n")
+  cat("------------------------------------------------------------------------------", "\n")
 
 }
 
@@ -863,7 +863,7 @@ margins_output_latex <- function(x) {
   }
 
   # add colnames
-  colnames(output_matrix) <- c("Variable", "Category", "Effect", "Std.Error", "t-Value", "p-Value", " ")
+  colnames(output_matrix) <- c("Variable", "Class", "Effect", "Std.Error", "t-Value", "p-Value", " ")
   # define as data.frame
   output_matrix <- as.data.frame(output_matrix)
   # format the output matrix

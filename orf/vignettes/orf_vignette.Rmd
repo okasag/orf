@@ -3,6 +3,7 @@ title: "orf: ordered random forests"
 author: "Gabriel Okasa"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
+bibliography: library.bib
 vignette: >
   %\VignetteIndexEntry{orf: ordered random forests}
   %\VignetteEngine{knitr::rmarkdown}

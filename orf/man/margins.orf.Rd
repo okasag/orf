@@ -19,7 +19,13 @@
 \item{newdata}{matrix of new Xs for which marginal effects should be computed}
 }
 \value{
-object of type \code{margins.orf}
+object of type \code{margins.orf} with following elements
+      \item{forestInfo}{info containing forest inputs and data used}
+      \item{MarginalEffects}{marginal effects}
+      \item{Variances}{variances of marginal effects}
+      \item{StandardErrors}{standard errors of marginal effects}
+      \item{tValues}{t-values of marginal effects}
+      \item{pValues}{p-values of marginal effects}
 }
 \description{
 S3 orf with methods to estimate marginal effects
@@ -36,7 +42,7 @@ as well. Note, that the inference procedure is much more computationally exhaust
 exercise due to the computation of the forest weights. Additionally, the evaluation
 window for the marginal effects can be regulated through the \code{window} argument.
 Furthermore, new data for which marginal effects should be computed can be supplied
-as well as long as it lies within the support of X.
+as well as long as it lies within the support of \code{X}.
 }
 \examples{
 #\dontrun{
@@ -76,4 +82,7 @@ margins(orf, eval = "atmedian", inference = TRUE, window = 0.5, newdata = X[1:10
 
 #}
 
+}
+\seealso{
+\code{\link{summary.margins.orf}}, \code{\link{print.margins.orf}}
 }

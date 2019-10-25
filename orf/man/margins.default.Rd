@@ -33,5 +33,8 @@ as well. Note, that the inference procedure is much more computationally exhaust
 exercise due to the computation of the forest weights. Additionally, the evaluation
 window for the marginal effects can be regulated through the \code{window} argument.
 Furthermore, new data for which marginal effects should be computed can be supplied
-as well as long as it lies within the support of X.
+as well as long as it lies within the support of \code{X}.
+}
+\seealso{
+\code{\link{summary.margins.orf}}, \code{\link{print.margins.orf}}
 }

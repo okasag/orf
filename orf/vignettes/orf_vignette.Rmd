@@ -1,7 +1,6 @@
 ---
 title: "orf: ordered random forests"
 author: "Gabriel Okasa"
-date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 bibliography: library.bib
 vignette: >
@@ -12,19 +11,17 @@ vignette: >
 
 ## orf: Description
 
-`R` package `orf` is an implementation of the Ordered Forest estimator
-as in @Okasa2019. The Ordered Forest flexibly estimates
-the conditional probabilities of models with ordered
-categorical outcomes (so-called ordered choice models).
-Additionally to common machine learning algorithms the `orf`
-package provides functions for estimating marginal effects as well
-as statistical inference thereof and thus provides similar output
-as in standard econometric models for ordered choice. The core
-forest algorithm relies on the fast C++ forest implementation
-from the `ranger` package [@Wright2017].
+The `R` package `orf` is an implementation of the Ordered Forest estimator
+as in @Okasa2019. The Ordered Forest flexibly estimates the conditional
+probabilities of models with ordered categorical outcomes (so-called ordered
+choice models). Additionally to common machine learning algorithms the `orf`
+package provides functions for estimating marginal effects as well as
+statistical inference thereof and thus provides similar output as in standard
+econometric models for ordered choice. The core forest algorithm relies on the
+fast `C++` forest implementation from the `ranger` package [@Wright2017].
 
 In order to install `orf` type the following to make sure that all needed
-packages are installed.
+packages are installed:
 
 ```{r install, eval = FALSE}
 #install.packages("orf", dependencies = c("Depends", "Suggests"))
@@ -53,29 +50,41 @@ Then, the algorithm can be described as follows:
 **Algorithm**: Ordered Forest
 
 ******
-* **begin** Ordered Forest  
+* **input:** Data ($X,Y$)  
+* **output:** Class Probabilities $P[Y=m \mid X=x]$  
 
-    + **do** Cumulative Probabilities    
-        - **for** $m=0,...,M$:  
-            - **create** binary indicator variables according to: $Y_{m,i}=\mathbf{1}(Y_i \leq m)$  
-            - **estimate** regression random forest for: $P[Y_{m,i}=1 \mid X_i=x]$  
-            - **predict** conditional probabilities as: $\hat{Y}_{m,i}=\hat{P}[Y_{m,i}=1 \mid X_i=x] = \sum^N_{i=1}\hat{w}_{m,i}(x)Y_{m,i}$  
-        - **endfor**  
-    + **endo**    
+ * 1 **procedure** Ordered Forest  
+
+    + 2 **do** Cumulative Probabilities    
+        - 3 **for** $m=0,...,M$:  
+            - 4 **create** binary indicator variables according to: $Y_{m,i}=\mathbf{1}(Y_i \leq m)$  
+            - 5 **estimate** regression random forest for: $P[Y_{m,i}=1 \mid X_i=x]$  
+            - 6 **predict** conditional probabilities as: $\hat{Y}_{m,i}=\hat{P}[Y_{m,i}=1 \mid X_i=x] = \sum^N_{i=1}\hat{w}_{m,i}(x)Y_{m,i}$  
+        - 7 **endfor**  
+    + 8 **endo**    
     
-    + **do** Class Probabilities  
-        - **for** $m=1,...,M$:  
-            - **compute** probabilities for each class as: $\hat{P}_{m,i}=\hat{Y}_{m,i}-\hat{Y}_{m-1,i}$  
-            - **if** $\hat{P}_{m,i}<0$  
-                - **set** $\hat{P}_{m,i}=0$ and $\hat{P}_{m,i}=\frac{\hat{P}_{m,i}}{\sum^{M}_{m=1}\hat{P}_{m,i}}$  
-            - **endif**  
-        - **endfor**  
-    + **endo**    
+    + 9 **do** Class Probabilities  
+        - 10 **for** $m=1,...,M$:  
+            - 11 **compute** probabilities for each class as: $\hat{P}_{m,i}=\hat{Y}_{m,i}-\hat{Y}_{m-1,i}$  
+            - 12 **if** $\hat{P}_{m,i}<0$  
+                - 13 **set** $\hat{P}_{m,i}=0$ and $\hat{P}_{m,i}=\frac{\hat{P}_{m,i}}{\sum^{M}_{m=1}\hat{P}_{m,i}}$  
+            - 14 **endif**  
+        - 15 **endfor**  
+    + 16 **endo**    
     
-* **end** Ordered Forest
+ * 17 **end procedure** Ordered Forest
 
 
 ******
+
+Hence, the main idea of the Ordered Forest is to firstly transform the ordered 
+model into multiple overlapping binary models which are estimated by regression
+forests and thus yield predictions for the cumulative probabilities. Secondly,
+the estimated cumulative probabilities are differenced to isolate the actual class 
+probabilities. As such, the prediction for the conditional probability of a 
+particular ordered class $m$ is given by subtracting two adjacent cumulative
+probabilities. Notice, that this procedure uses the fact that the cumulative
+probability over all classes must sum up to unity by definition.
 
 ## orf: Ordered Forest
 
@@ -88,7 +97,8 @@ honest forest, instead of the honest tree as is the case in @Wager2018.
 This means that the honest split takes place before the forest estimation and not
 only before the tree estimations. This might somewhat reduce the efficiency of
 the estimator. However, if prediction only is desired, estimation without honesty
-and with bootstrapping is recommended for optimal prediction performance.
+and with bootstrapping as in classical random forests by @Breiman2001 is 
+recommended for optimal prediction performance.
 
 In order to estimate the Ordered Forest user must supply the data in form of
 matrix of covariates ($X$) and a vector of outcomes ($Y$) to the `orf` function.
@@ -130,7 +140,7 @@ covariate and the last covariate, i.e. $X1$ and $X4$ are continuous, the second
 one, $X2$, is ordered categorical and the third one, $X3$, is binary. Furthermore,
 within the data generating process, covariates $X1$, $X2$ and $X3$ enter in a 
 linear form with a positive effect on the outcome, while $X4$ is without any effect
-and thus serves as a noise variable in the dataset. For the exact DGP, see `orf::?odata`.
+and thus serves as a noise variable in the dataset. For the exact DGP, see `?orf::odata`.
 
 ```{r data}
 # load example data
@@ -314,6 +324,5 @@ predictions can be found in @Okasa2018 and the most recent predictions are liste
 online at [SEW Soccer Analytics](https://sew.unisg.ch/de/empirische-wirtschaftsforschung/sports-economics-research-group/soccer-analytics) and on [Twitter](https://twitter.com/SEW_Soccer).
 
 ## orf: References
-
-
+ 
 

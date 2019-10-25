@@ -54,13 +54,32 @@ forest algorithm relies on the fast C++ forest implementation
 from the ranger package.
 }
 \details{
-The Ordered Forest (\code{orf}) estimates the conditional ordered choice
-probabilities, i.e. P[Y=m|X=x]. Furthermore, estimation of marginal effects
-is also supported for \code{orf}. Additionally, weight-based inference for
+The Ordered Forest function, \code{orf}, estimates the conditional ordered choice
+probabilities, i.e. P[Y=m|X=x]. Additionally, weight-based inference for
 the probability predictions can be conducted as well. If inference is desired,
 the Ordered Forest must be estimated with honesty and subsampling.
 If prediction only is desired, estimation without honesty and with bootstrapping
 is recommended for optimal prediction performance.
+
+In order to estimate the Ordered Forest user must supply the data in form of
+matrix of covariates \code{X} and a vector of outcomes 'code{Y} to the \code{orf}
+function. These data inputs are also the only inputs that must be specified by
+the user without any defaults. Further optional arguments include the classical forest
+hyperparameters such as number of trees, \code{num.trees}, number of randomly
+selected features, \code{mtry}, and the minimum leaf size, \code{min.node.size}.
+The forest building scheme is regulated by the \code{replace} argument, meaning
+bootstrapping if \code{replace = TRUE} or subsampling if \code{replace = FALSE}.
+For the case of subsampling, \code{sample.fraction} argument regulates the subsampling
+rate. Further, honest forest is estimated if the \code{honesty} argument is set to
+\code{TRUE}, which is also the default. Similarly, the fraction of the sample used
+for the honest estimation is regulated by the \code{honesty.fraction} argument.
+The default setting conducts a 50:50 sample split, which is also generally advised
+to follow for optimal performance. Inference procedure of the Ordered Forest is based on
+the forest weights and is controlled by the \code{inference} argument. Note, that
+such weight-based inference is computationally demanding exercise due to the estimation
+of the forest weights and as such longer computation time is to be expected. Lastly,
+the \code{importance} argument turns on and off the permutation based variable
+importance.
 
 \code{orf} is compatible with standard \code{R} commands such as
 \code{predict}, \code{margins}, \code{plot}, \code{summary} and \code{print}.

@@ -52,5 +52,4 @@ print(orf_pred)
 
 #}
 
-
 }

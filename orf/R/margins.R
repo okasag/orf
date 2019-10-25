@@ -15,7 +15,9 @@
 #' exercise due to the computation of the forest weights. Additionally, the evaluation
 #' window for the marginal effects can be regulated through the \code{window} argument.
 #' Furthermore, new data for which marginal effects should be computed can be supplied
-#' as well as long as it lies within the support of X.
+#' as well as long as it lies within the support of \code{X}.
+#'
+#' @seealso \code{\link{summary.margins.orf}}, \code{\link{print.margins.orf}}
 #'
 #' @param forest estimated Ordered Forest object of class \code{orf}
 #' @param eval string defining evaluation point for marginal effects. These can be one of "mean", "atmean", or "atmedian". (Default is "mean")
@@ -44,7 +46,9 @@ margins <- function(forest, eval = NULL, inference = NULL, window = NULL, newdat
 #' exercise due to the computation of the forest weights. Additionally, the evaluation
 #' window for the marginal effects can be regulated through the \code{window} argument.
 #' Furthermore, new data for which marginal effects should be computed can be supplied
-#' as well as long as it lies within the support of X.
+#' as well as long as it lies within the support of \code{X}.
+#'
+#' @seealso \code{\link{summary.margins.orf}}, \code{\link{print.margins.orf}}
 #'
 #' @param forest estimated Ordered Forest object of class \code{orf}
 #' @param eval string defining evaluation point for marginal effects. These can be one of "mean", "atmean", or "atmedian". (Default is "mean")
@@ -79,7 +83,9 @@ margins.default <- function(forest, eval = NULL, inference = NULL, window = NULL
 #' exercise due to the computation of the forest weights. Additionally, the evaluation
 #' window for the marginal effects can be regulated through the \code{window} argument.
 #' Furthermore, new data for which marginal effects should be computed can be supplied
-#' as well as long as it lies within the support of X.
+#' as well as long as it lies within the support of \code{X}.
+#'
+#' @seealso \code{\link{summary.margins.orf}}, \code{\link{print.margins.orf}}
 #'
 #' @param forest estimated Ordered Forest object of class \code{orf}
 #' @param eval string defining evaluation point for marginal effects. These can be one of "mean", "atmean", or "atmedian" (default is "mean")
@@ -90,7 +96,13 @@ margins.default <- function(forest, eval = NULL, inference = NULL, window = NULL
 #' @importFrom stats predict median pnorm sd
 #' @import ranger
 #'
-#' @return object of type \code{margins.orf}
+#' @return object of type \code{margins.orf} with following elements
+#'       \item{forestInfo}{info containing forest inputs and data used}
+#'       \item{MarginalEffects}{marginal effects}
+#'       \item{Variances}{variances of marginal effects}
+#'       \item{StandardErrors}{standard errors of marginal effects}
+#'       \item{tValues}{t-values of marginal effects}
+#'       \item{pValues}{p-values of marginal effects}
 #'
 #' @examples
 #' #\dontrun{

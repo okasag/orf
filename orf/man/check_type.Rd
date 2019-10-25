@@ -15,3 +15,4 @@ type
 \description{
 Checks the input data of type in predict.orf
 }
+\keyword{internal}

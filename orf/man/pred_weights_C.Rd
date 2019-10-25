@@ -19,3 +19,4 @@ pred_weights_C(x, y, z, w)
 Computes honest weights from the random forest as in Wager & Athey (2019)
 for the test sample based on the honest training sample
 }
+\keyword{internal}

@@ -15,3 +15,4 @@ inference
 \description{
 Checks the input for inference
 }
+\keyword{internal}

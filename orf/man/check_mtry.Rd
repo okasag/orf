@@ -17,3 +17,4 @@ mtry
 \description{
 Checks the input data of mtry
 }
+\keyword{internal}

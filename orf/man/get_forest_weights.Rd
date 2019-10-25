@@ -20,3 +20,4 @@ matrix of honest forest weights
 get forest weights, i.e. in-sample weights based on honest or train sample
 produced by the random forest algorithm as defined in Wager & Athey (2018)
 }
+\keyword{internal}

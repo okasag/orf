@@ -780,6 +780,8 @@ print.margins.orf <- function(x, ...) {
 #'
 #' @param x object of type \code{margins.orf}
 #'
+#' @keywords internal
+#'
 margins_output <- function(x) {
 
   output_matrix <- matrix(NA, nrow = 1, ncol = 4)
@@ -833,6 +835,8 @@ margins_output <- function(x) {
 #' @param x object of type \code{margins.orf}
 #'
 #' @importFrom xtable xtable print.xtable
+#'
+#' @keywords internal
 #'
 margins_output_latex <- function(x) {
 
@@ -897,6 +901,8 @@ margins_output_latex <- function(x) {
 #'
 #' @param matrix matrix which rows should be replicated
 #' @param n number of times to repeat
+#'
+#' @keywords internal
 #'
 rep_row<-function(matrix, n){
   # thanks to: https://www.r-bloggers.com/a-quick-way-to-do-row-repeat-and-col-repeat-rep-row-rep-col/

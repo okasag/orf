@@ -19,3 +19,4 @@ get_honest_C(x, y, z, w)
 Computes honest predictions (fitted values) from the random forest
 for the train and honest sample based on the honest training sample
 }
+\keyword{internal}

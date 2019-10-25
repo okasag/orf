@@ -4,6 +4,8 @@
 #'
 #' @param X matrix of input features X
 #'
+#' @keywords internal
+#'
 check_X <- function(X) {
 
   if (inherits(X, "matrix") & !is.numeric(X)) {
@@ -28,6 +30,8 @@ check_X <- function(X) {
 #' @param X matrix of input features X
 #'
 #' @return Y
+#'
+#' @keywords internal
 #'
 check_Y <- function(Y, X) {
 
@@ -65,6 +69,8 @@ check_Y <- function(Y, X) {
 #'
 #' @return Y
 #'
+#' @keywords internal
+#'
 check_discrete_Y <- function(Y) {
 
   if (all((Y %% 1) != 0)) {
@@ -99,6 +105,8 @@ check_discrete_Y <- function(Y) {
 #'
 #' @return num.trees
 #'
+#' @keywords internal
+#'
 check_num_trees <- function(num.trees) {
 
   if (is.null(num.trees)) {
@@ -122,6 +130,8 @@ check_num_trees <- function(num.trees) {
 #' @param X matrix of input features X
 #'
 #' @return mtry
+#'
+#' @keywords internal
 #'
 check_mtry <- function(mtry, X) {
 
@@ -147,6 +157,8 @@ check_mtry <- function(mtry, X) {
 #'
 #' @return min.node.size
 #'
+#' @keywords internal
+#'
 check_min_node_size <- function(min.node.size, X) {
 
 if (is.null(min.node.size)) {
@@ -169,6 +181,9 @@ if (is.null(min.node.size)) {
 #' @param replace logical, if TRUE bootstrapping, if FALSE subsampling
 #'
 #' @return replace
+#'
+#' @keywords internal
+#'
 check_replace <- function(replace) {
 
   if (!(is.logical(replace))) {
@@ -190,6 +205,8 @@ check_replace <- function(replace) {
 #' @param replace logical, if bootstrap or subsampling should be used
 #'
 #' @return sample.fraction
+#'
+#' @keywords internal
 #'
 check_sample_fraction <- function(sample.fraction, replace) {
 
@@ -218,6 +235,9 @@ check_sample_fraction <- function(sample.fraction, replace) {
 #' @param honesty logical, if TRUE honest forest is built using 50:50 data split
 #'
 #' @return honesty
+#'
+#' @keywords internal
+#'
 check_honesty <- function(honesty) {
 
   if (!(is.logical(honesty))) {
@@ -239,6 +259,8 @@ check_honesty <- function(honesty) {
 #' @param honesty logical, if data should be split into train and honest sample
 #'
 #' @return honesty.fraction
+#'
+#' @keywords internal
 #'
 check_honesty_fraction <- function(honesty.fraction, honesty) {
 
@@ -272,6 +294,9 @@ check_honesty_fraction <- function(honesty.fraction, honesty) {
 #' @param inference ogical, if TRUE the weight based inference is conducted
 #'
 #' @return inference
+#'
+#' @keywords internal
+#'
 check_inference <- function(inference) {
 
   if (!(is.logical(inference)) | is.null(inference)) {
@@ -292,6 +317,9 @@ check_inference <- function(inference) {
 #' @param importance ogical, if TRUE variable importance is conducted
 #'
 #' @return importance
+#'
+#' @keywords internal
+#'
 check_importance <- function(importance) {
 
   if (!(is.logical(importance)) | is.null(importance)) {
@@ -311,6 +339,8 @@ check_importance <- function(importance) {
 #'
 #' @param new_data matrix X containing the observations to predict
 #' @param X matrix of input features X
+#'
+#' @keywords internal
 #'
 check_newdata <- function(new_data, X) {
 
@@ -337,6 +367,9 @@ check_newdata <- function(new_data, X) {
 #' @param latex logical, TRUE if latex summary should be generated
 #'
 #' @return latex
+#'
+#' @keywords internal
+#'
 check_latex <- function(latex) {
 
   if (!(is.logical(latex))) {
@@ -357,6 +390,8 @@ check_latex <- function(latex) {
 #' @param window scalar, share of SD of X used for margins
 #'
 #' @return window
+#'
+#' @keywords internal
 #'
 check_window <- function(window) {
 
@@ -380,6 +415,8 @@ check_window <- function(window) {
 #' @param eval string, evaluation points for margins
 #'
 #' @return eval
+#'
+#' @keywords internal
 #'
 check_eval <- function(eval) {
 
@@ -410,6 +447,8 @@ check_eval <- function(eval) {
 #' @param type string, prediction type for predict.orf
 #'
 #' @return type
+#'
+#' @keywords internal
 #'
 check_type <- function(type) {
 

@@ -20,3 +20,4 @@ vector of honest forest predictions
 get honest prediction, i.e. fitted values for in sample data
 (train and honest sample) based on the honest sample
 }
+\keyword{internal}

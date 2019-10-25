@@ -20,3 +20,4 @@ vector of honest forest predictions
 predict honest prediction for out of sample data
 based on the honest sample
 }
+\keyword{internal}

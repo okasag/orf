@@ -15,3 +15,4 @@ Y
 \description{
 Checks the input data as discrete outcome
 }
+\keyword{internal}

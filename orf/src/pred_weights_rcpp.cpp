@@ -10,6 +10,7 @@ using namespace Rcpp;
 //' @param y leaf_IDs - list of leaf IDs in honest data
 //' @param z leaf_size - list of leaf sizes in honest data
 //' @param w binary indicator - equal 1 if marginal effects are being computed, 0 otherwise for normal prediction
+//' @keywords internal
 // [[Rcpp::export]]
 NumericVector pred_weights_C(List x, List y, List z, int w) {
 

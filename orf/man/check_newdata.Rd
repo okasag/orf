@@ -14,3 +14,4 @@ check_newdata(new_data, X)
 \description{
 Checks the input for newdata for predict.orf/predict.mrf
 }
+\keyword{internal}

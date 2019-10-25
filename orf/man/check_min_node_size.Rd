@@ -17,3 +17,4 @@ min.node.size
 \description{
 Checks the input data of min.node.size
 }
+\keyword{internal}

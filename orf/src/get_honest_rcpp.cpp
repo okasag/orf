@@ -10,6 +10,7 @@ using namespace Rcpp;
 //' @param y honest_y (NumericVector)[nrow]
 //' @param z honest_leaves (NumericMatrix)[nrow, ntree]
 //' @param w train_leaves (NumericMatrix)[nrow, ntree]
+//' @keywords internal
 // [[Rcpp::export]]
 NumericVector get_honest_C(List x, NumericVector y, NumericMatrix z, NumericMatrix w) {
 

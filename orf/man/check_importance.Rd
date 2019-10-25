@@ -15,3 +15,4 @@ importance
 \description{
 Checks the input for importance
 }
+\keyword{internal}

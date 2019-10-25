@@ -9,6 +9,7 @@ using namespace Rcpp;
 //' @param x leaf_IDs_train - list of leaf IDs in train data
 //' @param y leaf_IDs - list of leaf IDs in honest data
 //' @param z leaf_size - list of leaf sizes in honest data
+//' @keywords internal
 // [[Rcpp::export]]
 NumericMatrix get_weights_C(List x, List y, List z) {
 

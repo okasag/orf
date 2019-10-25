@@ -15,3 +15,4 @@ latex
 \description{
 Checks the input for latex
 }
+\keyword{internal}

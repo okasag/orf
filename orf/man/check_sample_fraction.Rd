@@ -17,3 +17,4 @@ sample.fraction
 \description{
 Checks the input data of sample.fraction
 }
+\keyword{internal}

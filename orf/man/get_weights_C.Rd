@@ -17,3 +17,4 @@ get_weights_C(x, y, z)
 Computes honest weights from the random forest as in Wager & Athey (2019)
 for the train and honest sample based on the honest training sample
 }
+\keyword{internal}

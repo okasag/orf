@@ -17,3 +17,4 @@ Y
 \description{
 Checks the input data as a numeric matrix/vector
 }
+\keyword{internal}

@@ -15,3 +15,4 @@ window
 \description{
 Checks the input data of window in margins
 }
+\keyword{internal}

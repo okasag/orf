@@ -15,3 +15,4 @@ honesty
 \description{
 Checks the input for honesty
 }
+\keyword{internal}

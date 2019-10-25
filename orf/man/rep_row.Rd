@@ -14,3 +14,4 @@ rep_row(matrix, n)
 \description{
 function for replicating rows of a matrix n number of times
 }
+\keyword{internal}

@@ -19,3 +19,4 @@ pred_honest_C(x, y, z, w)
 Computes honest predictions from the random forest for a test sample based
 on the honest training sample
 }
+\keyword{internal}

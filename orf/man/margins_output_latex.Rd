@@ -13,3 +13,4 @@ margins_output_latex(x)
 function for creating latex inference table output for estimated effects which
 can be passed into \code{print.margins.orf}
 }
+\keyword{internal}

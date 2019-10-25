@@ -20,3 +20,4 @@ named list of honest and training sample
 Creates honest sample split by randomly selecting prespecified share of observations
 to belong to honest sample and to training sample
 }
+\keyword{internal}

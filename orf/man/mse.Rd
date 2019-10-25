@@ -18,3 +18,4 @@ scalar, sum MSE for given predictions
 computes the mean squared error (MSE) for evaluating the accuracy of
 ordered/unordered probability predictions
 }
+\keyword{internal}

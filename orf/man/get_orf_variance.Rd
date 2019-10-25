@@ -25,3 +25,4 @@ vector of ORF variances
 get variance of ordered random forest predictions based on honest sample
 splitting as described in Lechner (2018)
 }
+\keyword{internal}

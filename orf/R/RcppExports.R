@@ -10,6 +10,7 @@
 #' @param y honest_y (NumericVector)[nrow]
 #' @param z honest_leaves (NumericMatrix)[nrow, ntree]
 #' @param w train_leaves (NumericMatrix)[nrow, ntree]
+#' @keywords internal
 get_honest_C <- function(x, y, z, w) {
     .Call(`_orf_get_honest_C`, x, y, z, w)
 }
@@ -22,6 +23,7 @@ get_honest_C <- function(x, y, z, w) {
 #' @param x leaf_IDs_train - list of leaf IDs in train data
 #' @param y leaf_IDs - list of leaf IDs in honest data
 #' @param z leaf_size - list of leaf sizes in honest data
+#' @keywords internal
 get_weights_C <- function(x, y, z) {
     .Call(`_orf_get_weights_C`, x, y, z)
 }
@@ -35,6 +37,7 @@ get_weights_C <- function(x, y, z) {
 #' @param y honest_y (NumericVector)[nrow]
 #' @param z honest_leaves (NumericMatrix)[nrow, ntree]
 #' @param w test_leaves (NumericMatrix)[nrow, ntree]
+#' @keywords internal
 pred_honest_C <- function(x, y, z, w) {
     .Call(`_orf_pred_honest_C`, x, y, z, w)
 }
@@ -48,6 +51,7 @@ pred_honest_C <- function(x, y, z, w) {
 #' @param y leaf_IDs - list of leaf IDs in honest data
 #' @param z leaf_size - list of leaf sizes in honest data
 #' @param w binary indicator - equal 1 if marginal effects are being computed, 0 otherwise for normal prediction
+#' @keywords internal
 pred_weights_C <- function(x, y, z, w) {
     .Call(`_orf_pred_weights_C`, x, y, z, w)
 }

@@ -17,3 +17,4 @@ honesty.fraction
 \description{
 Checks the input data of honesty.fraction in orf
 }
+\keyword{internal}

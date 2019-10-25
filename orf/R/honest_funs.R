@@ -11,6 +11,9 @@
 #' @import ranger
 #'
 #' @return vector of honest forest predictions
+#'
+#' @keywords internal
+#'
 get_honest <- function(forest, honest_data, train_data) {
 
   # needed inputs for the function: forest      - estimated forest object of type ranger
@@ -66,6 +69,9 @@ get_honest <- function(forest, honest_data, train_data) {
 #' @importFrom stats predict
 #'
 #' @return vector of honest forest predictions
+#'
+#' @keywords internal
+#'
 predict_honest <- function(forest, honest_data, test_data) {
 
   # needed inputs for the function: forest - estimated forest object of type ranger
@@ -111,7 +117,9 @@ predict_honest <- function(forest, honest_data, test_data) {
 #' @param orf logical, if honest split should be done for orf or not
 #'
 #' @return named list of honest and training sample
-
+#'
+#' @keywords internal
+#'
 honest_split <- function(data, honesty.fraction, orf) {
 
   # get number of observations in total

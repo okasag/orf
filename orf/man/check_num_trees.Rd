@@ -15,3 +15,4 @@ num.trees
 \description{
 Checks the input data of num.trees
 }
+\keyword{internal}

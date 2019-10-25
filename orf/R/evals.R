@@ -7,7 +7,9 @@
 #' @param observed vector of observed ordered categorical outcomes (n x 1)
 #'
 #' @return scalar, mean RPS for given predictions
-
+#'
+#' @keywords internal
+#'
 rps <- function(predictions, observed){
 
   #               predictions <- matrix of predictions (n x categories)
@@ -63,7 +65,9 @@ rps <- function(predictions, observed){
 #' @param observed vector of observed ordered categorical outcomes (n x 1)
 #'
 #' @return scalar, sum MSE for given predictions
-
+#'
+#' @keywords internal
+#'
 mse <- function(predictions, observed){
 
   #               predictions <- matrix of predictions (n x categories)

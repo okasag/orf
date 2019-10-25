@@ -12,3 +12,4 @@ check_X(X)
 \description{
 Checks the input data as a numeric matrix
 }
+\keyword{internal}

@@ -10,6 +10,9 @@
 #' @param Y_ind_honest list of vectors of 0-1 outcomes for the honest sample
 #'
 #' @return vector of ORF variances
+#'
+#' @keywords internal
+#'
 get_orf_variance <- function(honest_pred, honest_weights, train_pred, train_weights, Y_ind_honest) {
 
   # needed inputs for the function: honest_pred - list of vectors of honest forest predictions
@@ -149,6 +152,9 @@ get_orf_variance <- function(honest_pred, honest_weights, train_pred, train_weig
 #' @param Y_ind_honest list of vectors of 0-1 outcomes for the honest sample
 #'
 #' @return vector of ORF variances
+#'
+#' @keywords internal
+#'
 pred_orf_variance <- function(honest_pred, honest_weights, Y_ind_honest) {
 
   # needed inputs for the function: honest_pred - list of vectors of honest forest predictions
@@ -255,6 +261,9 @@ pred_orf_variance <- function(honest_pred, honest_weights, Y_ind_honest) {
 #' @param pred_data list of prediction data (X_mean_up/down)
 #'
 #' @return list of predictions
+#'
+#' @keywords internal
+#'
 predict_forest_preds_for_ME <- function(forest, data, pred_data) {
 
   # needed inputs for the function: forest - list of ranger forest objects
@@ -309,6 +318,9 @@ predict_forest_preds_for_ME <- function(forest, data, pred_data) {
 #' @param pred_data list of prediction data (X_mean_up/down)
 #'
 #' @return list of weights
+#'
+#' @keywords internal
+#'
 predict_forest_weights_for_ME <- function(forest, data, pred_data) {
 
   # get leafs only for number of forests and then check the Xs on their own

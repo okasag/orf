@@ -11,6 +11,9 @@
 #' @import ranger
 #'
 #' @return matrix of honest forest weights
+#'
+#' @keywords internal
+#'
 get_forest_weights <- function(forest, honest_data, train_data) {
 
   # --------------------------------------------------------------------------------------------------- #
@@ -67,6 +70,9 @@ get_forest_weights <- function(forest, honest_data, train_data) {
 #' @import ranger
 #'
 #' @return matrix of honest forest weights
+#'
+#' @keywords internal
+#'
 predict_forest_weights <- function(forest, data, pred_data) {
 
   # --------------------------------------------------------------------------------------------------- #

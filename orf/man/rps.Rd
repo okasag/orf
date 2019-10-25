@@ -18,3 +18,4 @@ scalar, mean RPS for given predictions
 Computes the mean ranked probability score (RPS) for evaluating the accuracy of
 ordered probability predictions
 }
+\keyword{internal}

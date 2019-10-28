@@ -1,4 +1,4 @@
-#' orf: ordered random forests
+#' Ordered Forest
 #'
 #' @description
 #' An implementation of the Ordered Forest estimator
@@ -60,17 +60,14 @@
 #' @param importance logical, if TRUE variable importance measure based on permutation is conducted (default is set to FALSE)
 #'
 #' @import ranger
-#' @importFrom Rcpp sourceCpp
-#' @useDynLib orf, .registration = TRUE
 #'
 #' @return object of type \code{orf} with following elements
 #'       \item{trainForests}{saved forests trained for ORF estimations (inherited from \code{ranger})}
 #'       \item{forestInfo}{info containing forest inputs and data used}
 #'       \item{forestPredictions}{predicted values}
 #'       \item{forestVariances}{variances of predicted values}
-#'       \item{variableImportance}{weighted measure of permutation based variable importance}
-#'       \item{MSE}{in-sample mean squared error}
-#'       \item{RPS}{in-sample ranked probability score}
+#'       \item{forestImportance}{weighted measure of permutation based variable importance}
+#'       \item{forestAccuracy}{oob measures for mean squared error and ranked probability score}
 #'
 #' @author Gabriel Okasa \email{gabriel.okasa@@unisg.ch}
 #'
@@ -308,12 +305,6 @@ orf <- function(X, Y,
 
     # --------------------------------------------------------------------------------------- #
 
-    ## convert probabilities into class predictions ("classification")
-    #pred_class <- as.matrix(apply(pred_final, 1, which.max))
-    #colnames(pred_class) <- "Category"
-
-    # --------------------------------------------------------------------------------------- #
-
     # no inference here
     var_final <- NULL
 
@@ -391,12 +382,6 @@ orf <- function(X, Y,
 
     # compute honest RPS based on whole sample
     pred_rps <- rps(pred_final, Y)
-
-    # --------------------------------------------------------------------------------------- #
-
-    ## convert probabilities into class predictions ("classification")
-    #pred_class <- as.matrix(apply(pred_final, 1, which.max))
-    #colnames(pred_class) <- "Category"
 
     # --------------------------------------------------------------------------------------- #
 
@@ -497,12 +482,6 @@ orf <- function(X, Y,
 
     # --------------------------------------------------------------------------------------- #
 
-    ## convert probabilities into class predictions ("classification")
-    #pred_class <- as.matrix(apply(pred_final, 1, which.max))
-    #colnames(pred_class) <- "Category"
-
-    # --------------------------------------------------------------------------------------- #
-
     # compute the variances for the categorical predictions
     var_final <- get_orf_variance(honest_pred, honest_weights, train_pred, train_weights, Y_ind_honest)
     # check for normalization
@@ -544,12 +523,16 @@ orf <- function(X, Y,
   # -------------------------------------------------------------------------------- #
 
   # save forest information
-  forest_info <- list(inputs, train_data, honest_data, categories, data_ind)
+  forest_info        <- list(inputs, train_data, honest_data, categories, data_ind)
   names(forest_info) <- c("inputs", "trainData", "honestData", "categories", "indicatorData")
 
+  # save forest accuracy measures
+  forest_accuracy        <- list(pred_mse, pred_rps)
+  names(forest_accuracy) <- c("MSE", "RPS")
+
   # define output of the function
-  output <- list(forest, forest_info, pred_final, var_final, var_imp, pred_mse, pred_rps)
-  names(output) <- c("trainForests",  "forestInfo", "forestPredictions", "forestVariances", "variableImportance", "MSE", "RPS")
+  output        <- list(forest, forest_info, pred_final, var_final, var_imp, forest_accuracy)
+  names(output) <- c("trainForests",  "forestInfo", "forestPredictions", "forestVariances", "forestImportance", "forestAccuracy")
 
   # --------------------------------------------------------------------------------------- #
 
@@ -775,8 +758,8 @@ summary.orf <- function(object, latex = FALSE, ...) {
 
   ## honest splitting, i.e. use honest data
   # take out summary statistics
-  mse         <- round(forest$MSE, 5)
-  rps         <- round(forest$RPS, 5)
+  mse         <- round(forest$forestAccuracy$MSE, 5)
+  rps         <- round(forest$forestAccuracy$RPS, 5)
   trainsize   <- nrow(train_data)
   honestsize  <- ifelse(is.null(honest_data), 0, nrow(honest_data))
   features    <- ncol(train_data) - 1   # take out the response

@@ -37,9 +37,8 @@ object of type \code{orf} with following elements
       \item{forestInfo}{info containing forest inputs and data used}
       \item{forestPredictions}{predicted values}
       \item{forestVariances}{variances of predicted values}
-      \item{variableImportance}{weighted measure of permutation based variable importance}
-      \item{MSE}{in-sample mean squared error}
-      \item{RPS}{in-sample ranked probability score}
+      \item{forestImportance}{weighted measure of permutation based variable importance}
+      \item{forestAccuracy}{oob measures for mean squared error and ranked probability score}
 }
 \description{
 An implementation of the Ordered Forest estimator

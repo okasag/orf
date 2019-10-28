@@ -98,11 +98,11 @@ margins.default <- function(forest, eval = NULL, inference = NULL, window = NULL
 #'
 #' @return object of type \code{margins.orf} with following elements
 #'       \item{forestInfo}{info containing forest inputs and data used}
-#'       \item{MarginalEffects}{marginal effects}
-#'       \item{Variances}{variances of marginal effects}
-#'       \item{StandardErrors}{standard errors of marginal effects}
-#'       \item{tValues}{t-values of marginal effects}
-#'       \item{pValues}{p-values of marginal effects}
+#'       \item{forestEffects}{marginal effects}
+#'       \item{forestVariances}{variances of marginal effects}
+#'       \item{forestErrors}{standard errors of marginal effects}
+#'       \item{forestTvalues}{t-values of marginal effects}
+#'       \item{forestPvalues}{p-values of marginal effects}
 #'
 #' @examples
 #' #\dontrun{
@@ -523,7 +523,7 @@ margins.orf <- function(forest, eval = NULL, inference = NULL, window = NULL, ne
 
   # put everything into a list of results
   results <- list(forest_info, marginal_effects, variance_me, sd_me, t_value, p_values)
-  names(results) <- c("forestInfo", "MarginalEffects", "Variances", "StandardErrors", "tValues", "pValues")
+  names(results) <- c("forestInfo", "forestEffects", "forestVariances", "forestErrors", "forestTvalues", "forestPvalues")
 
   class(results) <- "margins.orf"
 
@@ -650,20 +650,20 @@ summary.margins.orf <- function(object, latex = FALSE, ...) {
   # -------------------------------------------------------------------------------- #
 
   # chekc if inference has been done
-  if (!is.null(orf_margins$Variances) & latex == FALSE) {
+  if (!is.null(orf_margins$forestVariances) & latex == FALSE) {
 
      # print inference output table
      margins_output(orf_margins)
 
-   } else if (!is.null(orf_margins$Variances) & latex == TRUE) {
+   } else if (!is.null(orf_margins$forestVariances) & latex == TRUE) {
 
      # print inference output table latex
      margins_output_latex(orf_margins)
 
-   } else if (is.null(orf_margins$Variances) & latex == TRUE) {
+   } else if (is.null(orf_margins$forestVariances) & latex == TRUE) {
 
      # put caption an latex environment
-     xoutput <- xtable(orf_margins$MarginalEffects, digits = 4, caption = "ORF Marginal Effects")
+     xoutput <- xtable(orf_margins$forestEffects, digits = 4, caption = "ORF Marginal Effects")
      # put hline after each variable
      print.xtable(xoutput, type = "latex", include.rownames = TRUE, comment = FALSE)
 
@@ -672,7 +672,7 @@ summary.margins.orf <- function(object, latex = FALSE, ...) {
      # print marginal effects title
      cat("ORF Marginal Effects: \n\n")
      # print just the marginal effects
-     print(round(orf_margins$MarginalEffects, 4))
+     print(round(orf_margins$forestEffects, 4))
 
   }
 
@@ -766,7 +766,7 @@ print.margins.orf <- function(x, ...) {
   # print marginal effects title
   cat("ORF Marginal Effects: \n\n")
   # print just the marginal effects
-  print(round(x$MarginalEffects, 4))
+  print(round(x$forestEffects, 4))
 
   # -------------------------------------------------------------------------------- #
 
@@ -789,24 +789,24 @@ margins_output <- function(x) {
   cat("ORF Marginal Effects: \n\n")
   cat("------------------------------------------------------------------------------", "\n")
 
-  for (var_idx in 1:nrow(x$MarginalEffects)) {
+  for (var_idx in 1:nrow(x$forestEffects)) {
 
-    cat(rownames(x$MarginalEffects)[var_idx], "\n")
-    cat("                   Class", "     Effect", "    StdDev", "    tValue ", "   pValue", "     ", "\n")
+    cat(rownames(x$forestEffects)[var_idx], "\n")
+    cat("                   Class", "     Effect", "    StdErr", "    tValue ", "   pValue", "     ", "\n")
 
-    for (cat_idx in 1:ncol(x$MarginalEffects)) {
+    for (cat_idx in 1:ncol(x$forestEffects)) {
 
       # generate stars (thanks to:
       # http://myowelt.blogspot.com/2008/04/beautiful-correlation-tables-in-r.html)
-      stars <- ifelse(x$pValues[var_idx, cat_idx] < .01, "***",
-                      ifelse(x$pValues[var_idx, cat_idx] < .05, "** ",
-                             ifelse(x$pValues[var_idx, cat_idx] < .1, "*  ", "   ")))
+      stars <- ifelse(x$forestPpalues[var_idx, cat_idx] < .01, "***",
+                      ifelse(x$forestPvalues[var_idx, cat_idx] < .05, "** ",
+                             ifelse(x$forestPalues[var_idx, cat_idx] < .1, "*  ", "   ")))
 
       # print estimates for each category iteratively
-      output_matrix[1, 1] <- x$MarginalEffects[var_idx, cat_idx]
-      output_matrix[1, 2] <- x$StandardErrors[var_idx, cat_idx]
-      output_matrix[1, 3] <- x$tValues[var_idx, cat_idx]
-      output_matrix[1, 4] <- x$pValues[var_idx, cat_idx]
+      output_matrix[1, 1] <- x$forestEffects[var_idx, cat_idx]
+      output_matrix[1, 2] <- x$forestErrors[var_idx, cat_idx]
+      output_matrix[1, 3] <- x$forestTvalues[var_idx, cat_idx]
+      output_matrix[1, 4] <- x$forestPvalues[var_idx, cat_idx]
 
 
       cat("                 |  ", cat_idx, "  |  ") # prit out the categories
@@ -841,11 +841,11 @@ margins_output <- function(x) {
 margins_output_latex <- function(x) {
 
   # get number of categories
-  ncat <- ncol(x$MarginalEffects)
+  ncat <- ncol(x$forestEffects)
   # get number of variables
-  nvar <- nrow(x$MarginalEffects)
+  nvar <- nrow(x$forestEffects)
   # get variable names
-  varnames <- rownames(x$MarginalEffects)
+  varnames <- rownames(x$forestEffects)
 
   # create empty output matrix
   output_matrix <- matrix("", nrow = (nvar*ncat), ncol = 7)
@@ -858,18 +858,18 @@ margins_output_latex <- function(x) {
 
       # generate stars (thanks to:
       # http://myowelt.blogspot.com/2008/04/beautiful-correlation-tables-in-r.html)
-      stars <- ifelse(x$pValues[var_idx+1, cat_idx] < .01, "***",
-                      ifelse(x$pValues[var_idx+1, cat_idx] < .05, "** ",
-                             ifelse(x$pValues[var_idx+1, cat_idx] < .1, "*  ", "   ")))
+      stars <- ifelse(x$forestPvalues[var_idx+1, cat_idx] < .01, "***",
+                      ifelse(x$forestPvalues[var_idx+1, cat_idx] < .05, "** ",
+                             ifelse(x$forestPvalues[var_idx+1, cat_idx] < .1, "*  ", "   ")))
 
       # print estimates for each category iteratively
       rownames(output_matrix)[(var_idx*ncat)+cat_idx] <- paste0(varnames[var_idx+1], cat_idx)
       output_matrix[1+(var_idx*ncat), 1] <- varnames[var_idx+1] # fit in variable name
       output_matrix[(var_idx*ncat)+cat_idx, 2] <- cat_idx # fit in category
-      output_matrix[(var_idx*ncat)+cat_idx, 3] <- x$MarginalEffects[var_idx+1, cat_idx]
-      output_matrix[(var_idx*ncat)+cat_idx, 4] <- x$StandardErrors[var_idx+1, cat_idx]
-      output_matrix[(var_idx*ncat)+cat_idx, 5] <- x$tValues[var_idx+1, cat_idx]
-      output_matrix[(var_idx*ncat)+cat_idx, 6] <- x$pValues[var_idx+1, cat_idx]
+      output_matrix[(var_idx*ncat)+cat_idx, 3] <- x$forestEffects[var_idx+1, cat_idx]
+      output_matrix[(var_idx*ncat)+cat_idx, 4] <- x$forestErrors[var_idx+1, cat_idx]
+      output_matrix[(var_idx*ncat)+cat_idx, 5] <- x$forestTvalues[var_idx+1, cat_idx]
+      output_matrix[(var_idx*ncat)+cat_idx, 6] <- x$forestPvalues[var_idx+1, cat_idx]
       output_matrix[(var_idx*ncat)+cat_idx, 7] <- stars
 
 

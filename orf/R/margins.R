@@ -97,12 +97,12 @@ margins.default <- function(forest, eval = NULL, inference = NULL, window = NULL
 #' @import ranger
 #'
 #' @return object of type \code{margins.orf} with following elements
-#'       \item{forestInfo}{info containing forest inputs and data used}
-#'       \item{forestEffects}{marginal effects}
-#'       \item{forestVariances}{variances of marginal effects}
-#'       \item{forestErrors}{standard errors of marginal effects}
-#'       \item{forestTvalues}{t-values of marginal effects}
-#'       \item{forestPvalues}{p-values of marginal effects}
+#'       \item{info}{info containing forest inputs and data used}
+#'       \item{effects}{marginal effects}
+#'       \item{variances}{variances of marginal effects}
+#'       \item{errors}{standard errors of marginal effects}
+#'       \item{tvalues}{t-values of marginal effects}
+#'       \item{pvalues}{p-values of marginal effects}
 #'
 #' @examples
 #' #\dontrun{
@@ -151,7 +151,7 @@ margins.orf <- function(forest, eval = NULL, inference = NULL, window = NULL, ne
   # ----------------------------------------------------------------------------------- #
 
   ## save forest inputs
-  inputs            <- forest$forestInfo$inputs
+  inputs            <- forest$info$inputs
   forest_replace    <- inputs$replace
   forest_honesty    <- inputs$honesty
   forest_inference  <- inputs$inference
@@ -191,12 +191,12 @@ margins.orf <- function(forest, eval = NULL, inference = NULL, window = NULL, ne
     # if no newdata supplied, estimate in sample marginal effects
     if (forest_honesty == FALSE) {
 
-      data <- forest$forestInfo$trainData # take in-sample data
+      data <- forest$info$trainData # take in-sample data
       X_eval <- as.matrix(data[, -1])
 
     } else if (forest_honesty == TRUE) {
 
-      data <- forest$forestInfo$honestData # take honest data
+      data <- forest$info$honestData # take honest data
       X_eval <- as.matrix(data[, -1])
 
     }
@@ -207,7 +207,7 @@ margins.orf <- function(forest, eval = NULL, inference = NULL, window = NULL, ne
     if (is.null(colnames(newdata))) { colnames(newdata) <- paste0("X", rep(1:ncol(newdata))) }
 
     # check if newdata is compatible with train data
-    if (all(colnames(forest$forestInfo$trainData)[-1] != colnames(newdata)) | ncol(newdata) != (ncol(forest$forestInfo$trainData) - 1)) {
+    if (all(colnames(forest$info$trainData)[-1] != colnames(newdata)) | ncol(newdata) != (ncol(forest$info$trainData) - 1)) {
 
       stop("newdata is not compatible with training data. Programme terminated.")
 
@@ -221,11 +221,11 @@ margins.orf <- function(forest, eval = NULL, inference = NULL, window = NULL, ne
       # get data which will be used for predicting the marginal effect
       if (forest_honesty == FALSE) {
 
-        data <- forest$forestInfo$trainData # take in-sample data
+        data <- forest$info$trainData # take in-sample data
 
       } else if (forest_honesty == TRUE) {
 
-        data <- forest$forestInfo$honestData # take honest data
+        data <- forest$info$honestData # take honest data
 
       }
 
@@ -242,7 +242,7 @@ margins.orf <- function(forest, eval = NULL, inference = NULL, window = NULL, ne
   # get number of observations
   n_data <- as.numeric(nrow(data))
   # get categories
-  categories <- forest$forestInfo$categories
+  categories <- forest$info$categories
   # get X as matrix
   X <- as.matrix(data[, -1])
   # get Y as matrix
@@ -356,25 +356,25 @@ margins.orf <- function(forest, eval = NULL, inference = NULL, window = NULL, ne
 
     #### now we do not need weights if we do not need inference (based on out of bag predictions)
     # forest prediction for X_mean_up (mean doesnt matter for atmean or atmedian)
-    forest_pred_up <- lapply(forest$trainForests, function(x) lapply(X_mean_up, function(y) mean(predict(x, data = y)$predictions)))
+    forest_pred_up <- lapply(forest$forests, function(x) lapply(X_mean_up, function(y) mean(predict(x, data = y)$predictions)))
     # forest prediction for X_mean_down (mean doesnt matter for atmean or atmedian)
-    forest_pred_down <- lapply(forest$trainForests, function(x) lapply(X_mean_down, function(y) mean(predict(x, data = y)$predictions)))
+    forest_pred_down <- lapply(forest$forests, function(x) lapply(X_mean_down, function(y) mean(predict(x, data = y)$predictions)))
 
   } else if (forest_honesty == TRUE & inference == FALSE) {
 
     # do honest predictions
     # forest prediction for X_mean_up (use new faster function particularly for ME)
-    forest_pred_up <- predict_forest_preds_for_ME(forest$trainForests, data_ind, X_mean_up)
+    forest_pred_up <- predict_forest_preds_for_ME(forest$forests, data_ind, X_mean_up)
     # forest prediction for X_mean_down
-    forest_pred_down <- predict_forest_preds_for_ME(forest$trainForests, data_ind, X_mean_down)
+    forest_pred_down <- predict_forest_preds_for_ME(forest$forests, data_ind, X_mean_down)
 
   } else if (forest_honesty == TRUE & inference == TRUE) {
 
     # do honest predictions with weight based inference
     # extract weights for desired Xs up: get weights from honest sample and predict weights for evaluation points from HONEST sample
-    forest_weights_up <- predict_forest_weights_for_ME(forest$trainForests, X, X_mean_up)
+    forest_weights_up <- predict_forest_weights_for_ME(forest$forests, X, X_mean_up)
     # extract weights for desired Xs down
-    forest_weights_down <- predict_forest_weights_for_ME(forest$trainForests, X, X_mean_down)
+    forest_weights_down <- predict_forest_weights_for_ME(forest$forests, X, X_mean_down)
 
     ## compute predictions based on weights
     # forest prediction for X_mean_up
@@ -523,7 +523,7 @@ margins.orf <- function(forest, eval = NULL, inference = NULL, window = NULL, ne
 
   # put everything into a list of results
   results <- list(forest_info, marginal_effects, variance_me, sd_me, t_value, p_values)
-  names(results) <- c("forestInfo", "forestEffects", "forestVariances", "forestErrors", "forestTvalues", "forestPvalues")
+  names(results) <- c("info", "effects", "variances", "errors", "tvalues", "pvalues")
 
   class(results) <- "margins.orf"
 
@@ -591,7 +591,7 @@ summary.margins.orf <- function(object, latex = FALSE, ...) {
 
   ## save forest margins inputs
   main_class        <- class(orf_margins)[1]
-  inputs            <- orf_margins$forestInfo$inputs
+  inputs            <- orf_margins$info$inputs
 
   honesty           <- inputs$honesty
   honesty.fraction  <- inputs$honesty.fraction
@@ -602,11 +602,11 @@ summary.margins.orf <- function(object, latex = FALSE, ...) {
   sample.fraction   <- inputs$sample.fraction
   inference         <- inputs$inference
 
-  pred_data         <- ifelse(is.null(orf_margins$forestInfo$newData), FALSE, TRUE)
-  eval_type         <- orf_margins$forestInfo$eval
-  eval_window       <- orf_margins$forestInfo$window
-  margins_inference <- orf_margins$forestInfo$marginsInference
-  categories        <- length(orf_margins$forestInfo$categories)
+  pred_data         <- ifelse(is.null(orf_margins$info$newData), FALSE, TRUE)
+  eval_type         <- orf_margins$info$eval
+  eval_window       <- orf_margins$info$window
+  margins_inference <- orf_margins$info$marginsInference
+  categories        <- length(orf_margins$info$categories)
   build             <- ifelse(replace == TRUE, "Bootstrap", "Subsampling")
   type              <- "Ordered Forest Margins"
 
@@ -650,20 +650,20 @@ summary.margins.orf <- function(object, latex = FALSE, ...) {
   # -------------------------------------------------------------------------------- #
 
   # chekc if inference has been done
-  if (!is.null(orf_margins$forestVariances) & latex == FALSE) {
+  if (!is.null(orf_margins$variances) & latex == FALSE) {
 
      # print inference output table
      margins_output(orf_margins)
 
-   } else if (!is.null(orf_margins$forestVariances) & latex == TRUE) {
+   } else if (!is.null(orf_margins$variances) & latex == TRUE) {
 
      # print inference output table latex
      margins_output_latex(orf_margins)
 
-   } else if (is.null(orf_margins$forestVariances) & latex == TRUE) {
+   } else if (is.null(orf_margins$variances) & latex == TRUE) {
 
      # put caption an latex environment
-     xoutput <- xtable(orf_margins$forestEffects, digits = 4, caption = "ORF Marginal Effects")
+     xoutput <- xtable(orf_margins$effects, digits = 4, caption = "ORF Marginal Effects")
      # put hline after each variable
      print.xtable(xoutput, type = "latex", include.rownames = TRUE, comment = FALSE)
 
@@ -672,7 +672,7 @@ summary.margins.orf <- function(object, latex = FALSE, ...) {
      # print marginal effects title
      cat("ORF Marginal Effects: \n\n")
      # print just the marginal effects
-     print(round(orf_margins$forestEffects, 4))
+     print(round(orf_margins$effects, 4))
 
   }
 
@@ -729,7 +729,7 @@ print.margins.orf <- function(x, ...) {
 
   ## save forest prediction inputs
   main_class        <- class(orf_margins)[1]
-  inputs            <- orf_margins$forestInfo$inputs
+  inputs            <- orf_margins$info$inputs
 
   honesty           <- inputs$honesty
   mtry              <- inputs$mtry
@@ -738,11 +738,11 @@ print.margins.orf <- function(x, ...) {
   replace           <- inputs$replace
   inference         <- inputs$inference
 
-  pred_data         <- orf_margins$forestInfo$newData
-  eval_type         <- orf_margins$forestInfo$eval
-  eval_window       <- orf_margins$forestInfo$window
-  margins_inference <- orf_margins$forestInfo$marginsInference
-  categories        <- length(orf_margins$forestInfo$categories)
+  pred_data         <- orf_margins$info$newData
+  eval_type         <- orf_margins$info$eval
+  eval_window       <- orf_margins$info$window
+  margins_inference <- orf_margins$info$marginsInference
+  categories        <- length(orf_margins$info$categories)
   build             <- ifelse(replace == TRUE, "Bootstrap", "Subsampling")
   type              <- "Ordered Forest Margins"
 
@@ -766,7 +766,7 @@ print.margins.orf <- function(x, ...) {
   # print marginal effects title
   cat("ORF Marginal Effects: \n\n")
   # print just the marginal effects
-  print(round(x$forestEffects, 4))
+  print(round(x$effects, 4))
 
   # -------------------------------------------------------------------------------- #
 
@@ -789,24 +789,24 @@ margins_output <- function(x) {
   cat("ORF Marginal Effects: \n\n")
   cat("------------------------------------------------------------------------------", "\n")
 
-  for (var_idx in 1:nrow(x$forestEffects)) {
+  for (var_idx in 1:nrow(x$effects)) {
 
-    cat(rownames(x$forestEffects)[var_idx], "\n")
+    cat(rownames(x$effects)[var_idx], "\n")
     cat("                   Class", "     Effect", "    StdErr", "    tValue ", "   pValue", "     ", "\n")
 
-    for (cat_idx in 1:ncol(x$forestEffects)) {
+    for (cat_idx in 1:ncol(x$effects)) {
 
       # generate stars (thanks to:
       # http://myowelt.blogspot.com/2008/04/beautiful-correlation-tables-in-r.html)
-      stars <- ifelse(x$forestPpalues[var_idx, cat_idx] < .01, "***",
-                      ifelse(x$forestPvalues[var_idx, cat_idx] < .05, "** ",
-                             ifelse(x$forestPalues[var_idx, cat_idx] < .1, "*  ", "   ")))
+      stars <- ifelse(x$pvalues[var_idx, cat_idx] < .01, "***",
+                      ifelse(x$pvalues[var_idx, cat_idx] < .05, "** ",
+                             ifelse(x$pvalues[var_idx, cat_idx] < .1, "*  ", "   ")))
 
       # print estimates for each category iteratively
-      output_matrix[1, 1] <- x$forestEffects[var_idx, cat_idx]
-      output_matrix[1, 2] <- x$forestErrors[var_idx, cat_idx]
-      output_matrix[1, 3] <- x$forestTvalues[var_idx, cat_idx]
-      output_matrix[1, 4] <- x$forestPvalues[var_idx, cat_idx]
+      output_matrix[1, 1] <- x$effects[var_idx, cat_idx]
+      output_matrix[1, 2] <- x$errors[var_idx, cat_idx]
+      output_matrix[1, 3] <- x$tvalues[var_idx, cat_idx]
+      output_matrix[1, 4] <- x$pvalues[var_idx, cat_idx]
 
 
       cat("                 |  ", cat_idx, "  |  ") # prit out the categories
@@ -841,11 +841,11 @@ margins_output <- function(x) {
 margins_output_latex <- function(x) {
 
   # get number of categories
-  ncat <- ncol(x$forestEffects)
+  ncat <- ncol(x$effects)
   # get number of variables
-  nvar <- nrow(x$forestEffects)
+  nvar <- nrow(x$effects)
   # get variable names
-  varnames <- rownames(x$forestEffects)
+  varnames <- rownames(x$effects)
 
   # create empty output matrix
   output_matrix <- matrix("", nrow = (nvar*ncat), ncol = 7)
@@ -858,18 +858,18 @@ margins_output_latex <- function(x) {
 
       # generate stars (thanks to:
       # http://myowelt.blogspot.com/2008/04/beautiful-correlation-tables-in-r.html)
-      stars <- ifelse(x$forestPvalues[var_idx+1, cat_idx] < .01, "***",
-                      ifelse(x$forestPvalues[var_idx+1, cat_idx] < .05, "** ",
-                             ifelse(x$forestPvalues[var_idx+1, cat_idx] < .1, "*  ", "   ")))
+      stars <- ifelse(x$pvalues[var_idx+1, cat_idx] < .01, "***",
+                      ifelse(x$pvalues[var_idx+1, cat_idx] < .05, "** ",
+                             ifelse(x$pvalues[var_idx+1, cat_idx] < .1, "*  ", "   ")))
 
       # print estimates for each category iteratively
       rownames(output_matrix)[(var_idx*ncat)+cat_idx] <- paste0(varnames[var_idx+1], cat_idx)
       output_matrix[1+(var_idx*ncat), 1] <- varnames[var_idx+1] # fit in variable name
       output_matrix[(var_idx*ncat)+cat_idx, 2] <- cat_idx # fit in category
-      output_matrix[(var_idx*ncat)+cat_idx, 3] <- x$forestEffects[var_idx+1, cat_idx]
-      output_matrix[(var_idx*ncat)+cat_idx, 4] <- x$forestErrors[var_idx+1, cat_idx]
-      output_matrix[(var_idx*ncat)+cat_idx, 5] <- x$forestTvalues[var_idx+1, cat_idx]
-      output_matrix[(var_idx*ncat)+cat_idx, 6] <- x$forestPvalues[var_idx+1, cat_idx]
+      output_matrix[(var_idx*ncat)+cat_idx, 3] <- x$effects[var_idx+1, cat_idx]
+      output_matrix[(var_idx*ncat)+cat_idx, 4] <- x$errors[var_idx+1, cat_idx]
+      output_matrix[(var_idx*ncat)+cat_idx, 5] <- x$tvalues[var_idx+1, cat_idx]
+      output_matrix[(var_idx*ncat)+cat_idx, 6] <- x$pvalues[var_idx+1, cat_idx]
       output_matrix[(var_idx*ncat)+cat_idx, 7] <- stars
 
 

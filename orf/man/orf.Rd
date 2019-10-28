@@ -2,7 +2,7 @@
 % Please edit documentation in R/orf_user.R
 \name{orf}
 \alias{orf}
-\title{orf: ordered random forests}
+\title{Ordered Forest}
 \usage{
 orf(X, Y, num.trees = 1000, mtry = NULL, min.node.size = NULL,
   replace = FALSE, sample.fraction = NULL, honesty = TRUE,
@@ -33,12 +33,12 @@ orf(X, Y, num.trees = 1000, mtry = NULL, min.node.size = NULL,
 }
 \value{
 object of type \code{orf} with following elements
-      \item{trainForests}{saved forests trained for ORF estimations (inherited from \code{ranger})}
-      \item{forestInfo}{info containing forest inputs and data used}
-      \item{forestPredictions}{predicted values}
-      \item{forestVariances}{variances of predicted values}
-      \item{forestImportance}{weighted measure of permutation based variable importance}
-      \item{forestAccuracy}{oob measures for mean squared error and ranked probability score}
+      \item{forests}{saved forests trained for ORF estimations (inherited from \code{ranger})}
+      \item{info}{info containing forest inputs and data used}
+      \item{predictions}{predicted values for class probabilities}
+      \item{variances}{variances of predicted values}
+      \item{importance}{weighted measure of permutation based variable importance}
+      \item{accuracy}{oob measures for mean squared error and ranked probability score}
 }
 \description{
 An implementation of the Ordered Forest estimator

@@ -20,12 +20,12 @@
 }
 \value{
 object of type \code{margins.orf} with following elements
-      \item{forestInfo}{info containing forest inputs and data used}
-      \item{forestEffects}{marginal effects}
-      \item{forestVariances}{variances of marginal effects}
-      \item{forestErrors}{standard errors of marginal effects}
-      \item{forestTvalues}{t-values of marginal effects}
-      \item{forestPvalues}{p-values of marginal effects}
+      \item{info}{info containing forest inputs and data used}
+      \item{effects}{marginal effects}
+      \item{variances}{variances of marginal effects}
+      \item{errors}{standard errors of marginal effects}
+      \item{tvalues}{t-values of marginal effects}
+      \item{pvalues}{p-values of marginal effects}
 }
 \description{
 S3 orf with methods to estimate marginal effects

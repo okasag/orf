@@ -62,12 +62,12 @@
 #' @import ranger
 #'
 #' @return object of type \code{orf} with following elements
-#'       \item{trainForests}{saved forests trained for ORF estimations (inherited from \code{ranger})}
-#'       \item{forestInfo}{info containing forest inputs and data used}
-#'       \item{forestPredictions}{predicted values}
-#'       \item{forestVariances}{variances of predicted values}
-#'       \item{forestImportance}{weighted measure of permutation based variable importance}
-#'       \item{forestAccuracy}{oob measures for mean squared error and ranked probability score}
+#'       \item{forests}{saved forests trained for ORF estimations (inherited from \code{ranger})}
+#'       \item{info}{info containing forest inputs and data used}
+#'       \item{predictions}{predicted values for class probabilities}
+#'       \item{variances}{variances of predicted values}
+#'       \item{importance}{weighted measure of permutation based variable importance}
+#'       \item{accuracy}{oob measures for mean squared error and ranked probability score}
 #'
 #' @author Gabriel Okasa \email{gabriel.okasa@@unisg.ch}
 #'
@@ -532,7 +532,7 @@ orf <- function(X, Y,
 
   # define output of the function
   output        <- list(forest, forest_info, pred_final, var_final, var_imp, forest_accuracy)
-  names(output) <- c("trainForests",  "forestInfo", "forestPredictions", "forestVariances", "forestImportance", "forestAccuracy")
+  names(output) <- c("forests",  "info", "predictions", "variances", "importance", "accuracy")
 
   # --------------------------------------------------------------------------------------- #
 
@@ -597,16 +597,16 @@ plot.orf <- function(x, ...) {
   ## get forest as x
   forest <- x
   ## save forest inputs
-  inputs <- forest$forestInfo$inputs
+  inputs <- forest$info$inputs
   honesty <- inputs$honesty
-  categories <- forest$forestInfo$categories
-  honest_data <- forest$forestInfo$honestData
-  train_data <- forest$forestInfo$trainData
+  categories <- forest$info$categories
+  honest_data <- forest$info$honestData
+  train_data <- forest$info$trainData
 
   # -------------------------------------------------------------------------------- #
 
   # get predictions and estimation data
-  probabilities <- forest$forestPredictions # take out honest predictions
+  probabilities <- forest$predictions # take out honest predictions
   all_data <- rbind(honest_data, train_data) # put data together
   all_data <- all_data[order(as.numeric(row.names(all_data))), ] # sort data as original
   outcomes <- all_data[, 1] # take the observed outcomes
@@ -738,7 +738,7 @@ summary.orf <- function(object, latex = FALSE, ...) {
 
   ## save forest inputs
   main_class        <- class(forest)[1]
-  inputs            <- forest$forestInfo$inputs
+  inputs            <- forest$info$inputs
 
   honesty           <- inputs$honesty
   honesty.fraction  <- inputs$honesty.fraction
@@ -749,23 +749,23 @@ summary.orf <- function(object, latex = FALSE, ...) {
   min.node.size     <- inputs$min.node.size
   replace           <- inputs$replace
   sample.fraction   <- inputs$sample.fraction
-  honest_data       <- forest$forestInfo$honestData
-  train_data        <- forest$forestInfo$trainData
-  categories        <- length(forest$forestInfo$categories)
+  honest_data       <- forest$info$honestData
+  train_data        <- forest$info$trainData
+  categories        <- length(forest$info$categories)
   type              <- "Ordered Forest"
 
   # -------------------------------------------------------------------------------- #
 
   ## honest splitting, i.e. use honest data
   # take out summary statistics
-  mse         <- round(forest$forestAccuracy$MSE, 5)
-  rps         <- round(forest$forestAccuracy$RPS, 5)
+  mse         <- round(forest$accuracy$MSE, 5)
+  rps         <- round(forest$accuracy$RPS, 5)
   trainsize   <- nrow(train_data)
   honestsize  <- ifelse(is.null(honest_data), 0, nrow(honest_data))
   features    <- ncol(train_data) - 1   # take out the response
 
   # check if subsampling or bootstrapping was used
-  if (forest$trainForests[[1]]$replace == TRUE) { build <- "Bootstrap" } else { build <- "Subsampling" }
+  if (forest$forests[[1]]$replace == TRUE) { build <- "Bootstrap" } else { build <- "Subsampling" }
 
   # -------------------------------------------------------------------------------- #
 
@@ -851,7 +851,7 @@ print.orf <- function(x, ...) {
 
   ## save forest inputs
   main_class        <- class(forest)[1]
-  inputs            <- forest$forestInfo$inputs
+  inputs            <- forest$info$inputs
 
   honesty           <- inputs$honesty
   mtry              <- inputs$mtry
@@ -859,9 +859,9 @@ print.orf <- function(x, ...) {
   min.node.size     <- inputs$min.node.size
   replace           <- inputs$replace
   inference         <- inputs$inference
-  honest_data       <- forest$forestInfo$honestData
-  train_data        <- forest$forestInfo$trainData
-  categories        <- length(forest$forestInfo$categories)
+  honest_data       <- forest$info$honestData
+  train_data        <- forest$info$trainData
+  categories        <- length(forest$info$categories)
   build             <- ifelse(replace == TRUE, "Bootstrap", "Subsampling")
   type              <- "Ordered Forest"
 
@@ -911,9 +911,9 @@ print.orf <- function(x, ...) {
 #' @import ranger
 #'
 #' @return object of class \code{orf.prediction} with following elements
-#'       \item{forestInfo}{info containing forest inputs and data used}
-#'       \item{forestPredictions}{predicted values}
-#'       \item{forestVariances}{variances of predicted values}
+#'       \item{info}{info containing forest inputs and data used}
+#'       \item{predictions}{predicted values}
+#'       \item{variances}{variances of predicted values}
 #'
 #' @examples
 #' #\dontrun{
@@ -966,13 +966,13 @@ predict.orf <- function(object, newdata = NULL, type = NULL, inference = NULL, .
   ## get forest as na object
   forest <- object
   ## save forest inputs
-  inputs <- forest$forestInfo$inputs
-  categories <- forest$forestInfo$categories
+  inputs <- forest$info$inputs
+  categories <- forest$info$categories
   replace <- inputs$replace
   honesty <- inputs$honesty
-  honest_data <- forest$forestInfo$honestData
-  train_data <- forest$forestInfo$trainData
-  honest_ind_data <- forest$forestInfo$indicatorData # indicator data needed for indicator predictions
+  honest_data <- forest$info$honestData
+  train_data <- forest$info$trainData
+  honest_ind_data <- forest$info$indicatorData # indicator data needed for indicator predictions
 
   # -------------------------------------------------------------------------------- #
 
@@ -1000,8 +1000,8 @@ predict.orf <- function(object, newdata = NULL, type = NULL, inference = NULL, .
   if (is.null(newdata) & (inference == inputs$inference)) {
 
     # take in sample predictions
-    pred_final <- forest$forestPredictions
-    var_final  <- forest$forestVariances
+    pred_final <- forest$predictions
+    var_final  <- forest$variances
 
     # check the desired type of predictions
     if (type == "class" | type == "c") {
@@ -1015,7 +1015,7 @@ predict.orf <- function(object, newdata = NULL, type = NULL, inference = NULL, .
   } else if (is.null(newdata) & (inference == FALSE) & (inputs$inference == TRUE)) {
 
     # then take the estimated values but dont supply the inference results
-    pred_final <- forest$forestPredictions
+    pred_final <- forest$predictions
     var_final  <- NULL
 
     # check the desired type of predictions
@@ -1028,8 +1028,8 @@ predict.orf <- function(object, newdata = NULL, type = NULL, inference = NULL, .
 
   } else {
 
-    # take out list of ranger objects (be careful, its Forests with S at the end!)
-    forest <- forest$trainForests
+    # take out list of ranger objects (be careful, its forests with S at the end!)
+    forest <- forest$forests
 
     ## get train data names (only X)
     train_data_name <- colnames(train_data)[2:ncol(train_data)]
@@ -1272,7 +1272,7 @@ predict.orf <- function(object, newdata = NULL, type = NULL, inference = NULL, .
 
   # define output of the function
   output <- list(forest_info, pred_final, var_final)
-  names(output) <- c("forestInfo", "forestPredictions", "forestVariances")
+  names(output) <- c("info", "predictions", "variances")
 
   # -------------------------------------------------------------------------------- #
 
@@ -1348,7 +1348,7 @@ print.orf.prediction <- function(x, ...) {
 
   ## save forest prediction inputs
   main_class        <- class(forest_pred)[1]
-  inputs            <- forest_pred$forestInfo$inputs
+  inputs            <- forest_pred$info$inputs
 
   honesty           <- inputs$honesty
   mtry              <- inputs$mtry
@@ -1357,10 +1357,10 @@ print.orf.prediction <- function(x, ...) {
   replace           <- inputs$replace
   inference         <- inputs$inference
 
-  pred_data         <- forest_pred$forestInfo$newData
-  pred_type         <- forest_pred$forestInfo$predType
-  pred_inference    <- forest_pred$forestInfo$predInference
-  categories        <- length(forest_pred$forestInfo$categories)
+  pred_data         <- forest_pred$info$newData
+  pred_type         <- forest_pred$info$predType
+  pred_inference    <- forest_pred$info$predInference
+  categories        <- length(forest_pred$info$categories)
   build             <- ifelse(replace == TRUE, "Bootstrap", "Subsampling")
   type              <- "Ordered Forest Prediction"
 
@@ -1383,7 +1383,7 @@ print.orf.prediction <- function(x, ...) {
 
   cat("Prediction Type:                 ", pred_type, "\n")
   cat("Number of Categories:            ", categories, "\n")
-  cat("Sample Size:                     ", nrow(forest_pred$forestPredictions), "\n")
+  cat("Sample Size:                     ", nrow(forest_pred$predictions), "\n")
   cat("Number of Trees:                 ", num.trees, "\n")
   cat("Build:                           ", build, "\n")
   cat("Mtry:                            ", mtry, "\n")
@@ -1462,7 +1462,7 @@ summary.orf.prediction <- function(object, latex = FALSE, ...) {
 
   ## save forest prediction inputs
   main_class        <- class(forest_pred)[1]
-  inputs            <- forest_pred$forestInfo$inputs
+  inputs            <- forest_pred$info$inputs
 
   honesty           <- inputs$honesty
   honesty.fraction  <- inputs$honesty.fraction
@@ -1473,11 +1473,11 @@ summary.orf.prediction <- function(object, latex = FALSE, ...) {
   sample.fraction   <- inputs$sample.fraction
   inference         <- inputs$inference
 
-  pred_data         <- forest_pred$forestInfo$newData
-  pred_type         <- forest_pred$forestInfo$predType
-  pred_inference    <- forest_pred$forestInfo$predInference
-  categories        <- length(forest_pred$forestInfo$categories)
-  sample_size       <- nrow(forest_pred$forestPredictions)
+  pred_data         <- forest_pred$info$newData
+  pred_type         <- forest_pred$info$predType
+  pred_inference    <- forest_pred$info$predInference
+  categories        <- length(forest_pred$info$categories)
+  sample_size       <- nrow(forest_pred$predictions)
   build             <- ifelse(replace == TRUE, "Bootstrap", "Subsampling")
   type              <- "Ordered Forest Prediction"
 

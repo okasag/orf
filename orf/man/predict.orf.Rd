@@ -20,9 +20,9 @@
 }
 \value{
 object of class \code{orf.prediction} with following elements
-      \item{forestInfo}{info containing forest inputs and data used}
-      \item{forestPredictions}{predicted values}
-      \item{forestVariances}{variances of predicted values}
+      \item{info}{info containing forest inputs and data used}
+      \item{predictions}{predicted values}
+      \item{variances}{variances of predicted values}
 }
 \description{
 Prediction for new observations based on estimated Ordered Forest of class \code{orf}

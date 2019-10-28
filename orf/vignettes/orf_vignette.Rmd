@@ -183,7 +183,7 @@ summary(orf_model)
 ```
 
 The summary of the estimated Ordered Forest provides the basic information about
-the estimation and its inputs as well as information about the in-sample prediction
+the estimation and its inputs as well as information about the out-of-bag prediction
 accuracy measured in terms of the classical mean squared error (MSE) and the 
 probabilistic ranked probability score (RPS). Furthermore, the `summary.orf` command
 provides a `latex` argument which generates a LaTeX coded table for immediate

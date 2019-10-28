@@ -28,16 +28,16 @@ test_that("marginal effects sum up to 0", {
   set.seed(123)
   orf <- orf(X, Y)
   orf_margins <- margins(orf)
-  expect_equal(as.numeric(rowSums(orf_margins$forestEffects)), rep(0, ncol(X)))
+  expect_equal(as.numeric(rowSums(orf_margins$effects)), rep(0, ncol(X)))
 })
 
 test_that("marginal effects variances etc are positive", {
   set.seed(123)
   orf <- orf(X, Y)
   orf_margins <- margins(orf, inference = TRUE)
-  expect_true(all(as.numeric(orf_margins$forestVariances) > 0))
-  expect_true(all(as.numeric(orf_margins$forestErrors) > 0))
-  expect_true(all(as.numeric(orf_margins$forestPvalues) >= 0) & all(as.numeric(orf_margins$forestPvalues) <= 1))
+  expect_true(all(as.numeric(orf_margins$variances) > 0))
+  expect_true(all(as.numeric(orf_margins$errors) > 0))
+  expect_true(all(as.numeric(orf_margins$pvalues) >= 0) & all(as.numeric(orf_margins$pvalues) <= 1))
 })
 
 test_that("not admissible marginal effects evaluation point throw a warning", {

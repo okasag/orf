@@ -78,12 +78,12 @@ check_discrete_Y <- function(Y) {
   }
 
   if (length(unique(Y)) > 10) {
-    warning("The input matrix Y contains more than 10 distinct values. This might be not optimal for an Ordered Choice Model.
+    message("The input matrix Y contains more than 10 distinct values. This might be not optimal for an Ordered Choice Model.
             Consider recoding your outcome into less categories.")
   }
 
   if (any(table(Y)/nrow(Y) < 0.05)) {
-    warning("At least one of the categories of the input matrix Y contains less than 5% of observations.
+    message("At least one of the categories of the input matrix Y contains less than 5% of observations.
             This might be not optimal for an Ordered/Multinomial Choice Model. Consider recoding your outcome into less categories.")
   }
 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/orf_user.R
 \name{plot.orf}
 \alias{plot.orf}
-\title{orf plot}
+\title{Plot of the Ordered Forest}
 \usage{
 \method{plot}{orf}(x, ...)
 }

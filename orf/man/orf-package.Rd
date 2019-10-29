@@ -3,7 +3,7 @@
 \docType{package}
 \name{orf-package}
 \alias{orf-package}
-\title{orf: ordered random forests}
+\title{orf: Ordered Random Forests}
 \description{
 An implementation of the Ordered Forest estimator
 as in Lechner & Okasa (2019). The Ordered Forest flexibly

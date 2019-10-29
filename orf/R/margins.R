@@ -1,7 +1,7 @@
-#' orf margins generic
+#' Marginal Effects
 #'
 #' @description
-#' S3 generic with methods to estimate marginal effects
+#' S3 generic method for estimation of marginal effects
 #' of an Ordered Forest objects of class \code{orf}.
 #'
 #' @details
@@ -17,7 +17,7 @@
 #' Furthermore, new data for which marginal effects should be computed can be supplied
 #' as well as long as it lies within the support of \code{X}.
 #'
-#' @seealso \code{\link{summary.margins.orf}}, \code{\link{print.margins.orf}}
+#' @seealso \code{\link{margins.orf}}, \code{\link{summary.margins.orf}} and \code{\link{print.margins.orf}}
 #'
 #' @param forest estimated Ordered Forest object of class \code{orf}
 #' @param eval string defining evaluation point for marginal effects. These can be one of "mean", "atmean", or "atmedian". (Default is "mean")
@@ -29,33 +29,6 @@
 margins <- function(forest, eval = NULL, inference = NULL, window = NULL, newdata = NULL) UseMethod("margins")
 
 
-#' orf margins default
-#'
-#' @description
-#' S3 default with methods to estimate marginal effects
-#' of an Ordered Forest objects of class \code{orf}.
-#'
-#' @details
-#' \code{margins.default} estimates marginal effects at the mean, at the median, or
-#' the mean marginal effects, depending on the \code{eval} argument. It is advised
-#' to increase the number of subsampling replications in the supplied \code{orf}
-#' object as the estimation of the marginal effects is a more demanding exercise
-#' than a simple Ordered Forest estimation/prediction. Additionally to the estimation
-#' of the marginal effects, the weight-based inference for the effects is supported
-#' as well. Note, that the inference procedure is much more computationally exhausting
-#' exercise due to the computation of the forest weights. Additionally, the evaluation
-#' window for the marginal effects can be regulated through the \code{window} argument.
-#' Furthermore, new data for which marginal effects should be computed can be supplied
-#' as well as long as it lies within the support of \code{X}.
-#'
-#' @seealso \code{\link{summary.margins.orf}}, \code{\link{print.margins.orf}}
-#'
-#' @param forest estimated Ordered Forest object of class \code{orf}
-#' @param eval string defining evaluation point for marginal effects. These can be one of "mean", "atmean", or "atmedian". (Default is "mean")
-#' @param inference logical, if TRUE inference on marginal effects will be conducted (default is inherited from the orf object)
-#' @param window numeric, share of standard deviation of X to be used for evaluation of the marginal effect (default is 0.1)
-#' @param newdata matrix of new Xs for which marginal effects should be computed
-#'
 #' @export
 margins.default <- function(forest, eval = NULL, inference = NULL, window = NULL, newdata = NULL) {
 
@@ -66,10 +39,10 @@ margins.default <- function(forest, eval = NULL, inference = NULL, window = NULL
 }
 
 
-#' orf margins
+#' Marginal Effects for the Ordered Forest
 #'
 #' @description
-#' S3 orf with methods to estimate marginal effects
+#' S3 method for estimation of marginal effects
 #' of an Ordered Forest objects of class \code{orf}.
 #'
 #' @details
@@ -535,7 +508,7 @@ margins.orf <- function(forest, eval = NULL, inference = NULL, window = NULL, ne
 }
 
 
-#' orf margins summary
+#' Summary of the Ordered Forest Marginal Effects
 #'
 #' @description
 #' summary of estimated marginal effects of the Ordered Forest of class \code{margins.orf}
@@ -681,7 +654,7 @@ summary.margins.orf <- function(object, latex = FALSE, ...) {
 }
 
 
-#' print.margins.orf
+#' Print of the Ordered Forest Marginal Effects
 #'
 #' @description
 #' print of estimated marginal effects of the Ordered Forest of class \code{margins.orf}

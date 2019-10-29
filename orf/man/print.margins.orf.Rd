@@ -2,7 +2,7 @@
 % Please edit documentation in R/margins.R
 \name{print.margins.orf}
 \alias{print.margins.orf}
-\title{print.margins.orf}
+\title{Print of the Ordered Forest Marginal Effects}
 \usage{
 \method{print}{margins.orf}(x, ...)
 }

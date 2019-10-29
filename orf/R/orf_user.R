@@ -546,7 +546,7 @@ orf <- function(X, Y,
 
 }
 
-#' orf plot
+#' Plot of the Ordered Forest
 #'
 #' @description
 #' plot the probability distributions estimated by the Ordered Forest object of class \code{orf}
@@ -679,7 +679,7 @@ plot.orf <- function(x, ...) {
 }
 
 
-#' orf summary
+#' Summary of the Ordered Forest
 #'
 #' @description
 #' summary of an estimated Ordered Forest object of class \code{orf}
@@ -800,7 +800,7 @@ summary.orf <- function(object, latex = FALSE, ...) {
 }
 
 
-#' print orf
+#' Print of the Ordered Forest
 #'
 #' @description
 #' print of an estimated Ordered Forest object of class \code{orf}
@@ -883,7 +883,7 @@ print.orf <- function(x, ...) {
 }
 
 
-#' orf prediction
+#' Prediction of the Ordered Forest
 #'
 #' @description
 #' Prediction for new observations based on estimated Ordered Forest of class \code{orf}
@@ -1287,7 +1287,7 @@ predict.orf <- function(object, newdata = NULL, type = NULL, inference = NULL, .
 }
 
 
-#' print orf prediction
+#' Print of the Ordered Forest Prediction
 #'
 #' @description
 #' print of Ordered Forest predictions of class \code{orf.prediction}
@@ -1396,7 +1396,7 @@ print.orf.prediction <- function(x, ...) {
 }
 
 
-#' orf prediction summary
+#' Summary of the Ordered Forest Prediction
 #'
 #' @description
 #' summary of Ordered Forest predictions of class \code{orf.prediction}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/margins.R
 \name{margins.orf}
 \alias{margins.orf}
-\title{orf margins}
+\title{Marginal Effects for the Ordered Forest}
 \usage{
 \method{margins}{orf}(forest, eval = NULL, inference = NULL,
   window = NULL, newdata = NULL)
@@ -28,7 +28,7 @@ object of type \code{margins.orf} with following elements
       \item{pvalues}{p-values of marginal effects}
 }
 \description{
-S3 orf with methods to estimate marginal effects
+S3 method for estimation of marginal effects
 of an Ordered Forest objects of class \code{orf}.
 }
 \details{

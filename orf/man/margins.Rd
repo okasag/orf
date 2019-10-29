@@ -2,7 +2,7 @@
 % Please edit documentation in R/margins.R
 \name{margins}
 \alias{margins}
-\title{orf margins generic}
+\title{Marginal Effects}
 \usage{
 margins(forest, eval = NULL, inference = NULL, window = NULL,
   newdata = NULL)
@@ -19,7 +19,7 @@ margins(forest, eval = NULL, inference = NULL, window = NULL,
 \item{newdata}{matrix of new Xs for which marginal effects should be computed}
 }
 \description{
-S3 generic with methods to estimate marginal effects
+S3 generic method for estimation of marginal effects
 of an Ordered Forest objects of class \code{orf}.
 }
 \details{
@@ -36,5 +36,5 @@ Furthermore, new data for which marginal effects should be computed can be suppl
 as well as long as it lies within the support of \code{X}.
 }
 \seealso{
-\code{\link{summary.margins.orf}}, \code{\link{print.margins.orf}}
+\code{\link{margins.orf}}, \code{\link{summary.margins.orf}} and \code{\link{print.margins.orf}}
 }

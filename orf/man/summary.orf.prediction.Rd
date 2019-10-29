@@ -2,7 +2,7 @@
 % Please edit documentation in R/orf_user.R
 \name{summary.orf.prediction}
 \alias{summary.orf.prediction}
-\title{orf prediction summary}
+\title{Summary of the Ordered Forest Prediction}
 \usage{
 \method{summary}{orf.prediction}(object, latex = FALSE, ...)
 }

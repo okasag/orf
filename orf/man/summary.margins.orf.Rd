@@ -2,7 +2,7 @@
 % Please edit documentation in R/margins.R
 \name{summary.margins.orf}
 \alias{summary.margins.orf}
-\title{orf margins summary}
+\title{Summary of the Ordered Forest Marginal Effects}
 \usage{
 \method{summary}{margins.orf}(object, latex = FALSE, ...)
 }

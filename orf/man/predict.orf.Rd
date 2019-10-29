@@ -2,7 +2,7 @@
 % Please edit documentation in R/orf_user.R
 \name{predict.orf}
 \alias{predict.orf}
-\title{orf prediction}
+\title{Prediction of the Ordered Forest}
 \usage{
 \method{predict}{orf}(object, newdata = NULL, type = NULL,
   inference = NULL, ...)

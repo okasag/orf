@@ -2,7 +2,7 @@
 % Please edit documentation in R/orf_user.R
 \name{print.orf}
 \alias{print.orf}
-\title{print orf}
+\title{Print of the Ordered Forest}
 \usage{
 \method{print}{orf}(x, ...)
 }

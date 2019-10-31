@@ -40,7 +40,7 @@ essentially the same output as in the standard parametric models. As such the
 Ordered Forest estimator not only provides estimates of conditional
 ordered choice probabilities, i.e. $P[Y=m|X=x]$ but also estimates of marginal
 effects, i.e. how the conditional probabilities vary with changes in $X$. Further,
-the **orf** estimator provides also inference for the marginal effects as well
+the `orf` estimator provides also inference for the marginal effects as well
 as for the conditional probabilities.
 
 More formally, consider an categorical ordered outcome variable $Y_i \in \{1,...,M \}$.
@@ -129,6 +129,7 @@ the Ordered Forest.
 ```{r orf intro, include = FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>", fig.width = 7, fig.height = 7, fig.align = "center")
 library(orf)
+set.seed(123)
 ```
 
 ### orf: `odata`
@@ -157,9 +158,8 @@ Now, estimate the Ordered Forest using the `orf` function with the default
 settings and supplying only the required data inputs. Print the output
 of the estimation procedure with the S3 method `print.orf`.
 
-```{r orf default}
+```{r orf default, }
 # estimate Ordered Forest with default settings
-set.seed(123)
 orf_model <- orf(X, Y)
 
 # print output of the orf estimation
@@ -171,7 +171,6 @@ summarize the estimation output with the S3 method `summary.orf`.
 
 ```{r orf custom}
 # estimate Ordered Forest with custom settings
-set.seed(123)
 orf_model <- orf(X, Y,
                        num.trees = 1000, mtry = 2, min.node.size = 5,
                        replace = FALSE, sample.fraction = 0.5,
@@ -239,7 +238,6 @@ summary a LaTeX table can be directly generated with the `latex` argument in the
 
 ```{r orf predict test}
 # specify response and covariates for train and test
-set.seed(123)
 idx <- sample(seq(1, nrow(odata), 1), 0.8*nrow(odata))
 
 # train set
@@ -251,7 +249,6 @@ Y_test <- odata[-idx, 1]
 X_test <- odata[-idx, -1]
 
 # estimate Ordered Forest
-set.seed(123)
 orf_train <- orf(X_train, Y_train)
 
 # predict the probabilities with the estimated orf

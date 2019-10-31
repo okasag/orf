@@ -8,11 +8,11 @@
   inference = NULL, ...)
 }
 \arguments{
-\item{object}{estimated cforest objet of class \code{orf}}
+\item{object}{estimated Ordered Forest object of class \code{orf}}
 
-\item{newdata}{matrix X containing the observations for which the outcomes should be predicted}
+\item{newdata}{numeric matrix X containing the observations for which the outcomes should be predicted}
 
-\item{type}{string specifying the type of the prediction, These can be either "probs" or  "p" for probabilities and "class" or "c" for classes. (Default is "probs").}
+\item{type}{string, specifying the type of the prediction, These can be either "probs" or  "p" for probabilities and "class" or "c" for classes. (Default is "probs").}
 
 \item{inference}{logical, if TRUE variances for the predictions will be estimated (only feasible for probability predictions).}
 
@@ -49,19 +49,17 @@ require(orf)
 data(odata)
 
 # specify response and covariates for train and test
-set.seed(123)
 idx <- sample(seq(1, nrow(odata), 1), 0.8*nrow(odata))
 
 # train set
-Y_train <- odata[idx, 1]
-X_train <- odata[idx, -1]
+Y_train <- as.numeric(odata[idx, 1])
+X_train <- as.matrix(odata[idx, -1])
 
 # test set
-Y_test <- odata[-idx, 1]
-X_test <- odata[-idx, -1]
+Y_test <- as.numeric(odata[-idx, 1])
+X_test <- as.matrix(odata[-idx, -1])
 
 # estimate Ordered Forest
-set.seed(123)
 orf <- orf(X_train, Y_train)
 
 # predict the probabilities with the estimated orf

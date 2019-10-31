@@ -9,7 +9,7 @@
 \arguments{
 \item{object}{estimated Ordered Forest object of class \code{orf}}
 
-\item{latex}{logical, TRUE if latex summary should be generated}
+\item{latex}{logical, if TRUE latex coded summary will be generated (default is FALSE)}
 
 \item{...}{further arguments (currently ignored)}
 }
@@ -31,11 +31,10 @@ require(orf)
 data(odata)
 
 # specify response and covariates
-Y <- odata[, 1]
-X <- odata[, -1]
+Y <- as.numeric(odata[, 1])
+X <- as.matrix(odata[, -1])
 
 # estimate Ordered Forest
-set.seed(123)
 orf <- orf(X, Y)
 
 # show summary of the orf estimation

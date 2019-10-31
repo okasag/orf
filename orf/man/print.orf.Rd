@@ -29,11 +29,10 @@ require(orf)
 data(odata)
 
 # specify response and covariates
-Y <- odata[, 1]
-X <- odata[, -1]
+Y <- as.numeric(odata[, 1])
+X <- as.matrix(odata[, -1])
 
 # estimate Ordered Forest
-set.seed(123)
 orf <- orf(X, Y)
 
 # print output of the orf estimation

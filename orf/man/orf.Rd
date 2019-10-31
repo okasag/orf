@@ -2,22 +2,22 @@
 % Please edit documentation in R/orf_user.R
 \name{orf}
 \alias{orf}
-\title{Ordered Forest}
+\title{Ordered Forest Estimator}
 \usage{
 orf(X, Y, num.trees = 1000, mtry = NULL, min.node.size = NULL,
   replace = FALSE, sample.fraction = NULL, honesty = TRUE,
   honesty.fraction = NULL, inference = FALSE, importance = FALSE)
 }
 \arguments{
-\item{X}{matrix of features}
+\item{X}{numeric matrix of features}
 
-\item{Y}{vector of outcomes (as.matrix acceptable too)}
+\item{Y}{numeric vector of outcomes}
 
 \item{num.trees}{scalar, number of trees in a forest, i.e. bootstrap replications (default is 1000 trees)}
 
 \item{mtry}{scalar, number of randomly selected features (default is the squared root of number of features, rounded up to the nearest integer)}
 
-\item{min.node.size}{scalar, minimum node size (default is 5 observations)}
+\item{min.node.size}{scalar, minimum node size, i.e. leaf size of a tree (default is 5 observations)}
 
 \item{replace}{logical, if TRUE sampling with replacement, i.e. bootstrap is used to grow the trees, otherwise subsampling without replacement is used (default is set to FALSE)}
 
@@ -94,58 +94,33 @@ require(orf)
 data(odata)
 
 # specify response and covariates
-Y <- odata[, 1]
-X <- odata[, -1]
+Y <- as.numeric(odata[, 1])
+X <- as.matrix(odata[, -1])
 
-## Main Example with all orf related functions
-# estimate Ordered Forest with default settings
-set.seed(123)
+# estimate Ordered Forest with default parameters
 orf <- orf(X, Y)
 
-# print output of the orf estimation
-print(orf)
-
-# show summary of the orf estimation
-summary(orf)
-
-# plot the estimated probability distributions
-plot(orf)
-
-# predict with the estimated orf
-predict(orf)
-
-# estimate marginal effects of the orf
-margins(orf)
-
-## Further Examples of orf
 # estimate Ordered Forest with own tuning parameters
-set.seed(123)
 orf <- orf(X, Y, num.trees = 2000, mtry = 3, min.node.size = 10)
 
 # estimate Ordered Forest with bootstrapping and without honesty
-set.seed(123)
 orf <- orf(X, Y, replace = TRUE, honesty = FALSE)
 
 # estimate Ordered Forest with subsampling and with honesty
-set.seed(123)
 orf <- orf(X, Y, replace = FALSE, honesty = TRUE)
 
 # estimate Ordered Forest with subsampling and with honesty
 # with own tuning for subsample fraction and honesty fraction
-set.seed(123)
 orf <- orf(X, Y, replace = FALSE, sample.fraction = 0.5, honesty = TRUE, honesty.fraction = 0.5)
 
 # estimate Ordered Forest with subsampling and with honesty and with inference
 # (for inference, subsampling and honesty are required)
-set.seed(123)
 orf <- orf(X, Y, replace = FALSE, honesty = TRUE, inference = TRUE)
 
 # estimate Ordered Forest with simple variable importance measure
-set.seed(123)
 orf <- orf(X, Y, importance = TRUE)
 
 # estimate Ordered Forest with all custom settings
-set.seed(123)
 orf <- orf(X, Y, num.trees = 2000, mtry = 3, min.node.size = 10,
  replace = TRUE, sample.fraction = 1, honesty = FALSE,
  honesty.fraction = 0, inference = FALSE, importance = FALSE)

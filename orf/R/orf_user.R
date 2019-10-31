@@ -1,4 +1,4 @@
-#' Ordered Forest
+#' Ordered Forest Estimator
 #'
 #' @description
 #' An implementation of the Ordered Forest estimator
@@ -47,11 +47,11 @@
 #' @seealso \code{\link{summary.orf}}, \code{\link{plot.orf}}
 #' \code{\link{predict.orf}}, \code{\link{margins.orf}}
 #'
-#' @param X matrix of features
-#' @param Y vector of outcomes (as.matrix acceptable too)
+#' @param X numeric matrix of features
+#' @param Y numeric vector of outcomes
 #' @param num.trees scalar, number of trees in a forest, i.e. bootstrap replications (default is 1000 trees)
 #' @param mtry scalar, number of randomly selected features (default is the squared root of number of features, rounded up to the nearest integer)
-#' @param min.node.size scalar, minimum node size (default is 5 observations)
+#' @param min.node.size scalar, minimum node size, i.e. leaf size of a tree (default is 5 observations)
 #' @param replace logical, if TRUE sampling with replacement, i.e. bootstrap is used to grow the trees, otherwise subsampling without replacement is used (default is set to FALSE)
 #' @param sample.fraction scalar, subsampling rate (default is 1 for bootstrap and 0.5 for subsampling)
 #' @param honesty logical, if TRUE honest forest is built using sample splitting (default is set to TRUE)
@@ -88,58 +88,33 @@
 #' data(odata)
 #'
 #' # specify response and covariates
-#' Y <- odata[, 1]
-#' X <- odata[, -1]
+#' Y <- as.numeric(odata[, 1])
+#' X <- as.matrix(odata[, -1])
 #'
-#' ## Main Example with all orf related functions
-#' # estimate Ordered Forest with default settings
-#' set.seed(123)
+#' # estimate Ordered Forest with default parameters
 #' orf <- orf(X, Y)
 #'
-#' # print output of the orf estimation
-#' print(orf)
-#'
-#' # show summary of the orf estimation
-#' summary(orf)
-#'
-#' # plot the estimated probability distributions
-#' plot(orf)
-#'
-#' # predict with the estimated orf
-#' predict(orf)
-#'
-#' # estimate marginal effects of the orf
-#' margins(orf)
-#'
-#' ## Further Examples of orf
 #' # estimate Ordered Forest with own tuning parameters
-#' set.seed(123)
 #' orf <- orf(X, Y, num.trees = 2000, mtry = 3, min.node.size = 10)
 #'
 #' # estimate Ordered Forest with bootstrapping and without honesty
-#' set.seed(123)
 #' orf <- orf(X, Y, replace = TRUE, honesty = FALSE)
 #'
 #' # estimate Ordered Forest with subsampling and with honesty
-#' set.seed(123)
 #' orf <- orf(X, Y, replace = FALSE, honesty = TRUE)
 #'
 #' # estimate Ordered Forest with subsampling and with honesty
 #' # with own tuning for subsample fraction and honesty fraction
-#' set.seed(123)
 #' orf <- orf(X, Y, replace = FALSE, sample.fraction = 0.5, honesty = TRUE, honesty.fraction = 0.5)
 #'
 #' # estimate Ordered Forest with subsampling and with honesty and with inference
 #' # (for inference, subsampling and honesty are required)
-#' set.seed(123)
 #' orf <- orf(X, Y, replace = FALSE, honesty = TRUE, inference = TRUE)
 #'
 #' # estimate Ordered Forest with simple variable importance measure
-#' set.seed(123)
 #' orf <- orf(X, Y, importance = TRUE)
 #'
 #' # estimate Ordered Forest with all custom settings
-#' set.seed(123)
 #' orf <- orf(X, Y, num.trees = 2000, mtry = 3, min.node.size = 10,
 #'  replace = TRUE, sample.fraction = 1, honesty = FALSE,
 #'  honesty.fraction = 0, inference = FALSE, importance = FALSE)
@@ -575,11 +550,10 @@ orf <- function(X, Y,
 #' data(odata)
 #'
 #' # specify response and covariates
-#' Y <- odata[, 1]
-#' X <- odata[, -1]
+#' Y <- as.numeric(odata[, 1])
+#' X <- as.matrix(odata[, -1])
 #'
 #' # estimate Ordered Forest
-#' set.seed(123)
 #' orf <- orf(X, Y)
 #'
 #' # plot the estimated probability distributions
@@ -690,7 +664,7 @@ plot.orf <- function(x, ...) {
 #' well as the output information regarding the prediction accuracy.
 #'
 #' @param object estimated Ordered Forest object of class \code{orf}
-#' @param latex logical, TRUE if latex summary should be generated
+#' @param latex logical, if TRUE latex coded summary will be generated (default is FALSE)
 #' @param ... further arguments (currently ignored)
 #'
 #' @importFrom xtable xtable
@@ -705,11 +679,10 @@ plot.orf <- function(x, ...) {
 #' data(odata)
 #'
 #' # specify response and covariates
-#' Y <- odata[, 1]
-#' X <- odata[, -1]
+#' Y <- as.numeric(odata[, 1])
+#' X <- as.matrix(odata[, -1])
 #'
 #' # estimate Ordered Forest
-#' set.seed(123)
 #' orf <- orf(X, Y)
 #'
 #' # show summary of the orf estimation
@@ -823,11 +796,10 @@ summary.orf <- function(object, latex = FALSE, ...) {
 #' data(odata)
 #'
 #' # specify response and covariates
-#' Y <- odata[, 1]
-#' X <- odata[, -1]
+#' Y <- as.numeric(odata[, 1])
+#' X <- as.matrix(odata[, -1])
 #'
 #' # estimate Ordered Forest
-#' set.seed(123)
 #' orf <- orf(X, Y)
 #'
 #' # print output of the orf estimation
@@ -902,9 +874,9 @@ print.orf <- function(x, ...) {
 #'
 #' @seealso \code{\link{summary.orf.prediction}}, \code{\link{print.orf.prediction}}
 #'
-#' @param object estimated cforest objet of class \code{orf}
-#' @param newdata matrix X containing the observations for which the outcomes should be predicted
-#' @param type string specifying the type of the prediction, These can be either "probs" or  "p" for probabilities and "class" or "c" for classes. (Default is "probs").
+#' @param object estimated Ordered Forest object of class \code{orf}
+#' @param newdata numeric matrix X containing the observations for which the outcomes should be predicted
+#' @param type string, specifying the type of the prediction, These can be either "probs" or  "p" for probabilities and "class" or "c" for classes. (Default is "probs").
 #' @param inference logical, if TRUE variances for the predictions will be estimated (only feasible for probability predictions).
 #' @param ... further arguments (currently ignored)
 #'
@@ -925,19 +897,17 @@ print.orf <- function(x, ...) {
 #' data(odata)
 #'
 #' # specify response and covariates for train and test
-#' set.seed(123)
 #' idx <- sample(seq(1, nrow(odata), 1), 0.8*nrow(odata))
 #'
 #' # train set
-#' Y_train <- odata[idx, 1]
-#' X_train <- odata[idx, -1]
+#' Y_train <- as.numeric(odata[idx, 1])
+#' X_train <- as.matrix(odata[idx, -1])
 #'
 #' # test set
-#' Y_test <- odata[-idx, 1]
-#' X_test <- odata[-idx, -1]
+#' Y_test <- as.numeric(odata[-idx, 1])
+#' X_test <- as.matrix(odata[-idx, -1])
 #'
 #' # estimate Ordered Forest
-#' set.seed(123)
 #' orf <- orf(X_train, Y_train)
 #'
 #' # predict the probabilities with the estimated orf
@@ -1310,19 +1280,17 @@ predict.orf <- function(object, newdata = NULL, type = NULL, inference = NULL, .
 #' data(odata)
 #'
 #' # specify response and covariates for train and test
-#' set.seed(123)
 #' idx <- sample(seq(1, nrow(odata), 1), 0.8*nrow(odata))
 #'
 #' # train set
-#' Y_train <- odata[idx, 1]
-#' X_train <- odata[idx, -1]
+#' Y_train <- as.numeric(odata[idx, 1])
+#' X_train <- as.matrix(odata[idx, -1])
 #'
 #' # test set
-#' Y_test <- odata[-idx, 1]
-#' X_test <- odata[-idx, -1]
+#' Y_test <- as.numeric(odata[-idx, 1])
+#' X_test <- as.matrix(odata[-idx, -1])
 #'
 #' # estimate Ordered Forest
-#' set.seed(123)
 #' orf <- orf(X_train, Y_train)
 #'
 #' # predict the probabilities with the estimated orf
@@ -1407,7 +1375,7 @@ print.orf.prediction <- function(x, ...) {
 #' as well as the inputs of the \code{predict.orf} function.
 #'
 #' @param object predicted Ordered Forest object of class \code{orf.prediction}
-#' @param latex logical, TRUE if latex summary should be generated
+#' @param latex logical, if TRUE latex coded summary will be generated (default is FALSE)
 #' @param ... further arguments (currently ignored)
 #'
 #' @examples
@@ -1420,19 +1388,17 @@ print.orf.prediction <- function(x, ...) {
 #' data(odata)
 #'
 #' # specify response and covariates for train and test
-#' set.seed(123)
 #' idx <- sample(seq(1, nrow(odata), 1), 0.8*nrow(odata))
 #'
 #' # train set
-#' Y_train <- odata[idx, 1]
-#' X_train <- odata[idx, -1]
+#' Y_train <- as.numeric(odata[idx, 1])
+#' X_train <- as.matrix(odata[idx, -1])
 #'
 #' # test set
-#' Y_test <- odata[-idx, 1]
-#' X_test <- odata[-idx, -1]
+#' Y_test <- as.numeric(odata[-idx, 1])
+#' X_test <- as.matrix(odata[-idx, -1])
 #'
 #' # estimate Ordered Forest
-#' set.seed(123)
 #' orf <- orf(X_train, Y_train)
 #'
 #' # predict the probabilities with the estimated orf

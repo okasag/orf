@@ -7,9 +7,9 @@
 \method{summary}{margins.orf}(object, latex = FALSE, ...)
 }
 \arguments{
-\item{object}{object of type \code{margins.orf}}
+\item{object}{estimated Ordered Forest Marginal Effect object of type \code{margins.orf}}
 
-\item{latex}{logical, if latex output should be generated (\code{default = FALSE})}
+\item{latex}{logical, if TRUE latex coded summary will be generated (default is FALSE)}
 
 \item{...}{further arguments (currently ignored)}
 }
@@ -33,11 +33,10 @@ require(orf)
 data(odata)
 
 # specify response and covariates
-Y <- odata[, 1]
-X <- odata[, -1]
+Y <- as.numeric(odata[, 1])
+X <- as.matrix(odata[, -1])
 
 # estimate Ordered Forest
-set.seed(123)
 orf <- orf(X, Y)
 
 # estimate marginal effects of the orf

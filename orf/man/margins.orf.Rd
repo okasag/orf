@@ -10,13 +10,13 @@
 \arguments{
 \item{forest}{estimated Ordered Forest object of class \code{orf}}
 
-\item{eval}{string defining evaluation point for marginal effects. These can be one of "mean", "atmean", or "atmedian" (default is "mean")}
+\item{eval}{string, defining evaluation point for marginal effects. These can be one of "mean", "atmean", or "atmedian". (Default is "mean")}
 
-\item{inference}{logical, if TRUE inference on marginal effects will be conducted (default is inherited from the orf object)}
+\item{inference}{logical, if TRUE inference on marginal effects will be conducted (default is inherited from the \code{orf} object)}
 
 \item{window}{numeric, share of standard deviation of X to be used for evaluation of the marginal effect (default is 0.1)}
 
-\item{newdata}{matrix of new Xs for which marginal effects should be computed}
+\item{newdata}{numeric matrix X containing the new observations for which the marginal effects should be estimated}
 }
 \value{
 object of type \code{margins.orf} with following elements
@@ -54,11 +54,10 @@ require(orf)
 data(odata)
 
 # specify response and covariates
-Y <- odata[, 1]
-X <- odata[, -1]
+Y <- as.numeric(odata[, 1])
+X <- as.matrix(odata[, -1])
 
 # estimate Ordered Forest
-set.seed(123)
 orf <- orf(X, Y)
 
 # estimate marginal effects of the orf (default)

@@ -10,30 +10,38 @@ margins(forest, eval = NULL, inference = NULL, window = NULL,
 \arguments{
 \item{forest}{estimated Ordered Forest object of class \code{orf}}
 
-\item{eval}{string defining evaluation point for marginal effects. These can be one of "mean", "atmean", or "atmedian". (Default is "mean")}
+\item{eval}{string, defining evaluation point for marginal effects. These can be one of "mean", "atmean", or "atmedian". (Default is "mean")}
 
-\item{inference}{logical, if TRUE inference on marginal effects will be conducted (default is inherited from the orf object)}
+\item{inference}{logical, if TRUE inference on marginal effects will be conducted (default is inherited from the \code{orf} object)}
 
 \item{window}{numeric, share of standard deviation of X to be used for evaluation of the marginal effect (default is 0.1)}
 
-\item{newdata}{matrix of new Xs for which marginal effects should be computed}
+\item{newdata}{numeric matrix X containing the new observations for which the marginal effects should be estimated}
 }
 \description{
 S3 generic method for estimation of marginal effects
 of an Ordered Forest objects of class \code{orf}.
 }
-\details{
-\code{margins} estimates marginal effects at the mean, at the median, or
-the mean marginal effects, depending on the \code{eval} argument. It is advised
-to increase the number of subsampling replications in the supplied \code{orf}
-object as the estimation of the marginal effects is a more demanding exercise
-than a simple Ordered Forest estimation/prediction. Additionally to the estimation
-of the marginal effects, the weight-based inference for the effects is supported
-as well. Note, that the inference procedure is much more computationally exhausting
-exercise due to the computation of the forest weights. Additionally, the evaluation
-window for the marginal effects can be regulated through the \code{window} argument.
-Furthermore, new data for which marginal effects should be computed can be supplied
-as well as long as it lies within the support of \code{X}.
+\examples{
+#\dontrun{
+
+## Ordered Forest
+require(orf)
+
+# load example data
+data(odata)
+
+# specify response and covariates
+Y <- as.numeric(odata[, 1])
+X <- as.matrix(odata[, -1])
+
+# estimate Ordered Forest
+orf <- orf(X, Y)
+
+# estimate default marginal effects of the orf
+margins(orf)
+
+#}
 }
 \seealso{
 \code{\link{margins.orf}}, \code{\link{summary.margins.orf}} and \code{\link{print.margins.orf}}

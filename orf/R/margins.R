@@ -4,27 +4,34 @@
 #' S3 generic method for estimation of marginal effects
 #' of an Ordered Forest objects of class \code{orf}.
 #'
-#' @details
-#' \code{margins} estimates marginal effects at the mean, at the median, or
-#' the mean marginal effects, depending on the \code{eval} argument. It is advised
-#' to increase the number of subsampling replications in the supplied \code{orf}
-#' object as the estimation of the marginal effects is a more demanding exercise
-#' than a simple Ordered Forest estimation/prediction. Additionally to the estimation
-#' of the marginal effects, the weight-based inference for the effects is supported
-#' as well. Note, that the inference procedure is much more computationally exhausting
-#' exercise due to the computation of the forest weights. Additionally, the evaluation
-#' window for the marginal effects can be regulated through the \code{window} argument.
-#' Furthermore, new data for which marginal effects should be computed can be supplied
-#' as well as long as it lies within the support of \code{X}.
-#'
 #' @seealso \code{\link{margins.orf}}, \code{\link{summary.margins.orf}} and \code{\link{print.margins.orf}}
 #'
 #' @param forest estimated Ordered Forest object of class \code{orf}
-#' @param eval string defining evaluation point for marginal effects. These can be one of "mean", "atmean", or "atmedian". (Default is "mean")
-#' @param inference logical, if TRUE inference on marginal effects will be conducted (default is inherited from the orf object)
+#' @param eval string, defining evaluation point for marginal effects. These can be one of "mean", "atmean", or "atmedian". (Default is "mean")
+#' @param inference logical, if TRUE inference on marginal effects will be conducted (default is inherited from the \code{orf} object)
 #' @param window numeric, share of standard deviation of X to be used for evaluation of the marginal effect (default is 0.1)
-#' @param newdata matrix of new Xs for which marginal effects should be computed
+#' @param newdata numeric matrix X containing the new observations for which the marginal effects should be estimated
 #'
+#' @examples
+#' #\dontrun{
+#'
+#' ## Ordered Forest
+#' require(orf)
+#'
+#' # load example data
+#' data(odata)
+#'
+#' # specify response and covariates
+#' Y <- as.numeric(odata[, 1])
+#' X <- as.matrix(odata[, -1])
+#'
+#' # estimate Ordered Forest
+#' orf <- orf(X, Y)
+#'
+#' # estimate default marginal effects of the orf
+#' margins(orf)
+#'
+#' #}
 #' @export
 margins <- function(forest, eval = NULL, inference = NULL, window = NULL, newdata = NULL) UseMethod("margins")
 
@@ -34,7 +41,7 @@ margins.default <- function(forest, eval = NULL, inference = NULL, window = NULL
 
   warning(paste("margins does not know how to handle object of class ",
                 class(forest),
-                ". The supported classes are one of the following: orf/mrf."))
+                ". The supported classes are one of the following: orf."))
 
 }
 
@@ -61,11 +68,11 @@ margins.default <- function(forest, eval = NULL, inference = NULL, window = NULL
 #' @seealso \code{\link{summary.margins.orf}}, \code{\link{print.margins.orf}}
 #'
 #' @param forest estimated Ordered Forest object of class \code{orf}
-#' @param eval string defining evaluation point for marginal effects. These can be one of "mean", "atmean", or "atmedian" (default is "mean")
-#' @param inference logical, if TRUE inference on marginal effects will be conducted (default is inherited from the orf object)
+#' @param eval string, defining evaluation point for marginal effects. These can be one of "mean", "atmean", or "atmedian". (Default is "mean")
+#' @param inference logical, if TRUE inference on marginal effects will be conducted (default is inherited from the \code{orf} object)
 #' @param window numeric, share of standard deviation of X to be used for evaluation of the marginal effect (default is 0.1)
-#' @param newdata matrix of new Xs for which marginal effects should be computed
-#'
+#' @param newdata numeric matrix X containing the new observations for which the marginal effects should be estimated
+#
 #' @importFrom stats predict median pnorm sd
 #' @import ranger
 #'
@@ -87,11 +94,10 @@ margins.default <- function(forest, eval = NULL, inference = NULL, window = NULL
 #' data(odata)
 #'
 #' # specify response and covariates
-#' Y <- odata[, 1]
-#' X <- odata[, -1]
+#' Y <- as.numeric(odata[, 1])
+#' X <- as.matrix(odata[, -1])
 #'
 #' # estimate Ordered Forest
-#' set.seed(123)
 #' orf <- orf(X, Y)
 #'
 #' # estimate marginal effects of the orf (default)
@@ -520,8 +526,8 @@ margins.orf <- function(forest, eval = NULL, inference = NULL, window = NULL, ne
 #' Furthermore, summary output as a LaTeX table is supported in order to directly
 #' extract the results for the documentation.
 #'
-#' @param object object of type \code{margins.orf}
-#' @param latex logical, if latex output should be generated (\code{default = FALSE})
+#' @param object estimated Ordered Forest Marginal Effect object of type \code{margins.orf}
+#' @param latex logical, if TRUE latex coded summary will be generated (default is FALSE)
 #' @param ... further arguments (currently ignored)
 #'
 #' @examples
@@ -534,11 +540,10 @@ margins.orf <- function(forest, eval = NULL, inference = NULL, window = NULL, ne
 #' data(odata)
 #'
 #' # specify response and covariates
-#' Y <- odata[, 1]
-#' X <- odata[, -1]
+#' Y <- as.numeric(odata[, 1])
+#' X <- as.matrix(odata[, -1])
 #'
 #' # estimate Ordered Forest
-#' set.seed(123)
 #' orf <- orf(X, Y)
 #'
 #' # estimate marginal effects of the orf
@@ -664,7 +669,7 @@ summary.margins.orf <- function(object, latex = FALSE, ...) {
 #' marginal effects, printed directly to the \code{R} console. The printed information
 #' contains the results for the marginal effects for each covariate and each outcome class.
 #'
-#' @param x object of type \code{margins.orf}
+#' @param x estimated Ordered Forest Marginal Effect object of type \code{margins.orf}
 #' @param ... further arguments (currently ignored)
 #'
 #' @examples
@@ -677,11 +682,10 @@ summary.margins.orf <- function(object, latex = FALSE, ...) {
 #' data(odata)
 #'
 #' # specify response and covariates
-#' Y <- odata[, 1]
-#' X <- odata[, -1]
+#' Y <- as.numeric(odata[, 1])
+#' X <- as.matrix(odata[, -1])
 #'
 #' # estimate Ordered Forest
-#' set.seed(123)
 #' orf <- orf(X, Y)
 #'
 #' # estimate marginal effects of the orf
@@ -782,9 +786,9 @@ margins_output <- function(x) {
       output_matrix[1, 4] <- x$pvalues[var_idx, cat_idx]
 
 
-      cat("                 |  ", cat_idx, "  |  ") # prit out the categories
+      cat("                    ", cat_idx, "     ") # prit out the categories
 
-      cat(format(sprintf("%8.4f", round(output_matrix, 4)), width = 10), stars, "  |  ") # print out the estimates
+      cat(format(sprintf("%8.4f", round(output_matrix, 4)), width = 10), stars, "     ") # print out the estimates
 
       cat("\n") # break the line
 

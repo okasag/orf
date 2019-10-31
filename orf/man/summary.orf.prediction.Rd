@@ -9,7 +9,7 @@
 \arguments{
 \item{object}{predicted Ordered Forest object of class \code{orf.prediction}}
 
-\item{latex}{logical, TRUE if latex summary should be generated}
+\item{latex}{logical, if TRUE latex coded summary will be generated (default is FALSE)}
 
 \item{...}{further arguments (currently ignored)}
 }
@@ -31,19 +31,17 @@ require(orf)
 data(odata)
 
 # specify response and covariates for train and test
-set.seed(123)
 idx <- sample(seq(1, nrow(odata), 1), 0.8*nrow(odata))
 
 # train set
-Y_train <- odata[idx, 1]
-X_train <- odata[idx, -1]
+Y_train <- as.numeric(odata[idx, 1])
+X_train <- as.matrix(odata[idx, -1])
 
 # test set
-Y_test <- odata[-idx, 1]
-X_test <- odata[-idx, -1]
+Y_test <- as.numeric(odata[-idx, 1])
+X_test <- as.matrix(odata[-idx, -1])
 
 # estimate Ordered Forest
-set.seed(123)
 orf <- orf(X_train, Y_train)
 
 # predict the probabilities with the estimated orf

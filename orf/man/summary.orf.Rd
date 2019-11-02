@@ -46,3 +46,6 @@ summary(orf, latex = TRUE)
 #}
 
 }
+\author{
+Gabriel Okasa
+}

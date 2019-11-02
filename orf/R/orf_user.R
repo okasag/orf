@@ -1,3 +1,29 @@
+# -----------------------------------------------------------------------------
+# This file is part of orf.
+#
+# orf is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# orf is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with orf. If not, see <http://www.gnu.org/licenses/>.
+#
+# Written by:
+#
+# Gabriel Okasa
+# Swiss Institute for Empirical Economic Research
+# University of St.Gallen
+# Varnbüelstrasse 14
+# 9000 St.Gallen
+# Switzerland
+# -----------------------------------------------------------------------------
+
 #' Ordered Forest Estimator
 #'
 #' @description
@@ -69,7 +95,7 @@
 #'       \item{importance}{weighted measure of permutation based variable importance}
 #'       \item{accuracy}{oob measures for mean squared error and ranked probability score}
 #'
-#' @author Gabriel Okasa \email{gabriel.okasa@@unisg.ch}
+#' @author Gabriel Okasa
 #'
 #' @references
 #' \itemize{
@@ -133,16 +159,6 @@ orf <- function(X, Y,
                 inference = FALSE,
                 importance = FALSE) {
 
-  # needed inputs for the function: X - matrix of features
-  #                                 Y - vector of outcomes (as.matrix acceptable too)
-  #                                 num.trees - number of trees in a forest
-  #                                 mtry - number of randomly selected features
-  #                                 min.node.size - minimum node size
-  #                                 replace - sampling with or without replacement
-  #                                 sample.fraction - subsampling rate
-  #                                 honesty - logical, if TRUE honest forest is built using 50:50 data split
-  #                                 inference - logical, if TRUE the weight based inference is conducted (honesty has to be TRUE)
-  #                                 importance - logical, if TRUE variable importance measure based on permutation is conducted
   # -------------------------------------------------------------------------------- #
 
   ## standard checks for input data
@@ -240,7 +256,7 @@ orf <- function(X, Y,
 
     # --------------------------------------------------------------------------------------- #
 
-    # estimate ncat-1 forests (everything on the same data: placing splits and effect estimation), no subsampling
+    # estimate ncat-1 forests (everything on the same data: placing splits and effect estimation)
     forest <- lapply(data_ind, function(x) ranger(dependent.variable.name = paste(Y_name), data = x,
                                                   num.trees = num.trees, mtry = mtry, min.node.size = min.node.size,
                                                   replace = replace, sample.fraction = sample.fraction,
@@ -249,11 +265,11 @@ orf <- function(X, Y,
     # --------------------------------------------------------------------------------------- #
 
     # collect predictions for each forest based on whole sample (oob predictions)
-    pred <- lapply(forest, function(x) x$predictions) # collect forest predictions
+    pred   <- lapply(forest, function(x) x$predictions) # collect forest predictions
     # add the probability for the last outcome (always 1)
     pred_1 <- append(pred, list(rep(1, n)))
     # prepend zero vector to predictions for later differencing
-    pred_0 <- append(list(rep(0, n)), pred) # append a first 0 elemnt for the list
+    pred_0 <- append(list(rep(0, n)), pred) # append a first 0 element for the list
 
     # --------------------------------------------------------------------------------------- #
 
@@ -289,7 +305,7 @@ orf <- function(X, Y,
 
     # --------------------------------------------------------------------------------------- #
 
-    ## do honest forest estimation here using 50:50 data split as in Lechner (2018)
+    ## do honest forest estimation here using (preferably 50:50) data split as in Lechner (2019)
     # devide into 50:50 honesty sets
     split_data <- honest_split(dat, honesty.fraction, orf = TRUE)
     # take care of train data
@@ -320,7 +336,7 @@ orf <- function(X, Y,
 
     # --------------------------------------------------------------------------------------- #
 
-    # estimate ncat-1 forests (everything on the same data: placing splits and effect estimation), no subsampling
+    # estimate ncat-1 forests (on the train data: placing splits)
     forest <- lapply(data_ind_train, function(x) ranger(dependent.variable.name = paste(Y_name), data = x,
                                                         num.trees = num.trees, mtry = mtry, min.node.size = min.node.size,
                                                         replace = replace, sample.fraction = sample.fraction,
@@ -371,7 +387,7 @@ orf <- function(X, Y,
 
     # --------------------------------------------------------------------------------------- #
 
-    ## do honest forest estimation here using 50:50 data split as in Lechner (2018)
+    ## do honest forest estimation here using (preferably 50:50) data split as in Lechner (2019)
     # devide into 50:50 honesty sets
     split_data <- honest_split(dat, honesty.fraction, orf = TRUE)
     # take care of train data
@@ -402,7 +418,7 @@ orf <- function(X, Y,
 
     # --------------------------------------------------------------------------------------- #
 
-    # estimate ncat-1 forests (everything on the same data: placing splits and effect estimation), no subsampling
+    # estimate ncat-1 forests (on the train data: placing splits
     forest <- lapply(data_ind_train, function(x) ranger(dependent.variable.name = paste(Y_name), data = x,
                                                         num.trees = num.trees, mtry = mtry, min.node.size = min.node.size,
                                                         replace = replace, sample.fraction = sample.fraction,
@@ -459,8 +475,6 @@ orf <- function(X, Y,
 
     # compute the variances for the categorical predictions
     var_final <- get_orf_variance(honest_pred, honest_weights, train_pred, train_weights, Y_ind_honest)
-    # check for normalization
-    #sd_final <- sqrt(var_final)
 
     # --------------------------------------------------------------------------------------- #
 
@@ -480,7 +494,7 @@ orf <- function(X, Y,
     var_imp_shares      <- matrix(unlist(lapply(Y_ind_train, function(x) mean(x))), nrow = 1) # matrix of proportions for each but last class
     var_imp_shares_0    <- matrix(c(0, var_imp_shares[1, 1:(ncol(var_imp_shares)-1)]), nrow = 1) # shifted matrix for ease of computation
     var_imp_shares_last <- var_imp_shares[1, ncol(var_imp_shares)] # get the last share of classes
-    var_imp_forests     <- matrix(unlist(lapply(forest, function(x) x$variable.importance)), nrow = ncol(var_imp_shares), byrow = T) # get the variable importances for eahc of binary forests
+    var_imp_forests     <- matrix(unlist(lapply(forest, function(x) x$variable.importance)), nrow = ncol(var_imp_shares), byrow = T) # get the variable importances for each of binary forests
 
     # compute scaling factor using shares
     var_imp_scaling     <- matrix(rep(t((var_imp_shares - var_imp_shares_0)/var_imp_shares_last), ncol(X_train)), ncol = ncol(X_train))
@@ -519,6 +533,8 @@ orf <- function(X, Y,
   # return the output of the function
   return(output)
 
+  # -------------------------------------------------------------------------------- #
+
 }
 
 #' Plot of the Ordered Forest
@@ -539,6 +555,8 @@ orf <- function(X, Y,
 #'
 #' @import ggplot2
 #' @importFrom utils stack
+#'
+#' @author Gabriel Okasa
 #'
 #' @examples
 #' #\dontrun{
@@ -564,30 +582,26 @@ orf <- function(X, Y,
 #' @export
 plot.orf <- function(x, ...) {
 
-  # needed inputs for the function: forest - forest object coming from orf function
-
   # -------------------------------------------------------------------------------- #
 
   ## get forest as x
   forest <- x
   ## save forest inputs
-  inputs <- forest$info$inputs
-  honesty <- inputs$honesty
-  categories <- forest$info$categories
+  inputs      <- forest$info$inputs
+  honesty     <- inputs$honesty
+  categories  <- forest$info$categories
   honest_data <- forest$info$honestData
-  train_data <- forest$info$trainData
+  train_data  <- forest$info$trainData
 
   # -------------------------------------------------------------------------------- #
 
   # get predictions and estimation data
   probabilities <- forest$predictions # take out honest predictions
-  all_data <- rbind(honest_data, train_data) # put data together
-  all_data <- all_data[order(as.numeric(row.names(all_data))), ] # sort data as original
-  outcomes <- all_data[, 1] # take the observed outcomes
+  all_data      <- rbind(honest_data, train_data) # put data together
+  all_data      <- all_data[order(as.numeric(row.names(all_data))), ] # sort data as original
+  outcomes      <- all_data[, 1] # take the observed outcomes
 
   # -------------------------------------------------------------------------------- #
-
-  ### plot ORF ###
 
   ## plot realized categories overlayed with predicted category probabilities
   # new colnames
@@ -609,7 +623,7 @@ plot.orf <- function(x, ...) {
 
   # add colnames and column indicating the outcome category
   df_plot_prob <- lapply(seq_along(df_plot_prob), function(i) {
-    # add column of outcome category to eahc list entry
+    # add column of outcome category to each list entry
     df_plot_prob[[i]]$Outcome <- paste("Class", i, sep = " ")
     # add colnames
     colnames(df_plot_prob[[i]]) <- c("Probability", "Density", "Outcome")
@@ -621,7 +635,7 @@ plot.orf <- function(x, ...) {
 
   # add colnames and column indicating the outcome category
   df_plot_mean <- lapply(seq_along(df_plot_mean), function(i) {
-    # add column of outcome category to eahc list entry
+    # add column of outcome category to each list entry
     df_plot_mean[[i]]$Outcome <- paste("Class", i, sep = " ")
     # add colnames
     colnames(df_plot_mean[[i]]) <- c("Probability", "Density", "Outcome")
@@ -669,6 +683,8 @@ plot.orf <- function(x, ...) {
 #'
 #' @importFrom xtable xtable
 #'
+#' @author Gabriel Okasa
+#'
 #' @examples
 #' #\dontrun{
 #'
@@ -695,9 +711,6 @@ plot.orf <- function(x, ...) {
 #'
 #' @export
 summary.orf <- function(object, latex = FALSE, ...) {
-
-  # needed inputs for the function: forest - forest object coming from random_forest function
-  #                                        - latex : logical if the output should be printed in latex code
 
   # -------------------------------------------------------------------------------- #
 
@@ -786,6 +799,8 @@ summary.orf <- function(object, latex = FALSE, ...) {
 #' @param x estimated Ordered Forest object of class \code{orf}
 #' @param ... further arguments (currently ignored)
 #'
+#' @author Gabriel Okasa
+#'
 #' @examples
 #' #\dontrun{
 #'
@@ -810,9 +825,6 @@ summary.orf <- function(object, latex = FALSE, ...) {
 #'
 #' @export
 print.orf <- function(x, ...) {
-
-  # needed inputs for the function: forest - forest object coming from orf function
-  #                                        - ... additional arguments (currently ignored)
 
   # -------------------------------------------------------------------------------- #
 
@@ -887,6 +899,8 @@ print.orf <- function(x, ...) {
 #'       \item{predictions}{predicted values}
 #'       \item{variances}{variances of predicted values}
 #'
+#' @author Gabriel Okasa
+#'
 #' @examples
 #' #\dontrun{
 #'
@@ -923,8 +937,6 @@ print.orf <- function(x, ...) {
 #'
 #' @export
 predict.orf <- function(object, newdata = NULL, type = NULL, inference = NULL, ...) {
-  # needed inputs for the function: forest - orf object coming from orf function
-  #                                 newdata - matrix X containing the observations to predict
 
   # -------------------------------------------------------------------------------- #
 
@@ -933,15 +945,15 @@ predict.orf <- function(object, newdata = NULL, type = NULL, inference = NULL, .
     stop("Forest object is not of class orf. Programme terminated.")
   }
 
-  ## get forest as na object
+  ## get forest as an object
   forest <- object
   ## save forest inputs
-  inputs <- forest$info$inputs
-  categories <- forest$info$categories
-  replace <- inputs$replace
-  honesty <- inputs$honesty
-  honest_data <- forest$info$honestData
-  train_data <- forest$info$trainData
+  inputs          <- forest$info$inputs
+  categories      <- forest$info$categories
+  replace         <- inputs$replace
+  honesty         <- inputs$honesty
+  honest_data     <- forest$info$honestData
+  train_data      <- forest$info$trainData
   honest_ind_data <- forest$info$indicatorData # indicator data needed for indicator predictions
 
   # -------------------------------------------------------------------------------- #
@@ -998,7 +1010,7 @@ predict.orf <- function(object, newdata = NULL, type = NULL, inference = NULL, .
 
   } else {
 
-    # take out list of ranger objects (be careful, its forests with S at the end!)
+    # take out list of ranger objects
     forest <- forest$forests
 
     ## get train data names (only X)
@@ -1058,7 +1070,6 @@ predict.orf <- function(object, newdata = NULL, type = NULL, inference = NULL, .
     if (honesty == FALSE & inference == FALSE) {
 
       ## no honest splitting, i.e. use all data, no inference
-
       # predict with ncat-1 forests as in ranger default
       pred <- lapply(forest, function(x) predict(x, data = newdata)$predictions)
 
@@ -1217,7 +1228,7 @@ predict.orf <- function(object, newdata = NULL, type = NULL, inference = NULL, .
 
       } else {
 
-        # use standard pred_orf_variance
+        ## use standard pred_orf_variance
         # get indicator outcomes out of honest indicator data
         Y_ind_honest <- lapply(honest_ind_data, function(x) x[, 1])
 
@@ -1270,6 +1281,8 @@ predict.orf <- function(object, newdata = NULL, type = NULL, inference = NULL, .
 #' @param x predicted Ordered Forest object of class \code{orf.prediction}
 #' @param ... further arguments (currently ignored)
 #'
+#' @author Gabriel Okasa
+#'
 #' @examples
 #' #\dontrun{
 #'
@@ -1303,9 +1316,6 @@ predict.orf <- function(object, newdata = NULL, type = NULL, inference = NULL, .
 #'
 #' @export
 print.orf.prediction <- function(x, ...) {
-
-  # needed inputs for the function: forest - forest object coming from predict.orf function
-  #                                        - ... additional arguments (currently ignored)
 
   # -------------------------------------------------------------------------------- #
 
@@ -1378,6 +1388,8 @@ print.orf.prediction <- function(x, ...) {
 #' @param latex logical, if TRUE latex coded summary will be generated (default is FALSE)
 #' @param ... further arguments (currently ignored)
 #'
+#' @author Gabriel Okasa
+#'
 #' @examples
 #' #\dontrun{
 #'
@@ -1412,9 +1424,6 @@ print.orf.prediction <- function(x, ...) {
 #'
 #' @export
 summary.orf.prediction <- function(object, latex = FALSE, ...) {
-
-  # needed inputs for the function: forest - forest object coming from predict.orf function
-  #                                        - ... additional arguments (currently ignored)
 
   # -------------------------------------------------------------------------------- #
 

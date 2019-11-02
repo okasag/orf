@@ -1,3 +1,29 @@
+# -----------------------------------------------------------------------------
+# This file is part of orf.
+#
+# orf is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# orf is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with orf. If not, see <http://www.gnu.org/licenses/>.
+#
+# Written by:
+#
+# Gabriel Okasa
+# Swiss Institute for Empirical Economic Research
+# University of St.Gallen
+# Varnbüelstrasse 14
+# 9000 St.Gallen
+# Switzerland
+# -----------------------------------------------------------------------------
+
 #' Marginal Effects
 #'
 #' @description
@@ -11,6 +37,8 @@
 #' @param inference logical, if TRUE inference on marginal effects will be conducted (default is inherited from the \code{orf} object)
 #' @param window numeric, share of standard deviation of X to be used for evaluation of the marginal effect (default is 0.1)
 #' @param newdata numeric matrix X containing the new observations for which the marginal effects should be estimated
+#'
+#' @author Gabriel Okasa
 #'
 #' @examples
 #' #\dontrun{
@@ -32,6 +60,7 @@
 #' margins(orf)
 #'
 #' #}
+#'
 #' @export
 margins <- function(forest, eval = NULL, inference = NULL, window = NULL, newdata = NULL) UseMethod("margins")
 
@@ -84,6 +113,8 @@ margins.default <- function(forest, eval = NULL, inference = NULL, window = NULL
 #'       \item{tvalues}{t-values of marginal effects}
 #'       \item{pvalues}{p-values of marginal effects}
 #'
+#' @author Gabriel Okasa
+#'
 #' @examples
 #' #\dontrun{
 #'
@@ -124,9 +155,6 @@ margins.default <- function(forest, eval = NULL, inference = NULL, window = NULL
 #' @export
 margins.orf <- function(forest, eval = NULL, inference = NULL, window = NULL, newdata = NULL) {
 
-  # needed inputs for the function: forest - trained forest object of class orf/mrf/brf
-  #                                 eval - string defining evaluation point for marginal effects
-  #                                 newdata - matrix of new Xs for which the marginal effects should be computed
   # ----------------------------------------------------------------------------------- #
 
   ## save forest inputs
@@ -211,11 +239,10 @@ margins.orf <- function(forest, eval = NULL, inference = NULL, window = NULL, ne
     }
 
   }
-  ### data checks done
 
   # ----------------------------------------------------------------------------------- #
 
-  ### data preparation and checks
+  ## data preparation and checks
   # check the window size
   window <- check_window(window)
   # get number of observations
@@ -233,7 +260,7 @@ margins.orf <- function(forest, eval = NULL, inference = NULL, window = NULL, ne
 
   # ----------------------------------------------------------------------------------- #
 
-  ### marginal effects preparation
+  ## marginal effects preparation
   # share of SD to be used
   h_std <- window
   # check if X is continuous or dummy or categorical
@@ -249,7 +276,7 @@ margins.orf <- function(forest, eval = NULL, inference = NULL, window = NULL, ne
 
   # ----------------------------------------------------------------------------------- #
 
-  ### check the evaluation point
+  # check the evaluation point
   if (eval == "atmean") {
     # variable of interest: X_1 to X_last, ME at mean
     X_mean <- lapply(1:ncol(X_eval), function(x) t(as.matrix(colMeans(X_eval)))) # set all Xs to their mean values (so many times as we have Xs)
@@ -257,7 +284,7 @@ margins.orf <- function(forest, eval = NULL, inference = NULL, window = NULL, ne
     # variable of interest: X_1 to X_last, ME at median
     X_mean <- lapply(1:ncol(X_eval), function(x) t(as.matrix(apply(X_eval, 2, median)))) # set all Xs to their median values (so many times as we have Xs)
   } else if (eval == "mean") {
-    # # variable of interest: X_1 to X_last, mean ME
+    # variable of interest: X_1 to X_last, mean ME
     X_mean <- lapply(1:ncol(X_eval), function(x) X_eval) # set all Xs to their exact values (so many times as we have Xs)
   } else {
     stop("Incorrect evaluation point. This must be one of be one of mean, atmean, or atmedian. Programme terminated.")
@@ -265,7 +292,7 @@ margins.orf <- function(forest, eval = NULL, inference = NULL, window = NULL, ne
 
   # ----------------------------------------------------------------------------------- #
 
-  ### get data needed for evaluation of ME
+  ## get data needed for evaluation of ME
   # get number of evaluation points
   X_rows <- nrow(X_mean[[1]])
   # get number of Xs
@@ -298,7 +325,6 @@ margins.orf <- function(forest, eval = NULL, inference = NULL, window = NULL, ne
     X_down <- (X_down > X_min) * X_down + (X_down <= X_min) * X_min
 
   }
-  # checks for support of X done
 
   # ----------------------------------------------------------------------------------- #
 
@@ -330,10 +356,10 @@ margins.orf <- function(forest, eval = NULL, inference = NULL, window = NULL, ne
 
   # ----------------------------------------------------------------------------------- #
 
-  ### check honesty and inference
+  ## check honesty and inference
   if (forest_honesty == FALSE & inference == FALSE) {
 
-    #### now we do not need weights if we do not need inference (based on out of bag predictions)
+    ## now we do not need weights if we do not need inference (based on out of bag predictions)
     # forest prediction for X_mean_up (mean doesnt matter for atmean or atmedian)
     forest_pred_up <- lapply(forest$forests, function(x) lapply(X_mean_up, function(y) mean(predict(x, data = y)$predictions)))
     # forest prediction for X_mean_down (mean doesnt matter for atmean or atmedian)
@@ -341,15 +367,15 @@ margins.orf <- function(forest, eval = NULL, inference = NULL, window = NULL, ne
 
   } else if (forest_honesty == TRUE & inference == FALSE) {
 
-    # do honest predictions
-    # forest prediction for X_mean_up (use new faster function particularly for ME)
+    ## do honest predictions
+    # forest prediction for X_mean_up
     forest_pred_up <- predict_forest_preds_for_ME(forest$forests, data_ind, X_mean_up)
     # forest prediction for X_mean_down
     forest_pred_down <- predict_forest_preds_for_ME(forest$forests, data_ind, X_mean_down)
 
   } else if (forest_honesty == TRUE & inference == TRUE) {
 
-    # do honest predictions with weight based inference
+    ## do honest predictions with weight based inference
     # extract weights for desired Xs up: get weights from honest sample and predict weights for evaluation points from HONEST sample
     forest_weights_up <- predict_forest_weights_for_ME(forest$forests, X, X_mean_up)
     # extract weights for desired Xs down
@@ -365,7 +391,7 @@ margins.orf <- function(forest, eval = NULL, inference = NULL, window = NULL, ne
 
   # ----------------------------------------------------------------------------------- #
 
-  ### form ORF predictions
+  ## form ORF predictions
   # prepare up
   forest_pred_up_1 <- append(forest_pred_up, list(rep(list(rep(1, 1)), X_cols))) # append 1
   forest_pred_up_0 <- append(list(rep(list(rep(0, 1)), X_cols)), forest_pred_up) # prepend 0
@@ -390,7 +416,7 @@ margins.orf <- function(forest, eval = NULL, inference = NULL, window = NULL, ne
 
   # ----------------------------------------------------------------------------------- #
 
-  ### now subtract the predictions according to the ME formula
+  ## now subtract the predictions according to the ME formula
   forest_pred_diff_up_down <- mapply(function(x,y) mapply(function(x,y) x-y, x, y,  SIMPLIFY = F), forest_pred_up, forest_pred_down, SIMPLIFY = F)
   # compute the scaling factor: X_up-X_down=2*X_sd
   scaling_factor <- lapply(1:X_cols, function(i) mean(as.numeric((X_up - X_down)[, i]))) # save it as separate list vectors (mean doesnt change anything for "atmean" option)
@@ -413,8 +439,8 @@ margins.orf <- function(forest, eval = NULL, inference = NULL, window = NULL, ne
 
   if (inference == TRUE) {
 
-    ### variance for the marginal effects
-    ## compute prerequisities for variance of honest marginal effects
+    ## variance for the marginal effects
+    # compute prerequisities for variance of honest marginal effects
     # mean of scaling factor and squared afterwards (for atmean and atmedian the averaging doesnt change anything)
     scaling_factor_squared <- lapply(scaling_factor, function(x) (mean(x))^2)
 
@@ -433,7 +459,7 @@ margins.orf <- function(forest, eval = NULL, inference = NULL, window = NULL, ne
     forest_multi_demeaned_sq_sum_norm <- lapply(forest_multi_demeaned, function(x) lapply(x, function(x) (sum(x^2))*(nrow(Y_ind[[1]])/(nrow(Y_ind[[1]])-1))))
 
     ## now compute the prerequisites for covariances
-    # multiply forest_var_multi_demeaned according to formula for covariance (shifted categories needed for computational convenience)
+    # multiply forest_multi_demeaned according to formula for covariance (shifted categories needed for computational convenience)
     forest_multi_demeaned_0_last <- append(forest_multi_demeaned, list(rep(list(matrix(0, ncol = ncol(forest_multi_demeaned[[1]][[1]]), nrow = nrow(forest_multi_demeaned[[1]][[1]]))), ncol(X_eval)))) # append zero matrix list
     forest_multi_demeaned_0_first <- append(list(rep(list(matrix(0, ncol = ncol(forest_multi_demeaned[[1]][[1]]), nrow = nrow(forest_multi_demeaned[[1]][[1]]))), ncol(X_eval))), forest_multi_demeaned) # prepend zero matrix list
     # compute the multiplication of category m with m-1 according to the covariance formula (sum, normalize and multiply by 2)
@@ -473,7 +499,7 @@ margins.orf <- function(forest, eval = NULL, inference = NULL, window = NULL, ne
     # take square root of variance
     sd_me <- sqrt(variance_me)
 
-    #### z scores and p values ####
+    # t values and p values
     t_value <- (marginal_effects)/(sd_me)
     # control for dividing zero by zero
     t_value[is.nan(t_value)] = 0
@@ -529,6 +555,8 @@ margins.orf <- function(forest, eval = NULL, inference = NULL, window = NULL, ne
 #' @param object estimated Ordered Forest Marginal Effect object of type \code{margins.orf}
 #' @param latex logical, if TRUE latex coded summary will be generated (default is FALSE)
 #' @param ... further arguments (currently ignored)
+#'
+#' @author Gabriel Okasa
 #'
 #' @examples
 #' #\dontrun{
@@ -672,6 +700,8 @@ summary.margins.orf <- function(object, latex = FALSE, ...) {
 #' @param x estimated Ordered Forest Marginal Effect object of type \code{margins.orf}
 #' @param ... further arguments (currently ignored)
 #'
+#' @author Gabriel Okasa
+#'
 #' @examples
 #' #\dontrun{
 #'
@@ -764,7 +794,7 @@ margins_output <- function(x) {
   output_matrix <- matrix(NA, nrow = 1, ncol = 4)
 
   cat("ORF Marginal Effects: \n\n")
-  cat("------------------------------------------------------------------------------", "\n")
+  cat("---------------------------------------------------------------------------", "\n")
 
   for (var_idx in 1:nrow(x$effects)) {
 
@@ -797,9 +827,9 @@ margins_output <- function(x) {
 
   }
 
-  cat("------------------------------------------------------------------------------", "\n")
+  cat("---------------------------------------------------------------------------", "\n")
   cat("Significance levels correspond to: *** .< 0.01, ** .< 0.05, * .< 0.1 \n")
-  cat("------------------------------------------------------------------------------", "\n")
+  cat("---------------------------------------------------------------------------", "\n")
 
 }
 
@@ -881,7 +911,7 @@ margins_output_latex <- function(x) {
 #'
 #' @keywords internal
 #'
-rep_row<-function(matrix, n){
+rep_row <- function(matrix, n){
   # thanks to: https://www.r-bloggers.com/a-quick-way-to-do-row-repeat-and-col-repeat-rep-row-rep-col/
   matrix(rep(matrix, each = n), nrow = n)
 }

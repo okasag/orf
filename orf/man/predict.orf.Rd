@@ -77,3 +77,6 @@ orf_pred <- predict(orf, newdata = X_test, type = "class")
 \seealso{
 \code{\link{summary.orf.prediction}}, \code{\link{print.orf.prediction}}
 }
+\author{
+Gabriel Okasa
+}

@@ -42,7 +42,11 @@ orf <- orf(X, Y)
 margins(orf)
 
 #}
+
 }
 \seealso{
 \code{\link{margins.orf}}, \code{\link{summary.margins.orf}} and \code{\link{print.margins.orf}}
+}
+\author{
+Gabriel Okasa
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/orf_dev.R
 \name{predict_forest_weights_for_ME}
 \alias{predict_forest_weights_for_ME}
-\title{ORF Predictions for Marginal Effects}
+\title{ORF Weight Predictions for Marginal Effects}
 \usage{
 predict_forest_weights_for_ME(forest, data, pred_data)
 }
@@ -17,6 +17,6 @@ predict_forest_weights_for_ME(forest, data, pred_data)
 list of weights
 }
 \description{
-Fast ORF Predictions for estimation of marginal effects at mean
+Fast ORF Weight Predictions for estimation of marginal effects at mean
 }
 \keyword{internal}

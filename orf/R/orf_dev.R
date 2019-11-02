@@ -1,3 +1,29 @@
+# -----------------------------------------------------------------------------
+# This file is part of orf.
+#
+# orf is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# orf is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with orf. If not, see <http://www.gnu.org/licenses/>.
+#
+# Written by:
+#
+# Gabriel Okasa
+# Swiss Institute for Empirical Economic Research
+# University of St.Gallen
+# Varnbüelstrasse 14
+# 9000 St.Gallen
+# Switzerland
+# -----------------------------------------------------------------------------
+
 #' Get ORF Variance
 #'
 #' get variance of ordered random forest predictions based on honest sample
@@ -15,12 +41,6 @@
 #'
 get_orf_variance <- function(honest_pred, honest_weights, train_pred, train_weights, Y_ind_honest) {
 
-  # needed inputs for the function: honest_pred - list of vectors of honest forest predictions
-  #                                 honest_weights - list of n x n matrices of honest forest weights
-  #                                 train_pred - list of vectors of honest forets predictions from train sample
-  #                                 train_weights - list of vectors of honest forets predictions from train sample
-  #                                 Y_ind_honest - list of vectors of 0-1 outcomes for the honest sample
-
   # ----------------------------------------------------------------------------------- #
 
   # first get honest and train rownames
@@ -31,9 +51,8 @@ get_orf_variance <- function(honest_pred, honest_weights, train_pred, train_weig
 
   # ----------------------------------------------------------------------------------- #
 
-  ### variance for the orf predictions
-  ## compute prerequisities for variance of honest orf predictions
-  ## compute the conditional means (predictions): already have this as forest_pred
+  ## single variances computation
+  # compute the conditional means (predictions): already have this as forest_pred
   # divide it by N to get the "mean"
   honest_pred_mean <- lapply(honest_pred, function(x) x/length(honest_pred[[1]]))
   train_pred_mean <- lapply(train_pred, function(x) x/length(train_pred[[1]]))
@@ -41,7 +60,6 @@ get_orf_variance <- function(honest_pred, honest_weights, train_pred, train_weig
   # calculate standard multiplication of weights and outcomes: honest_weights*y_ind_honest
   honest_multi <- mapply(function(x,y) lapply(seq_along(y), function(i) x[i, ] * y), honest_weights, Y_ind_honest, SIMPLIFY = FALSE)
   train_multi <- mapply(function(x,y) lapply(seq_along(y), function(i) x[i, ] * y), train_weights, Y_ind_honest, SIMPLIFY = FALSE)
-  # subtract the mean from each obs i
 
   # subtract the mean from each obs i
   honest_multi_demeaned <- mapply(function(x,y) mapply(function(x,y) x-y, x, y, SIMPLIFY = FALSE), honest_multi, honest_pred_mean, SIMPLIFY = FALSE)
@@ -56,8 +74,6 @@ get_orf_variance <- function(honest_pred, honest_weights, train_pred, train_weig
   honest_multi_demeaned_sq_sum <- lapply(honest_multi_demeaned_sq, function(x) lapply(x, function(x) sum(x)))
   train_multi_demeaned_sq_sum <- lapply(train_multi_demeaned_sq, function(x) lapply(x, function(x) sum(x)))
 
-  # divide by scaling factor
-  #forest_multi_demeaned_sq_sum_scaled <- lapply(forest_multi_demeaned_sq_sum, function(x) mapply(function(x,y) x/y, x, scaling_factor_squared, SIMPLIFY = FALSE) )
   # multiply by N/N-1 (normalize)
   honest_multi_demeaned_sq_sum_norm <- lapply(honest_multi_demeaned_sq_sum, function(x) lapply(x, function(x) x*(length(honest_pred[[1]])/(length(honest_pred[[1]])-1)) ))
   train_multi_demeaned_sq_sum_norm <- lapply(train_multi_demeaned_sq_sum, function(x) lapply(x, function(x) x*(length(train_pred[[1]])/(length(train_pred[[1]])-1)) ))
@@ -65,11 +81,10 @@ get_orf_variance <- function(honest_pred, honest_weights, train_pred, train_weig
   # put it into a shorter named object
   honest_variance <- honest_multi_demeaned_sq_sum_norm
   train_variance <- train_multi_demeaned_sq_sum_norm
-  ## single variances done
 
   # ----------------------------------------------------------------------------------- #
 
-  ## now compute the covariances
+  ## covariances computation
   # multiply forest_var_multi_demeaned according to formula for covariance (shifted categories needed for computational convenience)
   # honest sample
   honest_multi_demeaned_0_last <- append(honest_multi_demeaned, list(rep(list(matrix(0, ncol = ncol(honest_multi_demeaned[[1]][[1]]), nrow = nrow(honest_multi_demeaned[[1]][[1]]))), nrow(honest_multi_demeaned[[1]][[1]]) )))
@@ -97,7 +112,6 @@ get_orf_variance <- function(honest_pred, honest_weights, train_pred, train_weig
   # put it into a shorter named object
   honest_covariance <- honest_multi_demeaned_cov_sum_norm_mult2
   train_covariance <- train_multi_demeaned_cov_sum_norm_mult2
-  ## covariances done
 
   # ----------------------------------------------------------------------------------- #
 
@@ -110,11 +124,11 @@ get_orf_variance <- function(honest_pred, honest_weights, train_pred, train_weig
   train_variance_last <- append(train_variance, list(rep(list(0), nrow(train_multi_demeaned[[1]][[1]]) ))) # append zero element list
   train_variance_first <- append(list(rep(list(0), nrow(train_multi_demeaned[[1]][[1]]) )), train_variance) # prepend zero element list
 
-  ## put everything together according to formula: var_last + var_first - cov
+  # put everything together according to formula: var_last + var_first - cov
   honest_variance_final <- mapply(function(x,y,z) mapply(function(x,y,z) x+y-z, x, y, z, SIMPLIFY = FALSE), honest_variance_last, honest_variance_first, honest_covariance, SIMPLIFY = FALSE)
   train_variance_final <- mapply(function(x,y,z) mapply(function(x,y,z) x+y-z, x, y, z, SIMPLIFY = FALSE), train_variance_last, train_variance_first, train_covariance, SIMPLIFY = FALSE)
 
-  ## output for final variances of marginal effects
+  ## output for final variances
   # coerce to a matrix
   honest_var <- sapply(honest_variance_final, function(x) sapply(x, function(x) as.matrix(x)))
   train_var <- sapply(train_variance_final, function(x) sapply(x, function(x) as.matrix(x)))
@@ -157,10 +171,6 @@ get_orf_variance <- function(honest_pred, honest_weights, train_pred, train_weig
 #'
 pred_orf_variance <- function(honest_pred, honest_weights, Y_ind_honest) {
 
-  # needed inputs for the function: honest_pred - list of vectors of honest forest predictions
-  #                                 honest_weights - list of n x n matrices of honest forest weights
-  #                                 Y_ind_honest - list of vectors of 0-1 outcomes for the honest sample
-
   # ----------------------------------------------------------------------------------- #
 
   # get categories
@@ -168,14 +178,13 @@ pred_orf_variance <- function(honest_pred, honest_weights, Y_ind_honest) {
 
   # ----------------------------------------------------------------------------------- #
 
-  ### variance for the orf predictions
-  ## compute prerequisities for variance of honest orf predictions
-  ## compute the conditional means (predictions): already have this as forest_pred
+  ## single variances computation
+  # compute the conditional means (predictions): already have this as forest_pred
   # divide it by N to get the "mean"
   honest_pred_mean <- lapply(honest_pred, function(x) x/length(Y_ind_honest[[1]]))
 
-  # calculate standard multiplication of weights and outcomes: honest_weights*y_ind_honest (be careful with seq_along!) you have to go as many rows as honest_pred or honest_weights have
-  honest_multi <- mapply(function(x,y) lapply(seq_along(x[, 1]), function(i) x[i, ] * y), honest_weights, Y_ind_honest, SIMPLIFY = FALSE)  # subtract the mean from each obs i
+  # calculate standard multiplication of weights and outcomes: honest_weights*y_ind_honest (note with seq_along: as many rows as honest_pred or honest_weights)
+  honest_multi <- mapply(function(x,y) lapply(seq_along(x[, 1]), function(i) x[i, ] * y), honest_weights, Y_ind_honest, SIMPLIFY = FALSE)
 
   # subtract the mean from each obs i
   honest_multi_demeaned <- mapply(function(x,y) mapply(function(x,y) x-y, x, y, SIMPLIFY = FALSE), honest_multi, honest_pred_mean, SIMPLIFY = FALSE)
@@ -192,11 +201,10 @@ pred_orf_variance <- function(honest_pred, honest_weights, Y_ind_honest) {
 
   # put it into a shorter named object
   honest_variance <- honest_multi_demeaned_sq_sum_norm
-  ## single variances done
 
   # ----------------------------------------------------------------------------------- #
 
-  ## now compute the covariances
+  ##  covariances computation
   # multiply forest_var_multi_demeaned according to formula for covariance (shifted categories needed for computational convenience)
   # honest sample
   honest_multi_demeaned_0_last <- append(honest_multi_demeaned, list(rep(list(rep(0, length(honest_multi_demeaned[[1]][[1]]))), length(honest_multi_demeaned[[1]]))))
@@ -216,7 +224,6 @@ pred_orf_variance <- function(honest_pred, honest_weights, Y_ind_honest) {
 
   # put it into a shorter named object
   honest_covariance <- honest_multi_demeaned_cov_sum_norm_mult2
-  ## covariances done
 
   # ----------------------------------------------------------------------------------- #
 
@@ -226,10 +233,10 @@ pred_orf_variance <- function(honest_pred, honest_weights, Y_ind_honest) {
   honest_variance_last <- append(honest_variance, list(rep(list(0), length(honest_multi_demeaned[[1]])))) # append zero element list
   honest_variance_first <- append(list(rep(list(0), length(honest_multi_demeaned[[1]]))), honest_variance) # prepend zero element list
 
-  ## put everything together according to formula: var_last + var_first - cov
+  # put everything together according to formula: var_last + var_first - cov
   honest_variance_final <- mapply(function(x,y,z) mapply(function(x,y,z) x+y-z, x, y, z, SIMPLIFY = FALSE), honest_variance_last, honest_variance_first, honest_covariance, SIMPLIFY = FALSE)
 
-  ## output for final variances of marginal effects
+  ## output for final variances
   # coerce to a matrix
   honest_var <- sapply(honest_variance_final, function(x) sapply(x, function(x) as.matrix(x)))
 
@@ -265,10 +272,6 @@ pred_orf_variance <- function(honest_pred, honest_weights, Y_ind_honest) {
 #' @keywords internal
 #'
 predict_forest_preds_for_ME <- function(forest, data, pred_data) {
-
-  # needed inputs for the function: forest - list of ranger forest objects
-  #                                 data - list of n x n matrices of indicator data for orf
-  #                                 pred_data - list of prediction data (X_mean_up/down)
 
   # ----------------------------------------------------------------------------------- #
 
@@ -309,9 +312,9 @@ predict_forest_preds_for_ME <- function(forest, data, pred_data) {
 }
 
 
-#' ORF Predictions for Marginal Effects
+#' ORF Weight Predictions for Marginal Effects
 #'
-#' Fast ORF Predictions for estimation of marginal effects at mean
+#' Fast ORF Weight Predictions for estimation of marginal effects at mean
 #'
 #' @param forest list of ranger forest objects
 #' @param data list of n x n matrices of indicator data for orf
@@ -342,7 +345,6 @@ predict_forest_weights_for_ME <- function(forest, data, pred_data) {
 
     # start looping over all X_means
     for (X_index in seq_along(pred_data)) {
-      # foreach(X_index=seq_along(pred_data)) %do% {
 
       # now do the same for your prediction data
       leaf_IDs_pred <- predict(forest[[forest_index]], as.matrix(pred_data[[X_index]]), type = "terminalNodes")$predictions

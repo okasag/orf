@@ -3,7 +3,7 @@ Type: Package
 Title: Ordered Random Forests
 Version: 0.1.0.9000
 Date: 2019-10-29
-Author: Gabriel Okasa
+Author: Gabriel Okasa [aut, cre]
 Maintainer: Gabriel Okasa <gabriel.okasa@unisg.ch>
 Description: An implementation of the Ordered Forest estimator 
     as in Lechner & Okasa (2019). The Ordered Forest flexibly 
@@ -15,7 +15,7 @@ Description: An implementation of the Ordered Forest estimator
     as in standard econometric models for ordered choice. The core 
     forest algorithm relies on the fast C++ forest implementation 
     from the ranger package.
-License: GPL-3
+License: GPL-3 | file LICENSE
 Encoding: UTF-8
 LazyData: true
 Depends: R (>= 2.10)

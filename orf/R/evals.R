@@ -1,3 +1,29 @@
+# -----------------------------------------------------------------------------
+# This file is part of orf.
+#
+# orf is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# orf is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with orf. If not, see <http://www.gnu.org/licenses/>.
+#
+# Written by:
+#
+# Gabriel Okasa
+# Swiss Institute for Empirical Economic Research
+# University of St.Gallen
+# Varnbüelstrasse 14
+# 9000 St.Gallen
+# Switzerland
+# -----------------------------------------------------------------------------
+
 #' Ranked Probability Score
 #'
 #' Computes the mean ranked probability score (RPS) for evaluating the accuracy of
@@ -11,9 +37,6 @@
 #' @keywords internal
 #'
 rps <- function(predictions, observed){
-
-  #               predictions <- matrix of predictions (n x categories)
-  #               observed <- vector of observed ordered categorical outcomes (n x 1)
 
   # ------------------------------------------------------------------------------------ #
 
@@ -33,7 +56,7 @@ rps <- function(predictions, observed){
   # prepare 0 vector for rps
   rps <- numeric(npred)
 
-  # compute the rps
+  # compute the rps (thanks to: https://opisthokonta.net/?p=1333)
   for (rr in 1:npred){
 
     cumulative <- 0
@@ -53,6 +76,8 @@ rps <- function(predictions, observed){
   # return the mrps
   return(mrps)
 
+  # ------------------------------------------------------------------------------------ #
+
 }
 
 
@@ -69,9 +94,6 @@ rps <- function(predictions, observed){
 #' @keywords internal
 #'
 mse <- function(predictions, observed){
-
-  #               predictions <- matrix of predictions (n x categories)
-  #               observed <- vector of observed ordered categorical outcomes (n x 1)
 
   # ------------------------------------------------------------------------------------ #
 
@@ -93,5 +115,7 @@ mse <- function(predictions, observed){
 
   # return the mse
   return(mse)
+
+  # ------------------------------------------------------------------------------------ #
 
 }

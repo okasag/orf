@@ -140,5 +140,5 @@ orf <- orf(X, Y, num.trees = 2000, mtry = 3, min.node.size = 10,
 \code{\link{predict.orf}}, \code{\link{margins.orf}}
 }
 \author{
-Gabriel Okasa \email{gabriel.okasa@unisg.ch}
+Gabriel Okasa
 }

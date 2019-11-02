@@ -51,3 +51,6 @@ summary(orf_margins, latex = TRUE)
 #}
 
 }
+\author{
+Gabriel Okasa
+}

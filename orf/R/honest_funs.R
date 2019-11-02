@@ -1,3 +1,29 @@
+# -----------------------------------------------------------------------------
+# This file is part of orf.
+#
+# orf is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# orf is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with orf. If not, see <http://www.gnu.org/licenses/>.
+#
+# Written by:
+#
+# Gabriel Okasa
+# Swiss Institute for Empirical Economic Research
+# University of St.Gallen
+# Varnbüelstrasse 14
+# 9000 St.Gallen
+# Switzerland
+# -----------------------------------------------------------------------------
+
 #' Get Honest Predictions
 #'
 #' get honest prediction, i.e. fitted values for in sample data
@@ -16,15 +42,11 @@
 #'
 get_honest <- function(forest, honest_data, train_data) {
 
-  # needed inputs for the function: forest      - estimated forest object of type ranger
-  #                                 honest_data - honest dataframe
-  #                                 train_data  - train dataframe
-
   # ----------------------------------------------------------------------------------- #
 
   # get terminal nodes for the honest sample, i.e. run honest sample through forest
   honest_leaves <- predict(forest, honest_data, type = "terminalNodes")$predictions
-  train_leaves <- predict(forest, train_data, type = "terminalNodes")$predictions
+  train_leaves  <- predict(forest, train_data, type = "terminalNodes")$predictions
   # filter out unique leaves for each tree
   unique_leaves <- apply(honest_leaves, 2, unique)
   unique_leaves_train <- apply(train_leaves, 2, unique)
@@ -33,19 +55,18 @@ get_honest <- function(forest, honest_data, train_data) {
 
   # --------------------------------------------------------------------------------------------------- #
 
-  #### Rcpp implementation ####
+  # Rcpp implementation
   honest_fitted_values <- as.matrix(get_honest_C(unique_leaves, honest_y, honest_leaves, train_leaves))
 
   # --------------------------------------------------------------------------------------------------- #
 
   # combine the two into a complete dataset (first honest rownames, then train rownames)
   rownames(honest_fitted_values) <- c(rownames(honest_data), rownames(train_data)) # put original rownames in
-  #forest_fitted_values <- rbind(train_fitted_values, honest_fitted_values) # put the sample together
-  forest_fitted_values <- honest_fitted_values[order(as.numeric(row.names(honest_fitted_values))), ] # order according to rownames
+  # order according to rownames
+  forest_fitted_values <- honest_fitted_values[order(as.numeric(row.names(honest_fitted_values))), ]
 
   # put it into output
   output <- as.numeric(forest_fitted_values)
-  #names(output) <- "honestPred"
 
   # --------------------------------------------------------------------------------------------------- #
 
@@ -74,18 +95,13 @@ get_honest <- function(forest, honest_data, train_data) {
 #'
 predict_honest <- function(forest, honest_data, test_data) {
 
-  # needed inputs for the function: forest - estimated forest object of type ranger
-  #                                 honest_data - honest dataframe
-  #                                 test_data - test dataframe
-
   # ----------------------------------------------------------------------------------- #
 
   # get terminal nodes for the honest sample, i.e. run honest sample through forest
   honest_leaves <- predict(forest, honest_data, type = "terminalNodes")$predictions
-  test_leaves <- predict(forest, test_data, type = "terminalNodes")$predictions
+  test_leaves   <- predict(forest, test_data, type = "terminalNodes")$predictions
   # filter out unique leaves for each tree
   unique_leaves <- apply(honest_leaves, 2, unique)
-  #unique_leaves_test <- apply(test_leaves, 2, unique)
   # take honest outcomes
   honest_y <- as.numeric(honest_data[, 1])
 
@@ -94,7 +110,7 @@ predict_honest <- function(forest, honest_data, test_data) {
   # new Rcpp prediction
   honest_pred <- pred_honest_C(unique_leaves, honest_y, honest_leaves, test_leaves)
 
-  # --------------------------------------------------------------------------------------------------- #
+  # ------------------------------------------------------------------------------------ #
 
   # put it into output
   output <- as.numeric(honest_pred)
@@ -121,6 +137,8 @@ predict_honest <- function(forest, honest_data, test_data) {
 #' @keywords internal
 #'
 honest_split <- function(data, honesty.fraction, orf) {
+
+  # ------------------------------------------------------------------------------------ #
 
   # get number of observations in total
   n <- nrow(data)
@@ -152,7 +170,7 @@ honest_split <- function(data, honesty.fraction, orf) {
 
     }
 
-    # check if in the above procedure was succesful
+    # check if the above procedure was succesful
     if (all(sort(unique(train[, 1])) != sort(unique(honest[, 1])))) {
       stop("At least one of the categories of the input matrix Y contains too few observations.
            This prevents an optimal honesty split. Consider recoding your outcome into less categories or set honesty = FALSE.")
@@ -172,6 +190,8 @@ honest_split <- function(data, honesty.fraction, orf) {
 
     }
 
+  # ------------------------------------------------------------------------------------ #
+
   # put it into output
   output <- list(train, honest)
   # set names
@@ -179,6 +199,8 @@ honest_split <- function(data, honesty.fraction, orf) {
 
   # return output
   return(output)
+
+  # ------------------------------------------------------------------------------------ #
 
 }
 

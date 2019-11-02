@@ -85,3 +85,6 @@ margins(orf, eval = "atmedian", inference = TRUE, window = 0.5, newdata = X[1:10
 \seealso{
 \code{\link{summary.margins.orf}}, \code{\link{print.margins.orf}}
 }
+\author{
+Gabriel Okasa
+}

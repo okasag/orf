@@ -20,13 +20,6 @@ statistical inference thereof and thus provides similar output as in standard
 econometric models for ordered choice. The core forest algorithm relies on the
 fast `C++` forest implementation from the `ranger` package [@Wright2017].
 
-In order to install `orf` type the following to make sure that all needed
-packages are installed:
-
-```{r install, eval = FALSE}
-#install.packages("orf", dependencies = c("Depends", "Suggests"))
-```
-
 The development page of the package is located at [https://github.com/okasag/orf/](https://github.com/okasag/orf/).
 
 ## orf: Algorithm
@@ -50,29 +43,28 @@ Then, the algorithm can be described as follows:
 **Algorithm**: Ordered Forest
 
 ******
-* **input:** Data ($X,Y$)  
-* **output:** Class Probabilities $P[Y=m \mid X=x]$  
+**input:** Data ($X,Y$)  
+**output:** Class Probabilities $\hat{P}[Y=m \mid X=x]$  
 
  * 1 **procedure** Ordered Forest  
-
-    + 2 **do** Cumulative Probabilities    
+    + 2 **subprocedure** Cumulative Probabilities    
         - 3 **for** $m=0,...,M$:  
             - 4 **create** binary indicator variables according to: $Y_{m,i}=\mathbf{1}(Y_i \leq m)$  
             - 5 **estimate** regression random forest for: $P[Y_{m,i}=1 \mid X_i=x]$  
-            - 6 **predict** conditional probabilities as: $\hat{Y}_{m,i}=\hat{P}[Y_{m,i}=1 \mid X_i=x] = \sum^N_{i=1}\hat{w}_{m,i}(x)Y_{m,i}$  
+            - 6 **predict** conditional probabilities as: $\hat{Y}_{m,i}=\hat{P}[Y_{m,i}=1 \mid X_i=x]$
         - 7 **endfor**  
-    + 8 **endo**    
+    + 8 **end subprocedure**    
     
-    + 9 **do** Class Probabilities  
+    + 9 **subprocedure** Class Probabilities  
         - 10 **for** $m=1,...,M$:  
             - 11 **compute** probabilities for each class as: $\hat{P}_{m,i}=\hat{Y}_{m,i}-\hat{Y}_{m-1,i}$  
             - 12 **if** $\hat{P}_{m,i}<0$  
                 - 13 **set** $\hat{P}_{m,i}=0$ and $\hat{P}_{m,i}=\frac{\hat{P}_{m,i}}{\sum^{M}_{m=1}\hat{P}_{m,i}}$  
             - 14 **endif**  
         - 15 **endfor**  
-    + 16 **endo**    
+    + 16 **end subprocedure**    
     
- * 17 **end procedure** Ordered Forest
+ * 17 **end procedure**
 
 
 ******

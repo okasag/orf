@@ -1,29 +1,3 @@
-# -----------------------------------------------------------------------------
-# This file is part of orf.
-#
-# orf is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# orf is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with orf. If not, see <http://www.gnu.org/licenses/>.
-#
-# Written by:
-#
-# Gabriel Okasa
-# Swiss Institute for Empirical Economic Research
-# University of St.Gallen
-# Varnbüelstrasse 14
-# 9000 St.Gallen
-# Switzerland
-# -----------------------------------------------------------------------------
-
 #' Marginal Effects
 #'
 #' @description
@@ -298,7 +272,7 @@ margins.orf <- function(forest, eval = NULL, inference = NULL, window = NULL, ne
   # get number of Xs
   X_cols <- ncol(X_mean[[1]])
   # get SD of Xs
-  X_sd <- rep_row(apply(X, 2, sd), n = X_rows)
+  X_sd <- matrix(rep(apply(X, 2, sd), times = 1, each = X_rows), nrow = X_rows)
   # create X_up (X_mean + 0.1 * X_sd)
   X_up <- X_mean[[1]] + h_std*X_sd
   # create X_down (X_mean - 0.1 * X_sd)
@@ -306,9 +280,9 @@ margins.orf <- function(forest, eval = NULL, inference = NULL, window = NULL, ne
 
   ## now check for the support of X
   # check X_max
-  X_max <- rep_row(apply(X, 2, max), n = X_rows)
+  X_max <- matrix(rep(apply(X, 2, max), times = 1, each = X_rows), nrow = X_rows)
   # check X_min
-  X_min <- rep_row(apply(X, 2, min), n = X_rows)
+  X_min <- matrix(rep(apply(X, 2, min), times = 1, each = X_rows), nrow = X_rows)
   # check if X_up is within the range X_min and X_max
   X_up <- (X_up < X_max) * X_up + (X_up >= X_max) * X_max
   X_up <- (X_up > X_min) * X_up + (X_up <= X_min) * (X_min + h_std * X_sd)
@@ -803,8 +777,7 @@ margins_output <- function(x) {
 
     for (cat_idx in 1:ncol(x$effects)) {
 
-      # generate stars (thanks to:
-      # http://myowelt.blogspot.com/2008/04/beautiful-correlation-tables-in-r.html)
+      # generate stars (inspired by and thanks to: http://myowelt.blogspot.com/2008/04/beautiful-correlation-tables-in-r.html)
       stars <- ifelse(x$pvalues[var_idx, cat_idx] < .01, "***",
                       ifelse(x$pvalues[var_idx, cat_idx] < .05, "** ",
                              ifelse(x$pvalues[var_idx, cat_idx] < .1, "*  ", "   ")))
@@ -863,8 +836,7 @@ margins_output_latex <- function(x) {
 
     for (cat_idx in 1:ncat) {
 
-      # generate stars (thanks to:
-      # http://myowelt.blogspot.com/2008/04/beautiful-correlation-tables-in-r.html)
+      # generate stars (inspired by and thanks to: http://myowelt.blogspot.com/2008/04/beautiful-correlation-tables-in-r.html)
       stars <- ifelse(x$pvalues[var_idx+1, cat_idx] < .01, "***",
                       ifelse(x$pvalues[var_idx+1, cat_idx] < .05, "** ",
                              ifelse(x$pvalues[var_idx+1, cat_idx] < .1, "*  ", "   ")))
@@ -899,19 +871,4 @@ margins_output_latex <- function(x) {
   # put hline after each variable
   print.xtable(xoutput, hline.after = c(0, seq(ncat, ncat*nvar, ncat)), type = "latex", include.rownames = FALSE, comment = FALSE)
 
-}
-
-
-#' repeat rows of a matrix
-#'
-#' function for replicating rows of a matrix n number of times
-#'
-#' @param matrix matrix which rows should be replicated
-#' @param n number of times to repeat
-#'
-#' @keywords internal
-#'
-rep_row <- function(matrix, n){
-  # thanks to: https://www.r-bloggers.com/a-quick-way-to-do-row-repeat-and-col-repeat-rep-row-rep-col/
-  matrix(rep(matrix, each = n), nrow = n)
 }

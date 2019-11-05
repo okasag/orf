@@ -1,29 +1,3 @@
-// -----------------------------------------------------------------------------
-// This file is part of orf.
-//
-// orf is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// orf is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with orf. If not, see <http://www.gnu.org/licenses/>.
-//
-// Written by:
-//
-// Gabriel Okasa
-// Swiss Institute for Empirical Economic Research
-// University of St.Gallen
-// Varnbüelstrasse 14
-// 9000 St.Gallen
-// Switzerland
-// -----------------------------------------------------------------------------
-
 #include <Rcpp.h>
 using namespace Rcpp;
 

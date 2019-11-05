@@ -1,6 +1,6 @@
 ---
-title: "orf: ordered random forests"
-author: "Gabriel Okasa"
+title: "orf: Ordered Random Forests"
+author: "Gabriel Okasa and Michael Lechner"
 output: rmarkdown::html_vignette
 bibliography: library.bib
 vignette: >

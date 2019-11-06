@@ -1,6 +1,6 @@
-## orf: ordered random forests
+# orf: ordered random forests
 
-### Description
+## Introduction
 
 The `R` package `orf` is an implementation of the Ordered Forest estimator
 as in Lechner & Okasa (2019). The Ordered Forest flexibly estimates the conditional
@@ -11,7 +11,9 @@ statistical inference thereof and thus provides similar output as in standard
 econometric models for ordered choice. The core forest algorithm relies on the
 fast `C++` forest implementation from the `ranger` package (Wright & Ziegler, 2017).
 
-### Examples
+## Examples
+
+The examples below demonstrate the basic functionality of the `orf` package.
 
 ```r
 ## Ordered Forest
@@ -45,7 +47,9 @@ margins(orf)
 ## end of example
 ```
 
-### References
+For a more detailed examples see the package vignette.
+
+## References
 
 - Lechner, M., & Okasa, G. (2019). Random Forest Estimation of the Ordered Choice Model. arXiv preprint arXiv:1907.02436. <https://arxiv.org/abs/1907.02436>
 - Goller, D., Knaus, M. C., Lechner, M., & Okasa, G. (2018). Predicting Match Outcomes in Football by an Ordered Forest Estimator (No. 1811). University of St. Gallen, School of Economics and Political Science. <http://ux-tauri.unisg.ch/RePEc/usg/econwp/EWP-1811.pdf>

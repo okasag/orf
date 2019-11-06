@@ -1,6 +1,5 @@
 #' Ordered Forest Estimator
 #'
-#' @description
 #' An implementation of the Ordered Forest estimator
 #' as in Lechner & Okasa (2019). The Ordered Forest flexibly
 #' estimates the conditional probabilities of models with ordered
@@ -10,9 +9,8 @@
 #' as statistical inference thereof and thus provides similar output
 #' as in standard econometric models for ordered choice. The core
 #' forest algorithm relies on the fast C++ forest implementation
-#' from the ranger package.
+#' from the ranger package (Wright & Ziegler, 2017).
 #'
-#' @details
 #' The Ordered Forest function, \code{orf}, estimates the conditional ordered choice
 #' probabilities, i.e. P[Y=m|X=x]. Additionally, weight-based inference for
 #' the probability predictions can be conducted as well. If inference is desired,
@@ -73,7 +71,7 @@
 #'
 #' @references
 #' \itemize{
-#'   \item Lechner, M. & Okasa, G. (2019). Random Forest Estimation of the Ordered Choice Model. Lechner, M., & Okasa, G. (2019). Random Forest Estimation of the Ordered Choice Model. arXiv preprint arXiv:1907.02436. \url{https://arxiv.org/abs/1907.02436}
+#'   \item Lechner, M., & Okasa, G. (2019). Random Forest Estimation of the Ordered Choice Model. arXiv preprint arXiv:1907.02436. \url{https://arxiv.org/abs/1907.02436}
 #'   \item Goller, D., Knaus, M. C., Lechner, M., & Okasa, G. (2018). Predicting Match Outcomes in Football by an Ordered Forest Estimator (No. 1811). University of St. Gallen, School of Economics and Political Science. \url{http://ux-tauri.unisg.ch/RePEc/usg/econwp/EWP-1811.pdf}
 #'   \item Wright, M. N. & Ziegler, A. (2017). ranger: A fast implementation of random forests for high dimensional data in C++ and R. J Stat Softw 77:1-17. \url{https://doi.org/10.18637/jss.v077.i01}.
 #' }
@@ -513,10 +511,8 @@ orf <- function(X, Y,
 
 #' Plot of the Ordered Forest
 #'
-#' @description
 #' plot the probability distributions estimated by the Ordered Forest object of class \code{orf}
 #'
-#' @details
 #' \code{plot.orf} generates probability distributions, i.e. density plots of estimated
 #' ordered probabilities by the Ordered Forest for each outcome class considered.
 #' The plots effectively visualize the estimated probability density in contrast to
@@ -643,10 +639,8 @@ plot.orf <- function(x, ...) {
 
 #' Summary of the Ordered Forest
 #'
-#' @description
 #' summary of an estimated Ordered Forest object of class \code{orf}
 #'
-#' @details
 #' \code{summary.orf} provides a short summary of the Ordered Forest estimation,
 #' including the input information regarding the values of hyperparameters as
 #' well as the output information regarding the prediction accuracy.
@@ -762,10 +756,8 @@ summary.orf <- function(object, latex = FALSE, ...) {
 
 #' Print of the Ordered Forest
 #'
-#' @description
 #' print of an estimated Ordered Forest object of class \code{orf}
 #'
-#' @details
 #' \code{print.orf} provides a first glimpse of the Ordered Forest estimation,
 #' printed directly to the \code{R} console. The printed information contains
 #' the main inputs of the \code{orf} function.
@@ -843,10 +835,8 @@ print.orf <- function(x, ...) {
 
 #' Prediction of the Ordered Forest
 #'
-#' @description
 #' Prediction for new observations based on estimated Ordered Forest of class \code{orf}
 #'
-#' @details
 #' \code{predict.orf} estimates the conditional ordered choice probabilities,
 #' i.e. P[Y=m|X=x] for new data points (matrix X containing new observations
 #' of covariates) based on the estimated Ordered Forest object of class \code{orf}.
@@ -1244,10 +1234,8 @@ predict.orf <- function(object, newdata = NULL, type = NULL, inference = NULL, .
 
 #' Print of the Ordered Forest Prediction
 #'
-#' @description
 #' print of Ordered Forest predictions of class \code{orf.prediction}
 #'
-#' @details
 #' \code{print.orf.prediction} provides a first glimpse of the Ordered Forest
 #' prediction, printed directly to the \code{R} console. The printed information
 #' contains the main inputs of the \code{predict.orf} function.
@@ -1350,10 +1338,8 @@ print.orf.prediction <- function(x, ...) {
 
 #' Summary of the Ordered Forest Prediction
 #'
-#' @description
 #' summary of Ordered Forest predictions of class \code{orf.prediction}
 #'
-#' @details
 #' \code{summary.orf.prediction} provides a main summary of the Ordered Forest
 #' prediction, including the input information regarding the values of hyperparameters
 #' as well as the inputs of the \code{predict.orf} function.

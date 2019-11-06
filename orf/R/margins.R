@@ -1,6 +1,5 @@
 #' Marginal Effects
 #'
-#' @description
 #' S3 generic method for estimation of marginal effects
 #' of an Ordered Forest objects of class \code{orf}.
 #'
@@ -51,11 +50,9 @@ margins.default <- function(forest, eval = NULL, inference = NULL, window = NULL
 
 #' Marginal Effects for the Ordered Forest
 #'
-#' @description
 #' S3 method for estimation of marginal effects
 #' of an Ordered Forest objects of class \code{orf}.
 #'
-#' @details
 #' \code{margins.orf} estimates marginal effects at the mean, at the median, or
 #' the mean marginal effects, depending on the \code{eval} argument. It is advised
 #' to increase the number of subsampling replications in the supplied \code{orf}
@@ -516,10 +513,8 @@ margins.orf <- function(forest, eval = NULL, inference = NULL, window = NULL, ne
 
 #' Summary of the Ordered Forest Marginal Effects
 #'
-#' @description
 #' summary of estimated marginal effects of the Ordered Forest of class \code{margins.orf}
 #'
-#' @details
 #' \code{summary.margins.orf} provides estimation results of the Ordered Forest
 #' marginal effects. The summary contains the results for the marginal effects
 #' for each covariate and each outcome class, optionally with inference as well.
@@ -663,10 +658,8 @@ summary.margins.orf <- function(object, latex = FALSE, ...) {
 
 #' Print of the Ordered Forest Marginal Effects
 #'
-#' @description
 #' print of estimated marginal effects of the Ordered Forest of class \code{margins.orf}
 #'
-#' @details
 #' \code{print.margins.orf} provides a first glimpse of the Ordered Forest
 #' marginal effects, printed directly to the \code{R} console. The printed information
 #' contains the results for the marginal effects for each covariate and each outcome class.

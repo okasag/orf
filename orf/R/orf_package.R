@@ -1,6 +1,5 @@
 #' orf: Ordered Random Forests
 #'
-#' @description
 #' An implementation of the Ordered Forest estimator
 #' as in Lechner & Okasa (2019). The Ordered Forest flexibly
 #' estimates the conditional probabilities of models with ordered
@@ -10,7 +9,7 @@
 #' as statistical inference thereof and thus provides similar output
 #' as in standard econometric models for ordered choice. The core
 #' forest algorithm relies on the fast C++ forest implementation
-#' from the ranger package.
+#' from the ranger package (Wright & Ziegler, 2017).
 #'
 #' @docType package
 #'
@@ -47,7 +46,7 @@
 #'
 #' @references
 #' \itemize{
-#'   \item Lechner, M. & Okasa, G. (2019). Random Forest Estimation of the Ordered Choice Model. Lechner, M., & Okasa, G. (2019). Random Forest Estimation of the Ordered Choice Model. arXiv preprint arXiv:1907.02436. \url{https://arxiv.org/abs/1907.02436}
+#'   \item Lechner, M., & Okasa, G. (2019). Random Forest Estimation of the Ordered Choice Model. arXiv preprint arXiv:1907.02436. \url{https://arxiv.org/abs/1907.02436}
 #'   \item Goller, D., Knaus, M. C., Lechner, M., & Okasa, G. (2018). Predicting Match Outcomes in Football by an Ordered Forest Estimator (No. 1811). University of St. Gallen, School of Economics and Political Science. \url{http://ux-tauri.unisg.ch/RePEc/usg/econwp/EWP-1811.pdf}
 #'   \item Wright, M. N. & Ziegler, A. (2017). ranger: A fast implementation of random forests for high dimensional data in C++ and R. J Stat Softw 77:1-17. \url{https://doi.org/10.18637/jss.v077.i01}.
 #' }

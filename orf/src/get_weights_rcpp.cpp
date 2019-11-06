@@ -13,7 +13,6 @@ using namespace Rcpp;
 // [[Rcpp::export]]
 NumericMatrix get_weights_C(List x, List y, List z) {
 
-// Funtion inputs:
 // leaf_IDs_train - list of leaf IDs in train data
 // leaf_IDs - list of leaf IDs in honest data
 // leaf_size - list of leaf sizes in honest data
@@ -36,7 +35,7 @@ NumericMatrix get_weights_C(List x, List y, List z) {
   // now loop over trees
   for(int l = 0; l < nlist; ++l) {
 
-	    // take elements of lists as vectors
+	          // take elements of lists as vectors
             NumericVector leaf_IDs_train = as<NumericVector>(x[l]);
             NumericVector leaf_IDs       = as<NumericVector>(y[l]);
             NumericVector leaf_size      = as<NumericVector>(z[l]);
@@ -44,22 +43,22 @@ NumericMatrix get_weights_C(List x, List y, List z) {
             int n_leaf_IDs_train = leaf_IDs_train.size(); // how many different leaves are in train
             int n_leaf_IDs       = leaf_IDs.size(); // how many different leaves are in honest
 
-	    // matrix where rows are obs in train and cols are obs in honest
+	          // matrix where rows are obs in train and cols are obs in honest
             NumericMatrix tree_out_train(n_leaf_IDs_train, n_leaf_IDs);
-	    // matrix where rows are obs in honest and cols are obs in honest
+	          // matrix where rows are obs in honest and cols are obs in honest
             NumericMatrix tree_out_honest(n_leaf_IDs, n_leaf_IDs);
 
-	    // loops to go element by element and check the equality of leaves in each tree for train
+	          // loops to go element by element and check the equality of leaves in each tree for train
             for(int i = 0; i < n_leaf_IDs_train; ++i) {
             	for(int j = 0; j < n_leaf_IDs; ++j) {
 
-		    tree_out_train(i,j) = leaf_IDs_train[i]==leaf_IDs[j]; // are leaves equal
-		    tree_out_train(i,j) = tree_out_train(i,j)/leaf_size[j]; // normalize by leaf size
+        		    tree_out_train(i,j) = leaf_IDs_train[i]==leaf_IDs[j]; // are leaves equal
+        		    tree_out_train(i,j) = tree_out_train(i,j)/leaf_size[j]; // normalize by leaf size
 
             	}
             }
 
-	    // loop to add each tree weight to overall forest weight
+	          // loop to add each tree weight to overall forest weight
             for(int i = 0; i < n_leaf_IDs_train; ++i) {
               for(int j = 0; j < n_leaf_IDs; ++j) {
 
@@ -67,20 +66,20 @@ NumericMatrix get_weights_C(List x, List y, List z) {
 
               }
             }
-	    // train sample done
+	          // train sample done
 
-	    // now do the same weight computation for honest sample
-	    // loops to go element by element and check the equality of leaves in each tree for honest
+      	    // now do the same weight computation for honest sample
+      	    // loops to go element by element and check the equality of leaves in each tree for honest
             for(int i = 0; i < n_leaf_IDs; ++i) {
             	for(int j = 0; j < n_leaf_IDs; ++j) {
 
-		    tree_out_honest(i,j) = leaf_IDs[i]==leaf_IDs[j]; // are leaves equal
-		    tree_out_honest(i,j) = tree_out_honest(i,j)/leaf_size[j]; // normalize by leaf size
+        		    tree_out_honest(i,j) = leaf_IDs[i]==leaf_IDs[j]; // are leaves equal
+        		    tree_out_honest(i,j) = tree_out_honest(i,j)/leaf_size[j]; // normalize by leaf size
 
             	}
             }
 
-	    // loop to add each tree weight to overall forest weight
+	          // loop to add each tree weight to overall forest weight
             for(int i = 0; i < n_leaf_IDs; ++i) {
               for(int j = 0; j < n_leaf_IDs; ++j) {
 
@@ -88,8 +87,10 @@ NumericMatrix get_weights_C(List x, List y, List z) {
 
               }
             }
-	    // honest sample done
+	          // honest sample done
 
+	          // check for user interruptions
+	          Rcpp::checkUserInterrupt();
   }
 
   // loop to divide each element of a matrix by number of trees to get mean weights

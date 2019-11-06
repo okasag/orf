@@ -1,6 +1,5 @@
 #' Simulated Example Dataset
 #'
-#' @description
 #' A simulated example dataset with ordered categorical outcome variable
 #' containing different types of covariates for illustration purposes.
 #'

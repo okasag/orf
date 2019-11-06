@@ -9,7 +9,7 @@ package provides functions for estimating marginal effects as well
 as statistical inference thereof and thus provides similar output
 as in standard econometric models for ordered choice. The core
 forest algorithm relies on the fast C++ forest implementation
-from the ranger package.
+from the ranger package (Wright & Ziegler, 2017).
 
 ## author
 
@@ -18,9 +18,10 @@ from the ranger package.
 ## dependencies
 
 - main orf functions rely on the fast C++ implementation of the 
-random forest algorithm from the ranger package
+random forest algorithm from the ranger package (Wright & Ziegler, 2017)
 
 ## to do:
 
-- write new vignette
+- test checks() on all platforms
+- submit to CRAN
 

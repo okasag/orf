@@ -3,3 +3,5 @@
 ^doc$
 ^Meta$
 ^cran-comments.md$
+^NEWS\.md$
+^README\.md$

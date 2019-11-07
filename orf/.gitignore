@@ -1,5 +1,8 @@
 .Rproj.user
 .Rhistory
+.RData
+.Ruserdata
+.rda
 inst/doc
 /data
 doc

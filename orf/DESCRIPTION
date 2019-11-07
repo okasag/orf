@@ -6,14 +6,14 @@ Date: 2019-10-29
 Author: Gabriel Okasa [aut, cre], Michael Lechner [ctb]
 Maintainer: Gabriel Okasa <gabriel.okasa@unisg.ch>
 Description: An implementation of the Ordered Forest estimator as in 
-    Lechner & Okasa (2019). The Ordered Forest flexibly estimates the
-    conditional probabilities of models with ordered categorical outcomes
-    (so-called ordered choice models). Additionally to common machine 
+    Lechner & Okasa (2019) <arXiv:1907.02436>. The Ordered Forest flexibly
+    estimates the conditional probabilities of models with ordered categorical
+    outcomes (so-called ordered choice models). Additionally to common machine 
     learning algorithms the orf package provides functions for estimating
-    marginal effects as well as statistical inference thereof and thus
-    provides similar output as in standard econometric models for ordered
-    choice. The core forest algorithm relies on the fast C++ forest 
-    implementation from the ranger package (Wright & Ziegler, 2017).
+    marginal effects as well as statistical inference thereof and thus provides
+    similar output as in standard econometric models for ordered choice. The
+    core forest algorithm relies on the fast C++ forest implementation from
+    the ranger package (Wright & Ziegler, 2017) <arXiv:1508.04409>.
 License: GPL-3 | file LICENSE
 Encoding: UTF-8
 LazyData: true

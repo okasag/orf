@@ -1,5 +1,5 @@
 ---
-title: "orf: Ordered Random Forests"
+title: "orf: ordered random forests"
 author: "Gabriel Okasa and Michael Lechner"
 output: rmarkdown::html_vignette
 bibliography: library.bib
@@ -19,8 +19,6 @@ package provides functions for estimating marginal effects as well as
 statistical inference thereof and thus provides similar output as in standard
 econometric models for ordered choice. The core forest algorithm relies on the
 fast `C++` forest implementation from the `ranger` package [@Wright2017].
-
-The development page of the package is located at [https://github.com/okasag/orf/](https://github.com/okasag/orf/).
 
 ## orf: Algorithm
 

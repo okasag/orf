@@ -22,7 +22,7 @@ including the input information regarding the values of hyperparameters as
 well as the output information regarding the prediction accuracy.
 }
 \examples{
-#\dontrun{
+\dontrun{
 
 # Ordered Forest
 require(orf)
@@ -35,15 +35,15 @@ Y <- as.numeric(odata[, 1])
 X <- as.matrix(odata[, -1])
 
 # estimate Ordered Forest
-orf <- orf(X, Y)
+orf_fit <- orf(X, Y)
 
 # show summary of the orf estimation
-summary(orf)
+summary(orf_fit)
 
 # show summary of the orf estimation coded in LaTeX
-summary(orf, latex = TRUE)
+summary(orf_fit, latex = TRUE)
 
-#}
+}
 
 }
 \author{

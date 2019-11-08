@@ -14,7 +14,7 @@
 #' @author Gabriel Okasa
 #'
 #' @examples
-#' #\dontrun{
+#' \dontrun{
 #'
 #' ## Ordered Forest
 #' require(orf)
@@ -27,12 +27,12 @@
 #' X <- as.matrix(odata[, -1])
 #'
 #' # estimate Ordered Forest
-#' orf <- orf(X, Y)
+#' orf_fit <- orf(X, Y)
 #'
 #' # estimate default marginal effects of the orf
-#' margins(orf)
+#' orf_margins <- margins(orf_fit)
 #'
-#' #}
+#' }
 #'
 #' @export
 margins <- function(forest, eval = NULL, inference = NULL, window = NULL, newdata = NULL) UseMethod("margins")
@@ -87,7 +87,7 @@ margins.default <- function(forest, eval = NULL, inference = NULL, window = NULL
 #' @author Gabriel Okasa
 #'
 #' @examples
-#' #\dontrun{
+#' \dontrun{
 #'
 #' ## Ordered Forest
 #' require(orf)
@@ -100,28 +100,29 @@ margins.default <- function(forest, eval = NULL, inference = NULL, window = NULL
 #' X <- as.matrix(odata[, -1])
 #'
 #' # estimate Ordered Forest
-#' orf <- orf(X, Y)
+#' orf_fit <- orf(X, Y)
 #'
 #' # estimate marginal effects of the orf (default)
-#' margins(orf)
+#' orf_margins <- margins(orf_fit)
 #'
 #' # estimate marginal effects evaluated at the mean
-#' margins(orf, eval = "atmean")
+#' orf_margins <- margins(orf_fit, eval = "atmean")
 #'
 #' # estimate marginal effects with inference
 #' # (orf object has to be estimated with honesty and subsampling)
-#' margins(orf, inference = TRUE)
+#' orf_margins <- margins(orf_fit, inference = TRUE)
 #'
 #' # estimate marginal effects with custom window size
-#' margins(orf, window = 0.5)
+#' orf_margins <- margins(orf_fit, window = 0.5)
 #'
 #' # estimate marginal effects for some new data (within support of X)
-#' margins(orf, newdata = X[1:10, ])
+#' orf_margins <- margins(orf_fit, newdata = X[1:10, ])
 #'
 #' # estimate marginal effects with all custom settings
-#' margins(orf, eval = "atmedian", inference = TRUE, window = 0.5, newdata = X[1:10, ])
+#' orf_margins <- margins(orf_fit, eval = "atmedian", inference = TRUE,
+#'                                 window = 0.5, newdata = X[1:10, ])
 #'
-#' #}
+#' }
 #'
 #' @export
 margins.orf <- function(forest, eval = NULL, inference = NULL, window = NULL, newdata = NULL) {
@@ -528,7 +529,7 @@ margins.orf <- function(forest, eval = NULL, inference = NULL, window = NULL, ne
 #' @author Gabriel Okasa
 #'
 #' @examples
-#' #\dontrun{
+#' \dontrun{
 #'
 #' ## Ordered Forest
 #' require(orf)
@@ -541,10 +542,10 @@ margins.orf <- function(forest, eval = NULL, inference = NULL, window = NULL, ne
 #' X <- as.matrix(odata[, -1])
 #'
 #' # estimate Ordered Forest
-#' orf <- orf(X, Y)
+#' orf_fit <- orf(X, Y)
 #'
 #' # estimate marginal effects of the orf
-#' orf_margins <- margins(orf)
+#' orf_margins <- margins(orf_fit)
 #'
 #' # summary of marginal effects
 #' summary(orf_margins)
@@ -552,7 +553,7 @@ margins.orf <- function(forest, eval = NULL, inference = NULL, window = NULL, ne
 #' # summary of marginal effects coded in LaTeX
 #' summary(orf_margins, latex = TRUE)
 #'
-#' #}
+#' }
 #'
 #' @export
 summary.margins.orf <- function(object, latex = FALSE, ...) {
@@ -670,7 +671,7 @@ summary.margins.orf <- function(object, latex = FALSE, ...) {
 #' @author Gabriel Okasa
 #'
 #' @examples
-#' #\dontrun{
+#' \dontrun{
 #'
 #' ## Ordered Forest
 #' require(orf)
@@ -683,15 +684,15 @@ summary.margins.orf <- function(object, latex = FALSE, ...) {
 #' X <- as.matrix(odata[, -1])
 #'
 #' # estimate Ordered Forest
-#' orf <- orf(X, Y)
+#' orf_fit <- orf(X, Y)
 #'
 #' # estimate marginal effects of the orf
-#' orf_margins <- margins(orf)
+#' orf_margins <- margins(orf_fit)
 #'
 #' # print marginal effects
 #' print(orf_margins)
 #'
-#' #}
+#' }
 #'
 #' @export
 print.margins.orf <- function(x, ...) {

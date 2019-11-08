@@ -20,7 +20,7 @@ marginal effects, printed directly to the \code{R} console. The printed informat
 contains the results for the marginal effects for each covariate and each outcome class.
 }
 \examples{
-#\dontrun{
+\dontrun{
 
 ## Ordered Forest
 require(orf)
@@ -33,15 +33,15 @@ Y <- as.numeric(odata[, 1])
 X <- as.matrix(odata[, -1])
 
 # estimate Ordered Forest
-orf <- orf(X, Y)
+orf_fit <- orf(X, Y)
 
 # estimate marginal effects of the orf
-orf_margins <- margins(orf)
+orf_margins <- margins(orf_fit)
 
 # print marginal effects
 print(orf_margins)
 
-#}
+}
 
 }
 \author{

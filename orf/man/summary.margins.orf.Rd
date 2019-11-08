@@ -24,7 +24,7 @@ Furthermore, summary output as a LaTeX table is supported in order to directly
 extract the results for the documentation.
 }
 \examples{
-#\dontrun{
+\dontrun{
 
 ## Ordered Forest
 require(orf)
@@ -37,10 +37,10 @@ Y <- as.numeric(odata[, 1])
 X <- as.matrix(odata[, -1])
 
 # estimate Ordered Forest
-orf <- orf(X, Y)
+orf_fit <- orf(X, Y)
 
 # estimate marginal effects of the orf
-orf_margins <- margins(orf)
+orf_margins <- margins(orf_fit)
 
 # summary of marginal effects
 summary(orf_margins)
@@ -48,7 +48,7 @@ summary(orf_margins)
 # summary of marginal effects coded in LaTeX
 summary(orf_margins, latex = TRUE)
 
-#}
+}
 
 }
 \author{

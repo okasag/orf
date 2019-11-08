@@ -4,7 +4,7 @@
 #' as in Lechner & Okasa (2019). The Ordered Forest flexibly
 #' estimates the conditional probabilities of models with ordered
 #' categorical outcomes (so-called ordered choice models).
-#' Additionally to common machine learning algorithms the orf
+#' Additionally to common machine learning algorithms the \code{orf}
 #' package provides functions for estimating marginal effects as well
 #' as statistical inference thereof and thus provides similar output
 #' as in standard econometric models for ordered choice. The core
@@ -60,7 +60,7 @@
 #' @import ranger
 #'
 #' @return object of type \code{orf} with following elements
-#'       \item{forests}{saved forests trained for ORF estimations (inherited from \code{ranger})}
+#'       \item{forests}{saved forests trained for \code{orf} estimations (inherited from \code{ranger})}
 #'       \item{info}{info containing forest inputs and data used}
 #'       \item{predictions}{predicted values for class probabilities}
 #'       \item{variances}{variances of predicted values}
@@ -77,7 +77,7 @@
 #' }
 #'
 #' @examples
-#' #\dontrun{
+#' \dontrun{
 #'
 #' ## Ordered Forest
 #' require(orf)
@@ -90,34 +90,36 @@
 #' X <- as.matrix(odata[, -1])
 #'
 #' # estimate Ordered Forest with default parameters
-#' orf <- orf(X, Y)
+#' orf_fit <- orf(X, Y)
 #'
 #' # estimate Ordered Forest with own tuning parameters
-#' orf <- orf(X, Y, num.trees = 2000, mtry = 3, min.node.size = 10)
+#' orf_fit <- orf(X, Y, num.trees = 2000, mtry = 3, min.node.size = 10)
 #'
 #' # estimate Ordered Forest with bootstrapping and without honesty
-#' orf <- orf(X, Y, replace = TRUE, honesty = FALSE)
+#' orf_fit <- orf(X, Y, replace = TRUE, honesty = FALSE)
 #'
 #' # estimate Ordered Forest with subsampling and with honesty
-#' orf <- orf(X, Y, replace = FALSE, honesty = TRUE)
+#' orf_fit <- orf(X, Y, replace = FALSE, honesty = TRUE)
 #'
 #' # estimate Ordered Forest with subsampling and with honesty
 #' # with own tuning for subsample fraction and honesty fraction
-#' orf <- orf(X, Y, replace = FALSE, sample.fraction = 0.5, honesty = TRUE, honesty.fraction = 0.5)
+#' orf_fit <- orf(X, Y, replace = FALSE, sample.fraction = 0.5,
+#'                      honesty = TRUE, honesty.fraction = 0.5)
 #'
 #' # estimate Ordered Forest with subsampling and with honesty and with inference
 #' # (for inference, subsampling and honesty are required)
-#' orf <- orf(X, Y, replace = FALSE, honesty = TRUE, inference = TRUE)
+#' orf_fit <- orf(X, Y, replace = FALSE, honesty = TRUE, inference = TRUE)
 #'
 #' # estimate Ordered Forest with simple variable importance measure
-#' orf <- orf(X, Y, importance = TRUE)
+#' orf_fit <- orf(X, Y, importance = TRUE)
 #'
 #' # estimate Ordered Forest with all custom settings
-#' orf <- orf(X, Y, num.trees = 2000, mtry = 3, min.node.size = 10,
-#'  replace = TRUE, sample.fraction = 1, honesty = FALSE,
-#'  honesty.fraction = 0, inference = FALSE, importance = FALSE)
+#' orf_fit <- orf(X, Y, num.trees = 2000, mtry = 3, min.node.size = 10,
+#'                      replace = TRUE, sample.fraction = 1,
+#'                      honesty = FALSE, honesty.fraction = 0,
+#'                      inference = FALSE, importance = FALSE)
 #'
-#' #}
+#' }
 #'
 #' @export
 orf <- function(X, Y,
@@ -529,7 +531,7 @@ orf <- function(X, Y,
 #' @author Gabriel Okasa
 #'
 #' @examples
-#' #\dontrun{
+#' \dontrun{
 #'
 #' # Ordered Forest
 #' require(orf)
@@ -542,12 +544,12 @@ orf <- function(X, Y,
 #' X <- as.matrix(odata[, -1])
 #'
 #' # estimate Ordered Forest
-#' orf <- orf(X, Y)
+#' orf_fit <- orf(X, Y)
 #'
 #' # plot the estimated probability distributions
-#' plot(orf)
+#' plot(orf_fit)
 #'
-#' #}
+#' }
 #'
 #' @export
 plot.orf <- function(x, ...) {
@@ -654,7 +656,7 @@ plot.orf <- function(x, ...) {
 #' @author Gabriel Okasa
 #'
 #' @examples
-#' #\dontrun{
+#' \dontrun{
 #'
 #' # Ordered Forest
 #' require(orf)
@@ -667,15 +669,15 @@ plot.orf <- function(x, ...) {
 #' X <- as.matrix(odata[, -1])
 #'
 #' # estimate Ordered Forest
-#' orf <- orf(X, Y)
+#' orf_fit <- orf(X, Y)
 #'
 #' # show summary of the orf estimation
-#' summary(orf)
+#' summary(orf_fit)
 #'
 #' # show summary of the orf estimation coded in LaTeX
-#' summary(orf, latex = TRUE)
+#' summary(orf_fit, latex = TRUE)
 #'
-#' #}
+#' }
 #'
 #' @export
 summary.orf <- function(object, latex = FALSE, ...) {
@@ -768,7 +770,7 @@ summary.orf <- function(object, latex = FALSE, ...) {
 #' @author Gabriel Okasa
 #'
 #' @examples
-#' #\dontrun{
+#' \dontrun{
 #'
 #' # Ordered Forest
 #' require(orf)
@@ -781,12 +783,12 @@ summary.orf <- function(object, latex = FALSE, ...) {
 #' X <- as.matrix(odata[, -1])
 #'
 #' # estimate Ordered Forest
-#' orf <- orf(X, Y)
+#' orf_fit <- orf(X, Y)
 #'
 #' # print output of the orf estimation
-#' print(orf)
+#' print(orf_fit)
 #'
-#' #}
+#' }
 #'
 #'
 #' @export
@@ -866,7 +868,7 @@ print.orf <- function(x, ...) {
 #' @author Gabriel Okasa
 #'
 #' @examples
-#' #\dontrun{
+#' \dontrun{
 #'
 #' # Ordered Forest
 #' require(orf)
@@ -886,18 +888,18 @@ print.orf <- function(x, ...) {
 #' X_test <- as.matrix(odata[-idx, -1])
 #'
 #' # estimate Ordered Forest
-#' orf <- orf(X_train, Y_train)
+#' orf_fit <- orf(X_train, Y_train)
 #'
 #' # predict the probabilities with the estimated orf
-#' orf_pred <- predict(orf, newdata = X_test)
+#' orf_pred <- predict(orf_fit, newdata = X_test)
 #'
 #' # predict the probabilities with estimated orf together with variances
-#' orf_pred <- predict(orf, newdata = X_test, inference = TRUE)
+#' orf_pred <- predict(orf_fit, newdata = X_test, inference = TRUE)
 #'
 #' # predict the classes with estimated orf
-#' orf_pred <- predict(orf, newdata = X_test, type = "class")
+#' orf_pred <- predict(orf_fit, newdata = X_test, type = "class")
 #'
-#' #}
+#' }
 #'
 #' @export
 predict.orf <- function(object, newdata = NULL, type = NULL, inference = NULL, ...) {
@@ -1246,7 +1248,7 @@ predict.orf <- function(object, newdata = NULL, type = NULL, inference = NULL, .
 #' @author Gabriel Okasa
 #'
 #' @examples
-#' #\dontrun{
+#' \dontrun{
 #'
 #' # Ordered Forest
 #' require(orf)
@@ -1266,15 +1268,15 @@ predict.orf <- function(object, newdata = NULL, type = NULL, inference = NULL, .
 #' X_test <- as.matrix(odata[-idx, -1])
 #'
 #' # estimate Ordered Forest
-#' orf <- orf(X_train, Y_train)
+#' orf_fit <- orf(X_train, Y_train)
 #'
 #' # predict the probabilities with the estimated orf
-#' orf_pred <- predict(orf, newdata = X_test)
+#' orf_pred <- predict(orf_fit, newdata = X_test)
 #'
 #' # print the prediction object
 #' print(orf_pred)
 #'
-#' #}
+#' }
 #'
 #' @export
 print.orf.prediction <- function(x, ...) {
@@ -1351,7 +1353,7 @@ print.orf.prediction <- function(x, ...) {
 #' @author Gabriel Okasa
 #'
 #' @examples
-#' #\dontrun{
+#' \dontrun{
 #'
 #' # Ordered Forest
 #' require(orf)
@@ -1371,15 +1373,15 @@ print.orf.prediction <- function(x, ...) {
 #' X_test <- as.matrix(odata[-idx, -1])
 #'
 #' # estimate Ordered Forest
-#' orf <- orf(X_train, Y_train)
+#' orf_fit <- orf(X_train, Y_train)
 #'
 #' # predict the probabilities with the estimated orf
-#' orf_pred <- predict(orf, newdata = X_test)
+#' orf_pred <- predict(orf_fit, newdata = X_test)
 #'
 #' # summary of the prediction object
 #' summary(orf_pred)
 #'
-#' #}
+#' }
 #'
 #'
 #' @export

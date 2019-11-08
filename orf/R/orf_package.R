@@ -4,7 +4,7 @@
 #' as in Lechner & Okasa (2019). The Ordered Forest flexibly
 #' estimates the conditional probabilities of models with ordered
 #' categorical outcomes (so-called ordered choice models).
-#' Additionally to common machine learning algorithms the orf
+#' Additionally to common machine learning algorithms the \code{orf}
 #' package provides functions for estimating marginal effects as well
 #' as statistical inference thereof and thus provides similar output
 #' as in standard econometric models for ordered choice. The core
@@ -27,22 +27,22 @@
 #' X <- as.matrix(odata[, -1])
 #'
 #' # estimate Ordered Forest with default settings
-#' orf <- orf(X, Y)
+#' orf_fit <- orf(X, Y)
 #'
 #' # print output of the orf estimation
-#' print(orf)
+#' print(orf_fit)
 #'
 #' # show summary of the orf estimation
-#' summary(orf)
+#' summary(orf_fit)
 #'
 #' # plot the estimated probability distributions
-#' plot(orf)
+#' plot(orf_fit)
 #'
 #' # predict with the estimated orf
-#' predict(orf)
+#' predict(orf_fit)
 #'
 #' # estimate marginal effects of the orf
-#' margins(orf)
+#' margins(orf_fit)
 #'
 #' @references
 #' \itemize{

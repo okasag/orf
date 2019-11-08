@@ -138,8 +138,8 @@ and thus serves as a noise variable in the dataset. For the exact DGP, see `?orf
 data(odata)
 
 # specify response and covariates
-Y <- odata[, 1]
-X <- odata[, -1]
+Y <- as.numeric(odata[, 1])
+X <- as.matrix(odata[, -1])
 ```
 
 ### orf: `orf`, `print.orf`, `summary.orf`, `plot.orf`

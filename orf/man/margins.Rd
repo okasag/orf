@@ -23,7 +23,7 @@ S3 generic method for estimation of marginal effects
 of an Ordered Forest objects of class \code{orf}.
 }
 \examples{
-#\dontrun{
+\dontrun{
 
 ## Ordered Forest
 require(orf)
@@ -36,12 +36,12 @@ Y <- as.numeric(odata[, 1])
 X <- as.matrix(odata[, -1])
 
 # estimate Ordered Forest
-orf <- orf(X, Y)
+orf_fit <- orf(X, Y)
 
 # estimate default marginal effects of the orf
-margins(orf)
+orf_margins <- margins(orf_fit)
 
-#}
+}
 
 }
 \seealso{

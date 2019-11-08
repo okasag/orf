@@ -40,7 +40,7 @@ be estimated as well using the \code{type} argument. In this case, the predicted
 classes are obtained as classes with the highest predicted probability.
 }
 \examples{
-#\dontrun{
+\dontrun{
 
 # Ordered Forest
 require(orf)
@@ -60,18 +60,18 @@ Y_test <- as.numeric(odata[-idx, 1])
 X_test <- as.matrix(odata[-idx, -1])
 
 # estimate Ordered Forest
-orf <- orf(X_train, Y_train)
+orf_fit <- orf(X_train, Y_train)
 
 # predict the probabilities with the estimated orf
-orf_pred <- predict(orf, newdata = X_test)
+orf_pred <- predict(orf_fit, newdata = X_test)
 
 # predict the probabilities with estimated orf together with variances
-orf_pred <- predict(orf, newdata = X_test, inference = TRUE)
+orf_pred <- predict(orf_fit, newdata = X_test, inference = TRUE)
 
 # predict the classes with estimated orf
-orf_pred <- predict(orf, newdata = X_test, type = "class")
+orf_pred <- predict(orf_fit, newdata = X_test, type = "class")
 
-#}
+}
 
 }
 \seealso{

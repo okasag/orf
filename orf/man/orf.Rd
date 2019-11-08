@@ -33,7 +33,7 @@ orf(X, Y, num.trees = 1000, mtry = NULL, min.node.size = NULL,
 }
 \value{
 object of type \code{orf} with following elements
-      \item{forests}{saved forests trained for ORF estimations (inherited from \code{ranger})}
+      \item{forests}{saved forests trained for \code{orf} estimations (inherited from \code{ranger})}
       \item{info}{info containing forest inputs and data used}
       \item{predictions}{predicted values for class probabilities}
       \item{variances}{variances of predicted values}
@@ -45,7 +45,7 @@ An implementation of the Ordered Forest estimator
 as in Lechner & Okasa (2019). The Ordered Forest flexibly
 estimates the conditional probabilities of models with ordered
 categorical outcomes (so-called ordered choice models).
-Additionally to common machine learning algorithms the orf
+Additionally to common machine learning algorithms the \code{orf}
 package provides functions for estimating marginal effects as well
 as statistical inference thereof and thus provides similar output
 as in standard econometric models for ordered choice. The core
@@ -85,7 +85,7 @@ importance.
 For further details, see examples below.
 }
 \examples{
-#\dontrun{
+\dontrun{
 
 ## Ordered Forest
 require(orf)
@@ -98,34 +98,36 @@ Y <- as.numeric(odata[, 1])
 X <- as.matrix(odata[, -1])
 
 # estimate Ordered Forest with default parameters
-orf <- orf(X, Y)
+orf_fit <- orf(X, Y)
 
 # estimate Ordered Forest with own tuning parameters
-orf <- orf(X, Y, num.trees = 2000, mtry = 3, min.node.size = 10)
+orf_fit <- orf(X, Y, num.trees = 2000, mtry = 3, min.node.size = 10)
 
 # estimate Ordered Forest with bootstrapping and without honesty
-orf <- orf(X, Y, replace = TRUE, honesty = FALSE)
+orf_fit <- orf(X, Y, replace = TRUE, honesty = FALSE)
 
 # estimate Ordered Forest with subsampling and with honesty
-orf <- orf(X, Y, replace = FALSE, honesty = TRUE)
+orf_fit <- orf(X, Y, replace = FALSE, honesty = TRUE)
 
 # estimate Ordered Forest with subsampling and with honesty
 # with own tuning for subsample fraction and honesty fraction
-orf <- orf(X, Y, replace = FALSE, sample.fraction = 0.5, honesty = TRUE, honesty.fraction = 0.5)
+orf_fit <- orf(X, Y, replace = FALSE, sample.fraction = 0.5,
+                     honesty = TRUE, honesty.fraction = 0.5)
 
 # estimate Ordered Forest with subsampling and with honesty and with inference
 # (for inference, subsampling and honesty are required)
-orf <- orf(X, Y, replace = FALSE, honesty = TRUE, inference = TRUE)
+orf_fit <- orf(X, Y, replace = FALSE, honesty = TRUE, inference = TRUE)
 
 # estimate Ordered Forest with simple variable importance measure
-orf <- orf(X, Y, importance = TRUE)
+orf_fit <- orf(X, Y, importance = TRUE)
 
 # estimate Ordered Forest with all custom settings
-orf <- orf(X, Y, num.trees = 2000, mtry = 3, min.node.size = 10,
- replace = TRUE, sample.fraction = 1, honesty = FALSE,
- honesty.fraction = 0, inference = FALSE, importance = FALSE)
+orf_fit <- orf(X, Y, num.trees = 2000, mtry = 3, min.node.size = 10,
+                     replace = TRUE, sample.fraction = 1,
+                     honesty = FALSE, honesty.fraction = 0,
+                     inference = FALSE, importance = FALSE)
 
-#}
+}
 
 }
 \references{

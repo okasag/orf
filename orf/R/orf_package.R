@@ -16,6 +16,7 @@
 #' @author Gabriel Okasa \email{gabriel.okasa@@unisg.ch}
 #'
 #' @examples
+#' \dontrun{
 #' ## Ordered Forest
 #' require(orf)
 #'
@@ -43,6 +44,8 @@
 #'
 #' # estimate marginal effects of the orf
 #' margins(orf_fit)
+#'
+#' }
 #'
 #' @references
 #' \itemize{

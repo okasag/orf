@@ -11,6 +11,7 @@
 * There were 0 ERRORs and 0 WARNINGs and 1 NOTEs. 
 
 * the 1 NOTE is due to the first submission.
+* both names were marked as possibly mis-spelled but these are correct.
 
 ## Downstream dependencies
 * There are currently no downstream dependencies for this package.

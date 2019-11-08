@@ -9,7 +9,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-## orf: Description
+## orf: Introduction
 
 The `R` package `orf` is an implementation of the Ordered Forest estimator
 as in @Okasa2019. The Ordered Forest flexibly estimates the conditional

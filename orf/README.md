@@ -27,24 +27,25 @@ Y <- as.numeric(odata[, 1])
 X <- as.matrix(odata[, -1])
 
 # estimate Ordered Forest with default settings
-orf <- orf(X, Y)
+orf_fit <- orf(X, Y, num.trees = 1000, mtry = 2, min.node.size = 5,
+                     replace = FALSE, sample.fraction = 0.5,
+                     honesty = TRUE, honesty.fraction = 0.5,
+                     inference = FALSE, importance = FALSE)
 
-# print output of the orf estimation
-print(orf)
+# print output of the Ordered Forest estimation
+print(orf_fit)
 
-# show summary of the orf estimation
-summary(orf)
+# show summary of the Ordered Forest estimation
+summary(orf_fit, latex = FALSE)
 
 # plot the estimated probability distributions
-plot(orf)
+plot(orf_fit)
 
-# predict with the estimated orf
-predict(orf)
+# predict with the estimated Ordered Forest
+predict(orf_fit, newdata = NULL, type = "probs", inference = FALSE)
 
-# estimate marginal effects of the orf
-margins(orf)
-
-## end of example
+# estimate marginal effects of the Ordered Forest
+margins(orf, newdata = NULL, eval = "mean", window = 0.1, inference = FALSE)
 ```
 
 For a more detailed examples see the package vignette.
@@ -52,6 +53,5 @@ For a more detailed examples see the package vignette.
 ## References
 
 - Lechner, M., & Okasa, G. (2019). Random Forest Estimation of the Ordered Choice Model. arXiv preprint arXiv:1907.02436. <https://arxiv.org/abs/1907.02436>
-- Goller, D., Knaus, M. C., Lechner, M., & Okasa, G. (2018). Predicting Match Outcomes in Football by an Ordered Forest Estimator (No. 1811). University of St. Gallen, School of Economics and Political Science. <http://ux-tauri.unisg.ch/RePEc/usg/econwp/EWP-1811.pdf>
 - Wright, M. N. & Ziegler, A. (2017). ranger: A fast implementation of random forests for high dimensional data in C++ and R. J Stat Softw 77:1-17. <https://doi.org/10.18637/jss.v077.i01>
 

@@ -33,3 +33,5 @@ Suggests:
 VignetteBuilder: knitr
 LinkingTo: 
     Rcpp
+URL: https://github.com/okasag/orf
+BugReports: https://github.com/okasag/orf/issues

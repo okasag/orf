@@ -150,19 +150,19 @@ honest_split <- function(data, honesty.fraction, orf) {
            This prevents an optimal honesty split. Consider recoding your outcome into less categories or set honesty = FALSE.")
     }
 
-    } else {
+  } else {
 
-      # for classical regression forest the above condition is not binding
-      # randomize indices for train and honest sample (take care of uneven numbers with floor and ceiling)
-      ind <- sample(c(rep(0, ceiling((1-honesty.fraction)*n)), rep(1, floor(honesty.fraction*n))))
-      # indicator for which observations go into train and honest set
-      honesty_i <- which(ind == 1)
-      # separate training set
-      train <- data[-honesty_i, ]
-      # separate honest set
-      honest <- data[honesty_i, ]
+    # for classical regression forest the above condition is not binding
+    # randomize indices for train and honest sample (take care of uneven numbers with floor and ceiling)
+    ind <- sample(c(rep(0, ceiling((1-honesty.fraction)*n)), rep(1, floor(honesty.fraction*n))))
+    # indicator for which observations go into train and honest set
+    honesty_i <- which(ind == 1)
+    # separate training set
+    train <- data[-honesty_i, ]
+    # separate honest set
+    honest <- data[honesty_i, ]
 
-    }
+  }
 
   # ------------------------------------------------------------------------------------ #
 
@@ -177,4 +177,3 @@ honest_split <- function(data, honesty.fraction, orf) {
   # ------------------------------------------------------------------------------------ #
 
 }
-

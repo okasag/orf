@@ -22,14 +22,14 @@ fast `C++` forest implementation from the `ranger` package [@Wright2017].
 
 ## orf: Algorithm
 
-The main function of the package is `orf` which implements the Ordered Forest
+The main function of the package is `orf`, which implements the Ordered Forest
 estimator as developed in @Okasa2019. The main idea is to
 provide a flexible alternative to standard econometric ordered choice
 models (categorical dependent variable *with* inherent ordering) such as ordered
 logit or ordered probit while still being able to recover
 essentially the same output as in the standard parametric models. As such the 
 Ordered Forest estimator not only provides estimates of conditional
-ordered choice probabilities, i.e. $P[Y=m|X=x]$ but also estimates of marginal
+ordered choice probabilities, i.e. $P[Y=m|X=x]$, but also estimates of marginal
 effects, i.e. how the conditional probabilities vary with changes in $X$. Further,
 the `orf` estimator provides also inference for the marginal effects as well
 as for the conditional probabilities.
@@ -67,13 +67,13 @@ Then, the algorithm can be described as follows:
 
 ******
 
-Hence, the main idea of the Ordered Forest is to firstly transform the ordered 
+Hence, the main idea of the Ordered Forest is to firstly, transform the ordered 
 model into multiple overlapping binary models which are estimated by regression
 forests and thus yield predictions for the cumulative probabilities. Secondly,
 the estimated cumulative probabilities are differenced to isolate the actual class 
 probabilities. As such, the prediction for the conditional probability of a 
 particular ordered class $m$ is given by subtracting two adjacent cumulative
-probabilities. Notice, that this procedure uses the fact that the cumulative
+probabilities. Notice that this procedure uses the fact that the cumulative
 probability over all classes must sum up to unity by definition.
 
 ## orf: Ordered Forest
@@ -105,7 +105,7 @@ honest estimation is regulated by the `honesty.fraction` argument. The default
 setting conducts a 50:50 sample split, which is also generally advised to follow
 for optimal performance. Inference procedure of the Ordered Forest is based on 
 the forest weights as suggested in @Okasa2019 and is controlled by
-the `inference` argument. Note, that such weight-based inference is computationally
+the `inference` argument. Note that such weight-based inference is computationally
 demanding exercise due to the estimation of the forest weights and as such longer
 computation time is to be expected. Lastly, the `importance` argument turns on
 and off the permutation based variable importance. The variable importance for
@@ -255,13 +255,13 @@ the Ordered Forest enables also the estimation of the marginal effects, i.e.
 how these probabilities vary with changes in covariates. `margins.orf` estimates 
 marginal effects at the mean, at the median, or the mean marginal effects,
 depending on the `eval` argument. The evaluation window for the marginal effects
-can be regulated by the user through the `window` argument which is defined as
+can be regulated by the user through the `window` argument, which is defined as
 the share of standard deviation of the particular covariate $X$ with default set
 as `window = 0.1`. Furthermore, new data for which marginal effects should be
 estimated can be supplied as well using the argument `newdata` as long as the
 new data lies within the support of $X$. Additionally to the estimation of the
 marginal effects, the weight-based inference for the effects is supported as well,
-controlled by the `inference` argument. Note again, that the inference procedure
+controlled by the `inference` argument. Note again that the inference procedure
 is computationally exhausting exercise due to the estimation of the forest weights.
 
 Furthermore, the marginal effect estimation procedure depends on the type of the

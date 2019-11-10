@@ -7,7 +7,7 @@
 check_importance(importance)
 }
 \arguments{
-\item{importance}{ogical, if TRUE variable importance is conducted}
+\item{importance}{logical, if TRUE variable importance is conducted}
 }
 \value{
 importance

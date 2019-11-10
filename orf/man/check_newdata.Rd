@@ -12,6 +12,6 @@ check_newdata(new_data, X)
 \item{X}{matrix of input features X}
 }
 \description{
-Checks the input for newdata for predict.orf/predict.mrf
+Checks the input for newdata for predict.orf
 }
 \keyword{internal}

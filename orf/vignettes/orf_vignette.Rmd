@@ -79,7 +79,7 @@ probability over all classes must sum up to unity by definition.
 ## orf: Ordered Forest
 
 The Ordered Forest provided in the `orf` function estimates the conditional
-ordered choice probabilities as described by the above algortihm. Additionally,
+ordered choice probabilities as described by the above algorithm. Additionally,
 weight-based inference for the probability predictions can be conducted as well.
 If inference is desired, the Ordered Forest must be estimated with honesty and
 subsampling. Honesty is defined as in @Lechner2019 and thus refers to the
@@ -185,7 +185,7 @@ visualize the estimated probability density of each outcome class, i.e.
 $\hat{P}[Y=1\mid X=x]$, $\hat{P}[Y=2\mid X=x]$, and $\hat{P}[Y=3\mid X=x]$ in 
 contrast to the actual observed outcome class and as such provides a visual 
 inspection of the underlying probability predictions for the outcome classes.
-The dashed lines within the desnity plots locate the means of the respective
+The dashed lines within the density plots locate the means of the respective
 probability distributions.
 
 The example below demonstrates the usage of the `plot.orf` command.

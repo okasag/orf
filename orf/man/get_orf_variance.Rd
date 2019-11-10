@@ -12,9 +12,9 @@ get_orf_variance(honest_pred, honest_weights, train_pred, train_weights,
 
 \item{honest_weights}{list of n x n matrices of honest forest weights}
 
-\item{train_pred}{list of vectors of honest forets predictions from train sample}
+\item{train_pred}{list of vectors of honest forests predictions from train sample}
 
-\item{train_weights}{list of vectors of honest forets predictions from train sample}
+\item{train_weights}{list of vectors of honest forests predictions from train sample}
 
 \item{Y_ind_honest}{list of vectors of 0-1 outcomes for the honest sample}
 }

@@ -5,8 +5,8 @@
 #'
 #' @param honest_pred list of vectors of honest forest predictions
 #' @param honest_weights list of n x n matrices of honest forest weights
-#' @param train_pred list of vectors of honest forets predictions from train sample
-#' @param train_weights list of vectors of honest forets predictions from train sample
+#' @param train_pred list of vectors of honest forests predictions from train sample
+#' @param train_weights list of vectors of honest forests predictions from train sample
 #' @param Y_ind_honest list of vectors of 0-1 outcomes for the honest sample
 #'
 #' @return vector of ORF variances

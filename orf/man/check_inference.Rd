@@ -7,7 +7,7 @@
 check_inference(inference)
 }
 \arguments{
-\item{inference}{ogical, if TRUE the weight based inference is conducted}
+\item{inference}{logical, if TRUE the weight based inference is conducted}
 }
 \value{
 inference

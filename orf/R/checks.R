@@ -291,7 +291,7 @@ check_honesty_fraction <- function(honesty.fraction, honesty) {
 #'
 #' Checks the input for inference
 #'
-#' @param inference ogical, if TRUE the weight based inference is conducted
+#' @param inference logical, if TRUE the weight based inference is conducted
 #'
 #' @return inference
 #'
@@ -314,7 +314,7 @@ check_inference <- function(inference) {
 #'
 #' Checks the input for importance
 #'
-#' @param importance ogical, if TRUE variable importance is conducted
+#' @param importance logical, if TRUE variable importance is conducted
 #'
 #' @return importance
 #'
@@ -335,7 +335,7 @@ check_importance <- function(importance) {
 
 #' check newdata
 #'
-#' Checks the input for newdata for predict.orf/predict.mrf
+#' Checks the input for newdata for predict.orf
 #'
 #' @param new_data matrix X containing the observations to predict
 #' @param X matrix of input features X

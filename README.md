@@ -1,7 +1,7 @@
 # orf: ordered random forests
 
 Welcome to the repository of the `R` package `orf` for random forest estimation of
-the ordered choice models using the Ordered Forest estimator.
+the ordered choice models.
 
 ## Introduction
 

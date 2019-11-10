@@ -2,7 +2,7 @@ Package: orf
 Type: Package
 Title: Ordered Random Forests
 Version: 0.1.0
-Date: 2019-10-29
+Date: 2019-11-10
 Author: Gabriel Okasa [aut, cre], Michael Lechner [ctb]
 Maintainer: Gabriel Okasa <gabriel.okasa@unisg.ch>
 Description: An implementation of the Ordered Forest estimator as developed  

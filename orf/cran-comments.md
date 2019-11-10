@@ -1,5 +1,6 @@
 ## Submission
 * this is the first submission of the package
+* thank you for your time to review the package
 
 ## Test environments
 * local ubuntu 18.04, R 3.6.1

@@ -1,7 +1,7 @@
 #' orf: Ordered Random Forests
 #'
-#' An implementation of the Ordered Forest estimator
-#' as in Lechner & Okasa (2019). The Ordered Forest flexibly
+#' An implementation of the Ordered Forest estimator as developed
+#' in Lechner & Okasa (2019). The Ordered Forest flexibly
 #' estimates the conditional probabilities of models with ordered
 #' categorical outcomes (so-called ordered choice models).
 #' Additionally to common machine learning algorithms the \code{orf}
@@ -13,7 +13,7 @@
 #'
 #' @docType package
 #'
-#' @author Gabriel Okasa \email{gabriel.okasa@@unisg.ch}
+#' @author Gabriel Okasa, Michael Lechner
 #'
 #' @examples
 #' \dontrun{

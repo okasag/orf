@@ -5,8 +5,8 @@ Version: 0.1.0
 Date: 2019-10-29
 Author: Gabriel Okasa [aut, cre], Michael Lechner [ctb]
 Maintainer: Gabriel Okasa <gabriel.okasa@unisg.ch>
-Description: An implementation of the Ordered Forest estimator as in 
-    Lechner & Okasa (2019) <arXiv:1907.02436>. The Ordered Forest flexibly
+Description: An implementation of the Ordered Forest estimator as developed  
+    in Lechner & Okasa (2019) <arXiv:1907.02436>. The Ordered Forest flexibly
     estimates the conditional probabilities of models with ordered categorical
     outcomes (so-called ordered choice models). Additionally to common machine 
     learning algorithms the 'orf' package provides functions for estimating
@@ -31,7 +31,7 @@ Suggests:
     rmarkdown,
     testthat
 VignetteBuilder: knitr
-LinkingTo: 
-    Rcpp
 URL: https://github.com/okasag/orf
 BugReports: https://github.com/okasag/orf/issues
+LinkingTo: 
+    Rcpp

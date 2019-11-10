@@ -6,13 +6,13 @@ the ordered choice models.
 ## Introduction
 
 The `R` package `orf` is an implementation of the Ordered Forest estimator
-as in Lechner & Okasa (2019). The Ordered Forest flexibly estimates the conditional
-probabilities of models with ordered categorical outcomes (so-called ordered
-choice models). Additionally to common machine learning algorithms the `orf`
-package provides functions for estimating marginal effects as well as
-statistical inference thereof and thus provides similar output as in standard
-econometric models for ordered choice. The core forest algorithm relies on the
-fast `C++` forest implementation from the `ranger` package (Wright & Ziegler, 2017).
+as developed in Lechner & Okasa (2019). The Ordered Forest flexibly estimates
+the conditional probabilities of models with ordered categorical outcomes
+(so-called ordered choice models). Additionally to common machine learning
+algorithms the `orf` package provides functions for estimating marginal effects
+as well as statistical inference thereof and thus provides similar output as in
+standard econometric models for ordered choice. The core forest algorithm relies
+on the fast `C++` forest implementation from the `ranger` package (Wright & Ziegler, 2017).
 
 ## Examples
 

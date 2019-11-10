@@ -31,7 +31,7 @@ rps <- function(predictions, observed){
   rps <- numeric(npred)
   cum <- numeric(npred)
 
-  # loop over the categories (thanks to: https://opisthokonta.net/?p=1333)
+  # loop over the categories (inspired by and thanks to: https://opisthokonta.net/?p=1333)
   for (i in 1:ncat){
 
     cum <- cum + (rowSums(matrix(predictions[, 1:i], ncol = i)) - rowSums(matrix(observed_dist[, 1:i], ncol = i)))^2

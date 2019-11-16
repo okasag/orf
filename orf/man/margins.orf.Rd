@@ -57,15 +57,12 @@ X <- as.matrix(odata[, -1])
 
 # estimate Ordered Forest
 orf_fit <- orf(X, Y)
-
 \donttest{
 # estimate marginal effects of the orf (default)
 orf_margins <- margins(orf_fit)
 }
-
 # estimate marginal effects evaluated at the mean
 orf_margins <- margins(orf_fit, eval = "atmean")
-
 \donttest{
 # estimate marginal effects with inference
 # (orf object has to be estimated with honesty and subsampling)

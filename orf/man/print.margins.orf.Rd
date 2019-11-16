@@ -32,7 +32,6 @@ X <- as.matrix(odata[, -1])
 
 # estimate Ordered Forest
 orf_fit <- orf(X, Y)
-
 \donttest{
 # estimate marginal effects of the orf
 orf_margins <- margins(orf_fit)

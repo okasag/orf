@@ -62,7 +62,6 @@ orf_fit <- orf(X_train, Y_train)
 
 # predict the probabilities with the estimated orf
 orf_pred <- predict(orf_fit, newdata = X_test)
-
 \donttest{
 # predict the probabilities with estimated orf together with variances
 orf_pred <- predict(orf_fit, newdata = X_test, inference = TRUE)

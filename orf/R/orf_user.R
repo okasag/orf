@@ -89,7 +89,6 @@
 #'
 #' # estimate Ordered Forest with default parameters
 #' orf_fit <- orf(X, Y)
-#'
 #' \donttest{
 #' # estimate Ordered Forest with own tuning parameters
 #' orf_fit <- orf(X, Y, num.trees = 2000, mtry = 3, min.node.size = 10)
@@ -875,7 +874,6 @@ print.orf <- function(x, ...) {
 #'
 #' # predict the probabilities with the estimated orf
 #' orf_pred <- predict(orf_fit, newdata = X_test)
-#'
 #' \donttest{
 #' # predict the probabilities with estimated orf together with variances
 #' orf_pred <- predict(orf_fit, newdata = X_test, inference = TRUE)

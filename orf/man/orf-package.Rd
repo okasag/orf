@@ -41,7 +41,6 @@ plot(orf_fit)
 
 # predict with the estimated orf
 predict(orf_fit)
-
 \donttest{
 # estimate marginal effects of the orf
 margins(orf_fit)

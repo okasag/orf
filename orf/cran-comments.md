@@ -40,8 +40,9 @@ are fully executable. Therefore I replaced dontrun{} commands with donttest{}
 for these longer examples. Additionally, I removed all the other dontrun{}
 commands from all the other examples which are executable under 5 seconds.
 These examples demonstrate all the main functions of the package. Thus all 
-these examples will get executed in the automatic checks. I think this issue
-should be thereby solved.
+these examples will get executed in the automatic checks. Furthermore, all
+package functions get tested also under tests. I think this issue should 
+be thereby solved.
 
 ### Issue 4
 * **CRAN**: Following your .Rd documentation, check_discrete_Y() has the same input

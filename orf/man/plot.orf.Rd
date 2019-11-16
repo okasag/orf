@@ -23,8 +23,6 @@ the overall in-sample estimation accuracy. The dashed lines locate the means of
 the respective probability distributions.
 }
 \examples{
-\dontrun{
-
 # Ordered Forest
 require(orf)
 
@@ -40,8 +38,6 @@ orf_fit <- orf(X, Y)
 
 # plot the estimated probability distributions
 plot(orf_fit)
-
-}
 
 }
 \author{

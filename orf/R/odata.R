@@ -16,7 +16,6 @@
 #' For the exact data generating process, see the example below.
 #'
 #' @examples
-#' \dontrun{
 #' # generate example data
 #'
 #' # set seed for replicability
@@ -47,6 +46,5 @@
 #' odata <- as.data.frame(cbind(Y, X))
 #'
 #' # end of data generating
-#' }
 #'
 "odata"

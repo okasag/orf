@@ -85,8 +85,6 @@ importance.
 For further details, see examples below.
 }
 \examples{
-\dontrun{
-
 ## Ordered Forest
 require(orf)
 
@@ -100,6 +98,7 @@ X <- as.matrix(odata[, -1])
 # estimate Ordered Forest with default parameters
 orf_fit <- orf(X, Y)
 
+\donttest{
 # estimate Ordered Forest with own tuning parameters
 orf_fit <- orf(X, Y, num.trees = 2000, mtry = 3, min.node.size = 10)
 
@@ -126,7 +125,6 @@ orf_fit <- orf(X, Y, num.trees = 2000, mtry = 3, min.node.size = 10,
                      replace = TRUE, sample.fraction = 1,
                      honesty = FALSE, honesty.fraction = 0,
                      inference = FALSE, importance = FALSE)
-
 }
 
 }

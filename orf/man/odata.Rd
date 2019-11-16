@@ -23,7 +23,6 @@ containing different types of covariates for illustration purposes.
 For the exact data generating process, see the example below.
 }
 \examples{
-\dontrun{
 # generate example data
 
 # set seed for replicability
@@ -54,7 +53,6 @@ Y <- as.numeric(cut(Y, breaks = cuts, include.lowest = TRUE))
 odata <- as.data.frame(cbind(Y, X))
 
 # end of data generating
-}
 
 }
 \keyword{datasets}

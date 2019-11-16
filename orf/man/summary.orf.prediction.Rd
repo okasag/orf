@@ -22,8 +22,6 @@ prediction, including the input information regarding the values of hyperparamet
 as well as the inputs of the \code{predict.orf} function.
 }
 \examples{
-\dontrun{
-
 # Ordered Forest
 require(orf)
 
@@ -50,8 +48,8 @@ orf_pred <- predict(orf_fit, newdata = X_test)
 # summary of the prediction object
 summary(orf_pred)
 
-}
-
+# show summary of the orf prediction coded in LaTeX
+summary(orf_pred, latex = TRUE)
 
 }
 \author{

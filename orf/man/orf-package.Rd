@@ -17,7 +17,6 @@ forest algorithm relies on the fast C++ forest implementation
 from the ranger package (Wright & Ziegler, 2017).
 }
 \examples{
-\dontrun{
 ## Ordered Forest
 require(orf)
 
@@ -43,9 +42,9 @@ plot(orf_fit)
 # predict with the estimated orf
 predict(orf_fit)
 
+\donttest{
 # estimate marginal effects of the orf
 margins(orf_fit)
-
 }
 
 }

@@ -22,8 +22,6 @@ including the input information regarding the values of hyperparameters as
 well as the output information regarding the prediction accuracy.
 }
 \examples{
-\dontrun{
-
 # Ordered Forest
 require(orf)
 
@@ -42,8 +40,6 @@ summary(orf_fit)
 
 # show summary of the orf estimation coded in LaTeX
 summary(orf_fit, latex = TRUE)
-
-}
 
 }
 \author{

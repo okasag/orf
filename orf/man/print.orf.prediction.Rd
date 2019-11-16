@@ -20,8 +20,6 @@ prediction, printed directly to the \code{R} console. The printed information
 contains the main inputs of the \code{predict.orf} function.
 }
 \examples{
-\dontrun{
-
 # Ordered Forest
 require(orf)
 
@@ -47,8 +45,6 @@ orf_pred <- predict(orf_fit, newdata = X_test)
 
 # print the prediction object
 print(orf_pred)
-
-}
 
 }
 \author{

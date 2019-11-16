@@ -77,8 +77,6 @@
 #' }
 #'
 #' @examples
-#' \dontrun{
-#'
 #' ## Ordered Forest
 #' require(orf)
 #'
@@ -92,6 +90,7 @@
 #' # estimate Ordered Forest with default parameters
 #' orf_fit <- orf(X, Y)
 #'
+#' \donttest{
 #' # estimate Ordered Forest with own tuning parameters
 #' orf_fit <- orf(X, Y, num.trees = 2000, mtry = 3, min.node.size = 10)
 #'
@@ -118,7 +117,6 @@
 #'                      replace = TRUE, sample.fraction = 1,
 #'                      honesty = FALSE, honesty.fraction = 0,
 #'                      inference = FALSE, importance = FALSE)
-#'
 #' }
 #'
 #' @export
@@ -531,8 +529,6 @@ orf <- function(X, Y,
 #' @author Gabriel Okasa
 #'
 #' @examples
-#' \dontrun{
-#'
 #' # Ordered Forest
 #' require(orf)
 #'
@@ -548,8 +544,6 @@ orf <- function(X, Y,
 #'
 #' # plot the estimated probability distributions
 #' plot(orf_fit)
-#'
-#' }
 #'
 #' @export
 plot.orf <- function(x, ...) {
@@ -656,8 +650,6 @@ plot.orf <- function(x, ...) {
 #' @author Gabriel Okasa
 #'
 #' @examples
-#' \dontrun{
-#'
 #' # Ordered Forest
 #' require(orf)
 #'
@@ -676,8 +668,6 @@ plot.orf <- function(x, ...) {
 #'
 #' # show summary of the orf estimation coded in LaTeX
 #' summary(orf_fit, latex = TRUE)
-#'
-#' }
 #'
 #' @export
 summary.orf <- function(object, latex = FALSE, ...) {
@@ -770,8 +760,6 @@ summary.orf <- function(object, latex = FALSE, ...) {
 #' @author Gabriel Okasa
 #'
 #' @examples
-#' \dontrun{
-#'
 #' # Ordered Forest
 #' require(orf)
 #'
@@ -787,9 +775,6 @@ summary.orf <- function(object, latex = FALSE, ...) {
 #'
 #' # print output of the orf estimation
 #' print(orf_fit)
-#'
-#' }
-#'
 #'
 #' @export
 print.orf <- function(x, ...) {
@@ -868,8 +853,6 @@ print.orf <- function(x, ...) {
 #' @author Gabriel Okasa
 #'
 #' @examples
-#' \dontrun{
-#'
 #' # Ordered Forest
 #' require(orf)
 #'
@@ -893,12 +876,12 @@ print.orf <- function(x, ...) {
 #' # predict the probabilities with the estimated orf
 #' orf_pred <- predict(orf_fit, newdata = X_test)
 #'
+#' \donttest{
 #' # predict the probabilities with estimated orf together with variances
 #' orf_pred <- predict(orf_fit, newdata = X_test, inference = TRUE)
 #'
 #' # predict the classes with estimated orf
 #' orf_pred <- predict(orf_fit, newdata = X_test, type = "class")
-#'
 #' }
 #'
 #' @export
@@ -1248,8 +1231,6 @@ predict.orf <- function(object, newdata = NULL, type = NULL, inference = NULL, .
 #' @author Gabriel Okasa
 #'
 #' @examples
-#' \dontrun{
-#'
 #' # Ordered Forest
 #' require(orf)
 #'
@@ -1275,8 +1256,6 @@ predict.orf <- function(object, newdata = NULL, type = NULL, inference = NULL, .
 #'
 #' # print the prediction object
 #' print(orf_pred)
-#'
-#' }
 #'
 #' @export
 print.orf.prediction <- function(x, ...) {
@@ -1353,8 +1332,6 @@ print.orf.prediction <- function(x, ...) {
 #' @author Gabriel Okasa
 #'
 #' @examples
-#' \dontrun{
-#'
 #' # Ordered Forest
 #' require(orf)
 #'
@@ -1381,8 +1358,8 @@ print.orf.prediction <- function(x, ...) {
 #' # summary of the prediction object
 #' summary(orf_pred)
 #'
-#' }
-#'
+#' # show summary of the orf prediction coded in LaTeX
+#' summary(orf_pred, latex = TRUE)
 #'
 #' @export
 summary.orf.prediction <- function(object, latex = FALSE, ...) {

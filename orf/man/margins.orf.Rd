@@ -45,8 +45,6 @@ Furthermore, new data for which marginal effects should be computed can be suppl
 as well as long as it lies within the support of \code{X}.
 }
 \examples{
-\dontrun{
-
 ## Ordered Forest
 require(orf)
 
@@ -60,12 +58,15 @@ X <- as.matrix(odata[, -1])
 # estimate Ordered Forest
 orf_fit <- orf(X, Y)
 
+\donttest{
 # estimate marginal effects of the orf (default)
 orf_margins <- margins(orf_fit)
+}
 
 # estimate marginal effects evaluated at the mean
 orf_margins <- margins(orf_fit, eval = "atmean")
 
+\donttest{
 # estimate marginal effects with inference
 # (orf object has to be estimated with honesty and subsampling)
 orf_margins <- margins(orf_fit, inference = TRUE)
@@ -79,7 +80,6 @@ orf_margins <- margins(orf_fit, newdata = X[1:10, ])
 # estimate marginal effects with all custom settings
 orf_margins <- margins(orf_fit, eval = "atmedian", inference = TRUE,
                                 window = 0.5, newdata = X[1:10, ])
-
 }
 
 }

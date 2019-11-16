@@ -20,8 +20,6 @@ printed directly to the \code{R} console. The printed information contains
 the main inputs of the \code{orf} function.
 }
 \examples{
-\dontrun{
-
 # Ordered Forest
 require(orf)
 
@@ -37,9 +35,6 @@ orf_fit <- orf(X, Y)
 
 # print output of the orf estimation
 print(orf_fit)
-
-}
-
 
 }
 \author{

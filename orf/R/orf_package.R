@@ -16,7 +16,6 @@
 #' @author Gabriel Okasa, Michael Lechner
 #'
 #' @examples
-#' \dontrun{
 #' ## Ordered Forest
 #' require(orf)
 #'
@@ -42,9 +41,9 @@
 #' # predict with the estimated orf
 #' predict(orf_fit)
 #'
+#' \donttest{
 #' # estimate marginal effects of the orf
 #' margins(orf_fit)
-#'
 #' }
 #'
 #' @references

@@ -1,5 +1,5 @@
 ## Resubmission
-* this is the resubmission addressing the comment of Martina Schmirl
+* this is the second resubmission addressing the comment of Martina Schmirl
 * thank you for your time to review the package
 
 ## Changes in this Resubmission

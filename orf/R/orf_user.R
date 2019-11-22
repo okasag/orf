@@ -9,7 +9,7 @@
 #' as statistical inference thereof and thus provides similar output
 #' as in standard econometric models for ordered choice. The core
 #' forest algorithm relies on the fast C++ forest implementation
-#' from the ranger package (Wright & Ziegler, 2017).
+#' from the \code{ranger} package (Wright & Ziegler, 2017).
 #'
 #' The Ordered Forest function, \code{orf}, estimates the conditional ordered choice
 #' probabilities, i.e. P[Y=m|X=x]. Additionally, weight-based inference for

@@ -50,7 +50,7 @@ package provides functions for estimating marginal effects as well
 as statistical inference thereof and thus provides similar output
 as in standard econometric models for ordered choice. The core
 forest algorithm relies on the fast C++ forest implementation
-from the ranger package (Wright & Ziegler, 2017).
+from the \code{ranger} package (Wright & Ziegler, 2017).
 }
 \details{
 The Ordered Forest function, \code{orf}, estimates the conditional ordered choice

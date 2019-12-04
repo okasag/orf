@@ -9,6 +9,10 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+```{r options, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>", fig.width = 7, fig.height = 7, fig.align = "center")
+```
+
 ## orf: Introduction
 
 The `R` package `orf` is an implementation of the Ordered Forest estimator
@@ -19,6 +23,18 @@ package provides functions for estimating marginal effects as well as
 statistical inference thereof and thus provides similar output as in standard
 econometric models for ordered choice. The core forest algorithm relies on the
 fast `C++` forest implementation from the `ranger` package [@Wright2017].
+
+## orf: Installation
+
+In order to install the latest `CRAN` released version use:
+
+```{r install, eval = FALSE}
+install.packages("orf", dependencies = c("Imports", "Suggests"))
+```
+
+to make sure all the needed packages are installed as well. Note that if you install
+the package directly from the source a `C++` compiler is required. For Windows 
+users `Rtools` collection is required too.
 
 ## orf: Algorithm
 
@@ -117,7 +133,6 @@ Below you will find a few examples on how to use the `orf` function to estimate
 the Ordered Forest.
 
 ```{r orf intro, include = FALSE}
-knitr::opts_chunk$set(collapse = TRUE, comment = "#>", fig.width = 7, fig.height = 7, fig.align = "center")
 library(orf)
 set.seed(123)
 ```
@@ -148,7 +163,7 @@ Now, estimate the Ordered Forest using the `orf` function with the default
 settings and supplying only the required data inputs. Print the output
 of the estimation procedure with the S3 method `print.orf`.
 
-```{r orf default, }
+```{r orf default}
 # estimate Ordered Forest with default settings
 orf_model <- orf(X, Y)
 

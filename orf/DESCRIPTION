@@ -1,7 +1,7 @@
 Package: orf
 Type: Package
 Title: Ordered Random Forests
-Version: 0.1.2
+Version: 0.1.2.9000
 Date: 2019-11-22
 Author: Gabriel Okasa [aut, cre], Michael Lechner [ctb]
 Maintainer: Gabriel Okasa <gabriel.okasa@unisg.ch>

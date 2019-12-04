@@ -1,3 +1,7 @@
+[![CRAN checks](https://cranchecks.info/badges/summary/orf)](https://cran.r-project.org/web/checks/check_results_orf.html)
+[![](https://www.r-pkg.org/badges/version/orf?color=brightgreen)](https://cran.r-project.org/package=orf)
+[![](http://cranlogs.r-pkg.org/badges/grand-total/orf?color=blue)](https://cran.r-project.org/package=orf)
+
 # orf: ordered random forests
 
 ## Introduction
@@ -10,6 +14,18 @@ algorithms the `orf` package provides functions for estimating marginal effects
 as well as statistical inference thereof and thus provides similar output as in
 standard econometric models for ordered choice. The core forest algorithm relies
 on the fast `C++` forest implementation from the `ranger` package (Wright & Ziegler, 2017).
+
+## Installation
+
+In order to install the latest `CRAN` released version use:
+
+```r
+install.packages("orf", dependencies = c("Imports", "Suggests"))
+```
+
+to make sure all the needed packages are installed as well. Note that if you install
+the package directly from the source a `C++` compiler is required. For Windows 
+users `Rtools` collection is required too.
 
 ## Examples
 

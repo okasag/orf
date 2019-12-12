@@ -215,15 +215,16 @@ orf <- function(X, Y,
     # --------------------------------------------------------------------------------------- #
 
     # no honest splitting, i.e. use all data
-    train_data <- dat
+    train_data  <- dat
     honest_data <- NULL
 
     ## create variables needed for orf estimations
+    X_train     <- X
     # create indicator variables (outcomes)
-    Y_ind <- lapply(cat, function(x) ifelse((Y <= x), 1, 0))
+    Y_ind_train <- lapply(cat, function(x) ifelse((Y <= x), 1, 0))
 
     # create dataset for ranger estimation
-    data_ind <- lapply(Y_ind, function(x) as.data.frame(cbind(as.matrix(unlist(x)), X)))
+    data_ind    <- lapply(Y_ind_train, function(x) as.data.frame(cbind(as.matrix(unlist(x)), X_train)))
 
     # --------------------------------------------------------------------------------------- #
 

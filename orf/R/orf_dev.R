@@ -32,8 +32,8 @@ get_orf_variance <- function(honest_pred, honest_weights, train_pred, train_weig
   train_pred_mean <- lapply(train_pred, function(x) x/length(train_pred[[1]]))
 
   # calculate standard multiplication of weights and outcomes: honest_weights*y_ind_honest
-  honest_multi <- mapply(function(x,y) lapply(seq_along(y), function(i) x[i, ] * y), honest_weights, Y_ind_honest, SIMPLIFY = FALSE)
-  train_multi <- mapply(function(x,y) lapply(seq_along(y), function(i) x[i, ] * y), train_weights, Y_ind_honest, SIMPLIFY = FALSE)
+  honest_multi <- mapply(function(x,y) lapply(seq_along(x[, 1]), function(i) x[i, ] * y), honest_weights, Y_ind_honest, SIMPLIFY = FALSE)
+  train_multi <- mapply(function(x,y) lapply(seq_along(x[, 1]), function(i) x[i, ] * y), train_weights, Y_ind_honest, SIMPLIFY = FALSE)
 
   # subtract the mean from each obs i
   honest_multi_demeaned <- mapply(function(x,y) mapply(function(x,y) x-y, x, y, SIMPLIFY = FALSE), honest_multi, honest_pred_mean, SIMPLIFY = FALSE)
@@ -61,11 +61,11 @@ get_orf_variance <- function(honest_pred, honest_weights, train_pred, train_weig
   ## covariances computation
   # multiply forest_var_multi_demeaned according to formula for covariance (shifted categories needed for computational convenience)
   # honest sample
-  honest_multi_demeaned_0_last <- append(honest_multi_demeaned, list(rep(list(matrix(0, ncol = ncol(honest_multi_demeaned[[1]][[1]]), nrow = nrow(honest_multi_demeaned[[1]][[1]]))), nrow(honest_multi_demeaned[[1]][[1]]) )))
-  honest_multi_demeaned_0_first <- append(list(rep(list(matrix(0, ncol = ncol(honest_multi_demeaned[[1]][[1]]), nrow = nrow(honest_multi_demeaned[[1]][[1]]))), nrow(honest_multi_demeaned[[1]][[1]]) )), honest_multi_demeaned)
+  honest_multi_demeaned_0_last <- append(honest_multi_demeaned, list(rep(list(matrix(0, ncol = ncol(honest_multi_demeaned[[1]][[1]]), nrow = nrow(honest_multi_demeaned[[1]][[1]]))), length(honest_multi_demeaned[[1]]) )))
+  honest_multi_demeaned_0_first <- append(list(rep(list(matrix(0, ncol = ncol(honest_multi_demeaned[[1]][[1]]), nrow = nrow(honest_multi_demeaned[[1]][[1]]))), length(honest_multi_demeaned[[1]]) )), honest_multi_demeaned)
   # train sample
-  train_multi_demeaned_0_last <- append(train_multi_demeaned, list(rep(list(matrix(0, ncol = ncol(train_multi_demeaned[[1]][[1]]), nrow = nrow(train_multi_demeaned[[1]][[1]]))), nrow(train_multi_demeaned[[1]][[1]]) )))
-  train_multi_demeaned_0_first <- append(list(rep(list(matrix(0, ncol = ncol(train_multi_demeaned[[1]][[1]]), nrow = nrow(train_multi_demeaned[[1]][[1]]))), nrow(train_multi_demeaned[[1]][[1]]) )), train_multi_demeaned)
+  train_multi_demeaned_0_last <- append(train_multi_demeaned, list(rep(list(matrix(0, ncol = ncol(train_multi_demeaned[[1]][[1]]), nrow = nrow(train_multi_demeaned[[1]][[1]]))), length(train_multi_demeaned[[1]]) )))
+  train_multi_demeaned_0_first <- append(list(rep(list(matrix(0, ncol = ncol(train_multi_demeaned[[1]][[1]]), nrow = nrow(train_multi_demeaned[[1]][[1]]))), length(train_multi_demeaned[[1]]) )), train_multi_demeaned)
 
   # compute the multiplication of category m with m-1 according to the covariance formula
   honest_multi_demeaned_cov <- mapply(function(x,y) mapply(function(x,y) x*y, x, y, SIMPLIFY = FALSE), honest_multi_demeaned_0_first, honest_multi_demeaned_0_last, SIMPLIFY = FALSE)
@@ -92,11 +92,11 @@ get_orf_variance <- function(honest_pred, honest_weights, train_pred, train_weig
   ## put everything together according to the whole variance formula
   # shift variances accordingly for ease of next computations (covariance already has the desired format)
   # honest sample
-  honest_variance_last <- append(honest_variance, list(rep(list(0), nrow(honest_multi_demeaned[[1]][[1]]) ))) # append zero element list
-  honest_variance_first <- append(list(rep(list(0), nrow(honest_multi_demeaned[[1]][[1]]) )), honest_variance) # prepend zero element list
+  honest_variance_last <- append(honest_variance, list(rep(list(0), length(honest_multi_demeaned[[1]]) ))) # append zero element list
+  honest_variance_first <- append(list(rep(list(0), length(honest_multi_demeaned[[1]]) )), honest_variance) # prepend zero element list
   # train sample
-  train_variance_last <- append(train_variance, list(rep(list(0), nrow(train_multi_demeaned[[1]][[1]]) ))) # append zero element list
-  train_variance_first <- append(list(rep(list(0), nrow(train_multi_demeaned[[1]][[1]]) )), train_variance) # prepend zero element list
+  train_variance_last <- append(train_variance, list(rep(list(0), length(train_multi_demeaned[[1]]) ))) # append zero element list
+  train_variance_first <- append(list(rep(list(0), length(train_multi_demeaned[[1]]) )), train_variance) # prepend zero element list
 
   # put everything together according to formula: var_last + var_first - cov
   honest_variance_final <- mapply(function(x,y,z) mapply(function(x,y,z) x+y-z, x, y, z, SIMPLIFY = FALSE), honest_variance_last, honest_variance_first, honest_covariance, SIMPLIFY = FALSE)

@@ -73,6 +73,17 @@ test_that("variances without honesty and subsampling throw a warning", {
   expect_message(orf(X, Y, honesty = TRUE, replace = TRUE, inference = TRUE))
 })
 
+test_that("variances are possible with different honesty fractions", {
+  orf <- orf(X, Y, inference = FALSE)
+  expect_null(orf$variances)
+  orf <- orf(X, Y, inference = TRUE)
+  expect_vector(orf$variances)
+  orf <- orf(X, Y, inference = TRUE, honesty.fraction = 0.6)
+  expect_vector(orf$variances)
+  orf <- orf(X, Y, inference = TRUE, honesty.fraction = 0.4)
+  expect_vector(orf$variances)
+})
+
 # prediction error
 test_that("prediction errors are positive", {
   orf <- orf(X, Y)

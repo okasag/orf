@@ -37,6 +37,20 @@ test_that("marginal effects variances etc are positive", {
   expect_true(all(as.numeric(orf_margins$pvalues) >= 0) & all(as.numeric(orf_margins$pvalues) <= 1))
 })
 
+test_that("inference is possible with different honesty fractions", {
+  orf <- orf(X, Y)
+  orf_margins <- margins(orf, inference = FALSE)
+  expect_null(orf_margins$variances)
+  orf_margins <- margins(orf, inference = TRUE)
+  expect_vector(orf_margins$variances)
+  orf <- orf(X, Y, honesty.fraction = 0.6)
+  orf_margins <- margins(orf, inference = TRUE)
+  expect_vector(orf_margins$variances)
+  orf <- orf(X, Y, honesty.fraction = 0.4)
+  orf_margins <- margins(orf, inference = TRUE)
+  expect_vector(orf_margins$variances)
+})
+
 test_that("not admissible marginal effects evaluation point throw a warning", {
   orf <- orf(X, Y)
   expect_warning(margins(orf, eval = "something"))

@@ -4,8 +4,7 @@
 \alias{predict.orf}
 \title{Prediction of the Ordered Forest}
 \usage{
-\method{predict}{orf}(object, newdata = NULL, type = NULL,
-  inference = NULL, ...)
+\method{predict}{orf}(object, newdata = NULL, type = NULL, inference = NULL, ...)
 }
 \arguments{
 \item{object}{estimated Ordered Forest object of class \code{orf}}

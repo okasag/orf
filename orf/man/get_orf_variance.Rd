@@ -4,8 +4,13 @@
 \alias{get_orf_variance}
 \title{Get ORF Variance}
 \usage{
-get_orf_variance(honest_pred, honest_weights, train_pred, train_weights,
-  Y_ind_honest)
+get_orf_variance(
+  honest_pred,
+  honest_weights,
+  train_pred,
+  train_weights,
+  Y_ind_honest
+)
 }
 \arguments{
 \item{honest_pred}{list of vectors of honest forest predictions}

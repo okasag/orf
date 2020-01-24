@@ -4,9 +4,19 @@
 \alias{orf}
 \title{Ordered Forest Estimator}
 \usage{
-orf(X, Y, num.trees = 1000, mtry = NULL, min.node.size = NULL,
-  replace = FALSE, sample.fraction = NULL, honesty = TRUE,
-  honesty.fraction = NULL, inference = FALSE, importance = FALSE)
+orf(
+  X,
+  Y,
+  num.trees = 1000,
+  mtry = NULL,
+  min.node.size = NULL,
+  replace = FALSE,
+  sample.fraction = NULL,
+  honesty = TRUE,
+  honesty.fraction = NULL,
+  inference = FALSE,
+  importance = FALSE
+)
 }
 \arguments{
 \item{X}{numeric matrix of features}

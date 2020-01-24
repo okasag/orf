@@ -4,8 +4,7 @@
 \alias{margins}
 \title{Marginal Effects}
 \usage{
-margins(forest, eval = NULL, inference = NULL, window = NULL,
-  newdata = NULL)
+margins(forest, eval = NULL, inference = NULL, window = NULL, newdata = NULL)
 }
 \arguments{
 \item{forest}{estimated Ordered Forest object of class \code{orf}}

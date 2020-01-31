@@ -10,12 +10,11 @@
 * There were no further issues.
 * Additionally to the previous submission I have now updated the package version 
 in the DESCRIPTION file from '0.1.2' to '0.1.3' and updated the date as well.
+* I also added a short README.md file.
 * I documented the update in the NEWS.md file.
 
 ## Test environments
 * local ubuntu 18.04, R 3.6.2
-* local macOS 10.15, R 3.6.2
-* local windows 10, R 3.6.2
 * win-builder (devel, release and old release)
 
 ## R CMD check results

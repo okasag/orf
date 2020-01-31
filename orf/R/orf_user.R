@@ -186,14 +186,14 @@ orf <- function(X, Y,
   X_name <- colnames(X) # save the name of X
 
   ## set needed dataframe and local variables
-  dat <- as.data.frame(cbind(Y, X)) # dataframe
+  dat           <- as.data.frame(cbind(Y, X)) # dataframe
   colnames(dat) <- c(Y_name, X_name) # column names
-  n <- as.numeric(nrow(dat)) # number of observations
+  n             <- as.numeric(nrow(dat)) # number of observations
 
   # parameters (categories)
   categories <- as.numeric(sort(unique(Y))) # sequence of categories
-  ncat <- as.numeric(length(categories)) # number of categories
-  cat <- categories[1:(ncat-1)] # cat to esitmate / without the last category (not needed cuz P(Y_ind<=last_cat)=1)
+  ncat       <- as.numeric(length(categories)) # number of categories
+  cat        <- categories[1:(ncat-1)] # cat to esitmate / without the last category (not needed cuz P(Y_ind<=last_cat)=1)
 
   # variable importance definition
   if (importance == TRUE) {
@@ -279,21 +279,21 @@ orf <- function(X, Y,
 
     ## do honest forest estimation here using (preferably 50:50) data split as in Lechner (2019)
     # devide into 50:50 honesty sets
-    split_data <- honest_split(dat, honesty.fraction, orf = TRUE)
+    split_data          <- honest_split(dat, honesty.fraction, orf = TRUE)
     # take care of train data
-    train_data <- split_data$trainData # take out training data
-    rows_train_data <- as.numeric(rownames(train_data)) # take rownames of train data as numeric
-    Y_train <- as.matrix(train_data[, 1]) # take out Y train
-    colnames(Y_train) <- Y_name # add column name
-    X_train <- train_data[, -1] # take out X
-    colnames(X_train) <- X_name # add column names
+    train_data          <- split_data$trainData # take out training data
+    rows_train_data     <- as.numeric(rownames(train_data)) # take rownames of train data as numeric
+    Y_train             <- as.matrix(train_data[, 1]) # take out Y train
+    colnames(Y_train)   <- Y_name # add column name
+    X_train             <- train_data[, -1] # take out X
+    colnames(X_train)   <- X_name # add column names
     # take care of honest data
-    honest_data <- split_data$honestData # take out honest data
-    rows_honest_data <- as.numeric(rownames(honest_data)) # take rownames of train data as numeric
-    Y_honest <- as.matrix(honest_data[, 1]) # take out Y train
-    colnames(Y_honest) <- Y_name # add column name
-    X_honest <- honest_data[, -1] # take out X
-    colnames(X_honest) <- X_name # add column names
+    honest_data         <- split_data$honestData # take out honest data
+    rows_honest_data    <- as.numeric(rownames(honest_data)) # take rownames of train data as numeric
+    Y_honest            <- as.matrix(honest_data[, 1]) # take out Y train
+    colnames(Y_honest)  <- Y_name # add column name
+    X_honest            <- honest_data[, -1] # take out X
+    colnames(X_honest)  <- X_name # add column names
 
     # --------------------------------------------------------------------------------------- #
 
@@ -361,21 +361,21 @@ orf <- function(X, Y,
 
     ## do honest forest estimation here using (preferably 50:50) data split as in Lechner (2019)
     # devide into 50:50 honesty sets
-    split_data <- honest_split(dat, honesty.fraction, orf = TRUE)
+    split_data          <- honest_split(dat, honesty.fraction, orf = TRUE)
     # take care of train data
-    train_data <- split_data$trainData # take out training data
-    rows_train_data <- as.numeric(rownames(train_data)) # take rownames of train data as numeric
-    Y_train <- as.matrix(train_data[, 1]) # take out Y train
-    colnames(Y_train) <- Y_name # add column name
-    X_train <- train_data[, -1] # take out X
-    colnames(X_train) <- X_name # add column names
+    train_data          <- split_data$trainData # take out training data
+    rows_train_data     <- as.numeric(rownames(train_data)) # take rownames of train data as numeric
+    Y_train             <- as.matrix(train_data[, 1]) # take out Y train
+    colnames(Y_train)   <- Y_name # add column name
+    X_train             <- train_data[, -1] # take out X
+    colnames(X_train)   <- X_name # add column names
     # take care of honest data
-    honest_data <- split_data$honestData # take out honest data
-    rows_honest_data <- as.numeric(rownames(honest_data)) # take rownames of train data as numeric
-    Y_honest <- as.matrix(honest_data[, 1]) # take out Y train
-    colnames(Y_honest) <- Y_name # add column name
-    X_honest <- honest_data[, -1] # take out X
-    colnames(X_honest) <- X_name # add column names
+    honest_data         <- split_data$honestData # take out honest data
+    rows_honest_data    <- as.numeric(rownames(honest_data)) # take rownames of train data as numeric
+    Y_honest            <- as.matrix(honest_data[, 1]) # take out Y train
+    colnames(Y_honest)  <- Y_name # add column name
+    X_honest            <- honest_data[, -1] # take out X
+    colnames(X_honest)  <- X_name # add column names
 
     # --------------------------------------------------------------------------------------- #
 
@@ -967,24 +967,24 @@ predict.orf <- function(object, newdata = NULL, type = NULL, inference = NULL, .
     if (is.null(newdata) & (inference == TRUE) & (inputs$inference == FALSE)) {
 
       # note that the newdata is the estimation data and inference should reflect that
-      flag_newdata <- 1
+      flag_newdata  <- 1
       # take traindata as newdata and estimate the weights needed for inference
-      newdata <- as.data.frame(rbind(train_data, honest_data))
+      newdata       <- as.data.frame(rbind(train_data, honest_data))
       # sort according to rownames
-      newdata <- as.data.frame(newdata[order(as.numeric(row.names(newdata))), ])
+      newdata       <- as.data.frame(newdata[order(as.numeric(row.names(newdata))), ])
       # get further values
-      n_newdata <- nrow(newdata) # rows of new data
-      n_cat <- as.numeric(length(categories))
+      n_newdata     <- nrow(newdata) # rows of new data
+      n_cat         <- as.numeric(length(categories))
 
     } else if (!is.null(newdata)) {
 
       ## get X matrix newdata as dataframe and check colnames
       # X
       if (is.null(colnames(newdata))) { colnames(newdata) <- paste0("X", rep(1:ncol(newdata))) } # check if X has name
-      newdata_name <- colnames(newdata) # save the name of X
-      newdata <- as.data.frame(newdata) # as dataframe
-      n_newdata <- nrow(newdata) # rows of new data
-      n_cat <- as.numeric(length(categories))
+      newdata_name  <- colnames(newdata) # save the name of X
+      newdata       <- as.data.frame(newdata) # as dataframe
+      n_newdata     <- nrow(newdata) # rows of new data
+      n_cat         <- as.numeric(length(categories))
 
       # assign flag_newdata to zero
       flag_newdata <- 0

@@ -164,12 +164,12 @@ margins.orf <- function(forest, eval = NULL, inference = NULL, window = NULL, ne
     # if no newdata supplied, estimate in sample marginal effects
     if (forest_honesty == FALSE) {
 
-      data <- forest$info$trainData # take in-sample data
+      data   <- forest$info$trainData # take in-sample data
       X_eval <- as.matrix(data[, -1])
 
     } else if (forest_honesty == TRUE) {
 
-      data <- forest$info$honestData # take honest data
+      data   <- forest$info$honestData # take honest data
       X_eval <- as.matrix(data[, -1])
 
     }
@@ -210,30 +210,30 @@ margins.orf <- function(forest, eval = NULL, inference = NULL, window = NULL, ne
 
   ## data preparation and checks
   # check the window size
-  window <- check_window(window)
+  window      <- check_window(window)
   # get number of observations
-  n_data <- as.numeric(nrow(data))
+  n_data      <- as.numeric(nrow(data))
   # get categories
-  categories <- forest$info$categories
+  categories  <- forest$info$categories
   # get X as matrix
-  X <- as.matrix(data[, -1])
+  X           <- as.matrix(data[, -1])
   # get Y as matrix
-  Y <- as.matrix(data[, 1])
+  Y           <- as.matrix(data[, 1])
   # create indicator variables (outcomes)
-  Y_ind <- lapply(categories[1:length(categories)-1], function(x) ifelse((Y <= x), 1, 0))
+  Y_ind       <- lapply(categories[1:length(categories)-1], function(x) ifelse((Y <= x), 1, 0))
   # create datasets with indicator outcomes
-  data_ind <- lapply(Y_ind, function(x) as.data.frame(cbind(as.matrix(unlist(x)), X)))
+  data_ind    <- lapply(Y_ind, function(x) as.data.frame(cbind(as.matrix(unlist(x)), X)))
 
   # ----------------------------------------------------------------------------------- #
 
   ## marginal effects preparation
   # share of SD to be used
-  h_std <- window
+  h_std         <- window
   # check if X is continuous or dummy or categorical
-  X_type <- apply(X, 2, function(x) length(unique(x)))
+  X_type        <- apply(X, 2, function(x) length(unique(x)))
   # now determine the type of X
-  X_continuous <- which(X_type > 10) # define IDs of continuous Xs
-  X_dummy <- which(X_type == 2) # define IDs of dummies
+  X_continuous  <- which(X_type > 10) # define IDs of continuous Xs
+  X_dummy       <- which(X_type == 2) # define IDs of dummies
   X_categorical <- which(X_type > 2 & X_type <= 10)
   # additional check for constant variables which are nonsensical
   if (any(X_type == 1) | any(X_type == 0)) {
@@ -264,23 +264,23 @@ margins.orf <- function(forest, eval = NULL, inference = NULL, window = NULL, ne
   # get number of Xs
   X_cols <- ncol(X_mean[[1]])
   # get SD of Xs
-  X_sd <- matrix(rep(apply(X, 2, sd), times = 1, each = X_rows), nrow = X_rows)
+  X_sd   <- matrix(rep(apply(X, 2, sd), times = 1, each = X_rows), nrow = X_rows)
   # create X_up (X_mean + 0.1 * X_sd)
-  X_up <- X_mean[[1]] + h_std*X_sd
+  X_up   <- X_mean[[1]] + h_std*X_sd
   # create X_down (X_mean - 0.1 * X_sd)
   X_down <- X_mean[[1]] - h_std*X_sd
 
   ## now check for the support of X
   # check X_max
-  X_max <- matrix(rep(apply(X, 2, max), times = 1, each = X_rows), nrow = X_rows)
+  X_max   <- matrix(rep(apply(X, 2, max), times = 1, each = X_rows), nrow = X_rows)
   # check X_min
-  X_min <- matrix(rep(apply(X, 2, min), times = 1, each = X_rows), nrow = X_rows)
+  X_min   <- matrix(rep(apply(X, 2, min), times = 1, each = X_rows), nrow = X_rows)
   # check if X_up is within the range X_min and X_max
-  X_up <- (X_up < X_max) * X_up + (X_up >= X_max) * X_max
-  X_up <- (X_up > X_min) * X_up + (X_up <= X_min) * (X_min + h_std * X_sd)
+  X_up    <- (X_up < X_max) * X_up + (X_up >= X_max) * X_max
+  X_up    <- (X_up > X_min) * X_up + (X_up <= X_min) * (X_min + h_std * X_sd)
   # check if X_down is within the range X_min and X_max
-  X_down <- (X_down > X_min) * X_down + (X_down <= X_min) * X_min
-  X_down <- (X_down < X_max) * X_down + (X_down >= X_max) * (X_max - h_std * X_sd)
+  X_down  <- (X_down > X_min) * X_down + (X_down <= X_min) * X_min
+  X_down  <- (X_down < X_max) * X_down + (X_down >= X_max) * (X_max - h_std * X_sd)
   # check if X_up and X_down are same
   if (any(X_up == X_down)) {
     # adjust to higher share of SD
@@ -296,18 +296,18 @@ margins.orf <- function(forest, eval = NULL, inference = NULL, window = NULL, ne
 
   ## now we need 2 datasets: one with X_up and second with X_down
   # X_mean_up all (continous)
-  X_mean_up <- X_mean
+  X_mean_up   <- X_mean
   X_mean_down <- X_mean
 
   # replace values accordingly
   for (i in 1:X_cols) {
-    X_mean_up[[i]][, i] <- X_up[, i]
+    X_mean_up[[i]][, i]   <- X_up[, i]
     X_mean_down[[i]][, i] <- X_down[, i]
   }
 
   # adjust for categorical X (works also for zero categorical) (adjustment such that the difference is always 1)
   for (i in X_categorical) {
-    X_mean_up[[i]][, i] <- ceiling(X_mean_up[[i]][, i])
+    X_mean_up[[i]][, i]   <- ceiling(X_mean_up[[i]][, i])
     X_mean_down[[i]][, i] <- ifelse(ceiling(X_mean_down[[i]][, i]) == ceiling(X_mean_up[[i]][, i]),
                                     floor(X_mean_down[[i]][, i]),
                                     ceiling(X_mean_down[[i]][, i])
@@ -316,7 +316,7 @@ margins.orf <- function(forest, eval = NULL, inference = NULL, window = NULL, ne
 
   # adjust for dummies (works also for zero dummies)
   for (i in X_dummy) {
-    X_mean_up[[i]][, i] <- max(X[, i])
+    X_mean_up[[i]][, i]   <- max(X[, i])
     X_mean_down[[i]][, i] <- min(X[, i])
   }
 
@@ -803,11 +803,11 @@ margins_output <- function(x) {
 margins_output_latex <- function(x) {
 
   # get number of categories
-  ncat <- ncol(x$effects)
+  ncat      <- ncol(x$effects)
   # get number of variables
-  nvar <- nrow(x$effects)
+  nvar      <- nrow(x$effects)
   # get variable names
-  varnames <- rownames(x$effects)
+  varnames  <- rownames(x$effects)
 
   # create empty output matrix
   output_matrix <- matrix("", nrow = (nvar*ncat), ncol = 7)

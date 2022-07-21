@@ -321,9 +321,10 @@ summary(orf_margins)
 The Ordered Forest estimator is currently used by the Swiss Institute for
 Empirical Economic Research (SEW-HSG) of the University of St.Gallen, Switzerland
 in the Soccer Analytics project for the probability predictions of win, draw and 
-loss in soccer matches in the German Bundesliga. More details about the soccer
-predictions can be found in @Okasa2018 and the most recent predictions are listed
-online at [SEW Soccer Analytics](https://sew.unisg.ch/de/empirische-wirtschaftsforschung/sports-economics-research-group/soccer-analytics) and on [Twitter](https://twitter.com/SEW_Soccer).
+loss in soccer matches in the German Bundesliga and the Swiss Super League.
+More details about the soccer predictions can be found in @Okasa2018 and the most
+recent predictions are listed online at [SEW Soccer Analytics (GER)](https://sew.unisg.ch/en/lehrstuehle/empirische-wirtschaftsforschung/sports-economics-research-group/soccer-analytics),
+[SEW Soccer Analytics (SUI)](https://sew.unisg.ch/en/lehrstuehle/empirische-wirtschaftsforschung/sports-economics-research-group/soccer-analytics---ch) and on [Twitter](https://twitter.com/SEW_Soccer).
 
 ## orf: References
  

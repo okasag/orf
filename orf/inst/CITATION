@@ -5,11 +5,11 @@ citEntry(
   title       = "{orf}: Ordered Random Forests",
   author      = personList(as.person("Gabriel Okasa"),
                    as.person("Michael Lechner")) ,
-  year        = "2020",
-  note        = "R package version 0.1.3",
-  textVersion = paste("Gabriel Okasa and Michael Lechner (2020).",
+  year        = "2022",
+  note        = "R package version 0.1.4",
+  textVersion = paste("Gabriel Okasa and Michael Lechner (2022).",
         "orf: Ordered Random Forests",
-        "R package version 0.1.3")
+        "R package version 0.1.4")
 )
 
 citEntry(

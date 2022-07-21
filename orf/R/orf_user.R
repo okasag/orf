@@ -72,8 +72,8 @@
 #' @references
 #' \itemize{
 #'   \item Lechner, M., & Okasa, G. (2019). Random Forest Estimation of the Ordered Choice Model. arXiv preprint arXiv:1907.02436. \url{https://arxiv.org/abs/1907.02436}
-#'   \item Goller, D., Knaus, M. C., Lechner, M., & Okasa, G. (2018). Predicting Match Outcomes in Football by an Ordered Forest Estimator (No. 1811). University of St. Gallen, School of Economics and Political Science. \url{http://ux-tauri.unisg.ch/RePEc/usg/econwp/EWP-1811.pdf}
-#'   \item Wright, M. N. & Ziegler, A. (2017). ranger: A fast implementation of random forests for high dimensional data in C++ and R. J Stat Softw 77:1-17. \url{https://doi.org/10.18637/jss.v077.i01}.
+#'   \item Goller, D., Knaus, M. C., Lechner, M., & Okasa, G. (2021). Predicting Match Outcomes in Football by an Ordered Forest Estimator. A Modern Guide to Sports Economics. Edward Elgar Publishing, 335-355. \doi{10.4337/9781789906530.00026}
+#'   \item Wright, M. N. & Ziegler, A. (2017). ranger: A fast implementation of random forests for high dimensional data in C++ and R. J Stat Softw 77:1-17. \doi{10.18637/jss.v077.i01}.
 #' }
 #'
 #' @examples
@@ -889,7 +889,7 @@ predict.orf <- function(object, newdata = NULL, type = NULL, inference = NULL, .
   # -------------------------------------------------------------------------------- #
 
   ## standard checks for input data
-  if (class(object) != "orf") {
+  if (!inherits(object, "orf")) {
     stop("Forest object is not of class orf. Programme terminated.")
   }
 

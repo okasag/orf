@@ -1,6 +1,8 @@
-# orf 0.1.3.9000
+# orf 0.1.4
 
-* latest development version
+* change in maintainer email address
+* bug fix for class inheritance and readme
+* updated urls and references
 
 # orf 0.1.3
 

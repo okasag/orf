@@ -61,7 +61,7 @@ plot(orf_fit)
 predict(orf_fit, newdata = NULL, type = "probs", inference = FALSE)
 
 # estimate marginal effects of the Ordered Forest
-margins(orf, newdata = NULL, eval = "mean", window = 0.1, inference = FALSE)
+margins(orf_fit, newdata = NULL, eval = "mean", window = 0.1, inference = FALSE)
 ```
 
 For a more detailed examples see the package vignette.

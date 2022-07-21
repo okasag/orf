@@ -4,7 +4,9 @@
 \name{odata}
 \alias{odata}
 \title{Simulated Example Dataset}
-\format{A data frame with 1000 rows and 5 variables}
+\format{
+A data frame with 1000 rows and 5 variables
+}
 \usage{
 odata
 }
